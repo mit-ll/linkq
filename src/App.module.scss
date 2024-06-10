@@ -1,0 +1,28 @@
+/* Copyright (c) 2024 Massachusetts Institute of Technology */
+/* SPDX-License-Identifier: MIT */
+#app {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+}
+
+#sidebar {
+  width:500px;
+  position: relative;
+}
+
+#content {
+  width: calc(100% - 500px);
+  height: 100vh;
+  overflow-y: auto;
+  background-color: #333;
+
+  #results-content {
+    color: white;
+    padding: 1em;
+
+    #empty-results-message {
+      text-align: center;
+    }
+  }
+}

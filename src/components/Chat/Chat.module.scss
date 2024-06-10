@@ -1,0 +1,77 @@
+/* Copyright (c) 2024 Massachusetts Institute of Technology */
+/* SPDX-License-Identifier: MIT */
+
+#chat-container {
+  background-color: #222;
+  height: 100vh;
+  position: relative;
+
+  #chat-settings-button {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+  }
+
+  #chat-scroll-container { 
+    height: calc(100% - 35px - 2rem);
+    overflow-y: auto;
+    margin-bottom: 3px;
+    padding: 0.5rem;
+    
+    pre {
+      white-space: pre-wrap;
+      margin: 0;
+      color: #fff;
+    }
+  
+    .chat-entry {
+      display: flex;
+      justify-content: flex-start;
+  
+      .chat {
+        background-color: #444;
+        padding: 0.5rem;
+        max-width: calc(100% - 40px);
+        margin-bottom: 0.5rem;
+        border-radius: 5px;
+
+        button {
+          margin-top: 0.5rem;
+        }
+      }
+  
+      &.user {
+        justify-content: flex-end;
+        
+        .chat {
+          background-color: #154360;
+        }
+      }
+
+      &.system {
+        justify-content: flex-end;
+        
+        .chat {
+          // background-color: #154360;
+        }
+      }
+
+      .copy-query-buttons {
+        text-align: right;
+      }
+    }
+  }
+    
+  .loading {
+    margin: 0;
+    color: #fff;
+  }
+
+  
+  form {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
+}
