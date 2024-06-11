@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { ChatHistoryType } from '../utils/ChatGPTAPI'
+import { DEMO_FULL_HISTORY, DEMO_SIMPLE_HISTORY, IS_DEMO_MODE } from '../utils/demoData'
 
 
 const initialState: {
@@ -10,12 +11,12 @@ const initialState: {
   simpleChatHistory: ChatHistoryType,
 } = {
   //state for the full chat history, including system messages and the LLM interfacing with the KG API
-  fullChatHistory: [],
+  fullChatHistory: IS_DEMO_MODE ? DEMO_FULL_HISTORY : [],
   //this option toggles showing the full chat history for an ML expert user
   //vs hiding the system messages for a non-expert user
   showFullChatHistory: true,
   //state for the filtered chat history (ie no behind-the-scenes system messages)
-  simpleChatHistory: [],
+  simpleChatHistory: IS_DEMO_MODE ? DEMO_SIMPLE_HISTORY : [],
 }
 
 const chatHistorySlice = createSlice({

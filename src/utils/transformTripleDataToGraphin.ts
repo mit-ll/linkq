@@ -1,47 +1,68 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import {SemanticTriple, SemanticTripleQueryData} from "../types/semanticTypes.ts";
+import {SemanticTriple} from "../types/semanticTypes.ts";
 import {GraphinData, Utils} from "@antv/graphin";
 import {EntityDictionary} from "../types/wikidata.ts";
-import {createEdge, createNode} from "./graphin.ts";
+import {createEdge, createNode, parseNameFromWikidataUrl} from "./graphin.ts";
 
 export enum SPARQLItemType {
     Term = "Term",
     Variable = "Variable"
 }
 
-const isSPARQLVariable = (str: string): boolean => {
-    return str.startsWith("?");
-}
+type TermType = (SemanticTriple['subject'] | SemanticTriple["predicate"] | SemanticTriple['object'])["termType"]
 
-const getSPARQLItemType = (str: string): SPARQLItemType => {
-    return isSPARQLVariable(str) ? SPARQLItemType.Variable : SPARQLItemType.Term;
-}
+const isSPARQLVariable = (termType: TermType): boolean => termType === "Variable"
 
-const extractUniqueEntitiesFromTriples = (triples: SemanticTriple[]): string[] => {
+const getSPARQLItemType = (termType: TermType): SPARQLItemType => (
+    isSPARQLVariable(termType) ? SPARQLItemType.Variable : SPARQLItemType.Term
+)
+
+/**
+ * This function uses JSON.stringify and a string Set to return a unique array of SemanticTriple subjects and objects
+ * @param triples   all the SemanticTriples, including duplicates
+ * @returns         unique array of SemanticTriple subjects and objects
+ */
+const extractUniqueEntitiesFromTriples = (triples: SemanticTriple[]): (SemanticTriple['subject'] | SemanticTriple['object'])[] => {
     const entities = new Set<string>();
     triples.forEach(d => {
-        entities.add(d.subject);
-        entities.add(d.object);
+        //stringify the subject and object and add them to the set
+        entities.add(JSON.stringify(d.subject));
+        entities.add(JSON.stringify(d.object));
     })
-    return [...entities];
+
+    //convert the set back into SemanticTriple subjects and objects
+    return Array.from(entities).map(s => JSON.parse(s) as SemanticTriple['subject'] | SemanticTriple['object']);
 }
 
-const getTermLabel = (id: string, data?: EntityDictionary) => {
-    return data && data[id]?.labels?.en?.value;
-}
+/**
+ * This function tries to get the label of the ID from the entit dictionary.
+ * @param id                The entity or proeprty id, ex "P123"
+ * @param entityDictionary  The entity dictionary from Wikidata
+ * @returns                 The label for the id, if it exists in the dictionary
+ */
+const getTermLabel = (id: string, entityDictionary?: EntityDictionary) => entityDictionary?.[id]?.labels?.en?.value
 
-export const transformTripleQueryToGraphin = ({triples}: SemanticTripleQueryData, data?: EntityDictionary): GraphinData => {
-    const entities = extractUniqueEntitiesFromTriples(triples);
+export const transformTripleQueryToGraphin = (triples: SemanticTriple[], entityDictionary?: EntityDictionary): GraphinData => {
+    //create the nodes for the graph
+    const uniqueEntities = extractUniqueEntitiesFromTriples(triples);
+    const nodes = uniqueEntities.map(entity => (
+        createNode(
+            entity.value,
+            getSPARQLItemType(entity.termType),
+            getTermLabel(entity.value.split("/").at(-1)||"", entityDictionary)
+        )
+    ));
 
-    const nodes = entities.map(d => {
-        return (createNode(d, getSPARQLItemType(d), getTermLabel(d, data)));
-    });
+    //create the edges for the graph
+    const edges = Utils.processEdges(triples.map(triple => (
+        createEdge(
+            triple, 
+            getSPARQLItemType(triple.predicate.termType), 
+            getTermLabel(parseNameFromWikidataUrl(triple.predicate.value), entityDictionary)
+        )
+    )), { poly: 50 });
 
-    const edges = Utils.processEdges(triples.map(d => {
-        return (createEdge(d, getSPARQLItemType(d.predicate), getTermLabel(d.predicate, data)));
-    }), { poly: 50 });
-
-    return {nodes: nodes, edges: edges}
+    return {nodes, edges}
 }

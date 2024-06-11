@@ -11,6 +11,7 @@ import {QueryVisualization} from "./components/QueryVisualization/QueryVisualiza
 import { useAppSelector } from './redux/store';
 import { ChatGPTAPIProvider } from './hooks/useChatGPT';
 import styles from './App.module.scss'
+import { DemoModeModal } from './components/DemoModeModal';
 
 
 function App() {
@@ -34,6 +35,8 @@ function App() {
             </div>
           </div>
         </div>
+
+        <DemoModeModal/>
       </RunQueryProvider>
     </ChatGPTAPIProvider>
   )

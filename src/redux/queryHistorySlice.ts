@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { WikidataQueryResponseType } from '../types/wikidata'
+import { DEMO_QUERY_HISTORY, IS_DEMO_MODE } from '../utils/demoData'
 
 
 type QueryRecordType = {
@@ -18,7 +19,7 @@ const initialState: {
   queryHistory: QueryRecordType[],
 } = {
   //state for the query history (including query name, results, and summary)
-  queryHistory: [],
+  queryHistory: IS_DEMO_MODE ? DEMO_QUERY_HISTORY : [],
 }
 
 type PushQueryHistoryPayloadType = {
