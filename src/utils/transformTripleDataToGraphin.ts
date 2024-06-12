@@ -37,10 +37,10 @@ const extractUniqueEntitiesFromTriples = (triples: SemanticTriple[]): (SemanticT
 }
 
 /**
- * This function tries to get the label of the ID from the entit dictionary.
- * @param id                The entity or proeprty id, ex "P123"
+ * This function tries to get the label of the ID from the entity dictionary.
+ * @param id                The entity or proeprty id, ex "P166"
  * @param entityDictionary  The entity dictionary from Wikidata
- * @returns                 The label for the id, if it exists in the dictionary
+ * @returns                 The label for the id if it exists in the dictionary, ex "award received"
  */
 const getTermLabel = (id: string, entityDictionary?: EntityDictionary) => entityDictionary?.[id]?.labels?.en?.value
 
