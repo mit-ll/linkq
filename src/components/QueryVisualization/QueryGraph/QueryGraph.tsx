@@ -17,11 +17,12 @@ export const QueryGraph = () => {
     const {data: entityData} = getEntityDataFromQuery(queryValue);
 
     const queryGraphData = useMemo(() => {
-        const semanticTripleData = parseSparqlQuery(queryValue);
+        const semanticTriples = parseSparqlQuery(queryValue);
 
-        return transformTripleQueryToGraphin(semanticTripleData, entityData?.entities);
+        return transformTripleQueryToGraphin(semanticTriples, entityData?.entities);
     }, [queryValue, entityData]);
 
+    if(queryGraphData.nodes.length===0) return null
 
     return (
         <div>

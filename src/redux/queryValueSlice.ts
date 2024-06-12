@@ -1,6 +1,7 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
+import { DEMO_QUERY, IS_DEMO_MODE } from '../utils/demoData'
 
 
 // const GET_GOOGLE_FOUNDERS_AND_BIRTHDAYS = `SELECT ?founder ?founderLabel ?birthdate
@@ -15,7 +16,7 @@ const initialState: {
 } = {
   //state for the query in the editor
   // queryValue: GET_GOOGLE_FOUNDERS_AND_BIRTHDAYS, // use this for google founder start for the UI
-  queryValue: "", // use this for a blank editor
+  queryValue: IS_DEMO_MODE ? DEMO_QUERY : "", // use this for a blank editor
 }
 
 const queryValueSlice = createSlice({

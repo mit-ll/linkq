@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { WikidataQueryResponseType } from '../types/wikidata'
+import { DEMO_RESULTS, IS_DEMO_MODE } from '../utils/demoData'
 
 type ResultsType = {error: string | null, data: WikidataQueryResponseType | null, summary: string | null} | null
 
@@ -9,7 +10,7 @@ const initialState: {
   results: ResultsType,
 } = {
   //state for the current query results to display on screen
-  results: null,
+  results: IS_DEMO_MODE ? DEMO_RESULTS : null,
 }
 
 const resultsSlice = createSlice({

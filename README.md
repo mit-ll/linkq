@@ -1,6 +1,12 @@
 # LinkQ: An LLM-Assisted Visual Interface for Knowledge Graph Question-Answering
 
-Paper available at TODO link to arxiv paper
+Arxiv Paper: https://arxiv.org/abs/2406.06621
+
+Demo Site: https://mit-ll.github.io/linkq
+
+[![Screenshot](/public/screenshot.png)](https://mit-ll.github.io/linkq)
+
+
 
 Created with React + TypeScript + Vite
 

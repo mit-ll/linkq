@@ -1,8 +1,8 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import SparqlJs from "sparqljs";
-import {SemanticTripleQueryData} from "../types/semanticTypes.ts";
+import SparqlJs, { BgpPattern, SelectQuery } from "sparqljs";
+import {SemanticTriple} from "../types/semanticTypes.ts";
 
 const PREFIXES = `PREFIX bd: <bd:>
 PREFIX cc: <http://creativecommons.org/ns#>
@@ -36,35 +36,25 @@ PREFIX wdv: <http://www.wikidata.org/value/>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>`
 
-const isBGP = (argument: SparqlJs.Algebra.PlanNode | SparqlJs.Algebra.BGPNode): argument is SparqlJs.Algebra.BGPNode => {
-    return argument.type === 'bgp';
+const isBGP = (pattern: SparqlJs.Pattern): pattern is BgpPattern => {
+    return pattern.type === 'bgp';
 }
 
-const isNonPathTriple = (argument: SparqlJs.Algebra.TripleObject | SparqlJs.Algebra.PathTripleObject): argument is SparqlJs.Algebra.TripleObject => {
-    return typeof argument.predicate === 'string'
+const isNonPathTriple = (triple: SparqlJs.Triple): triple is SemanticTriple => {
+    return "termType" in triple.predicate
 }
 
-const isString = (argument: string | SparqlJs.Algebra.Aggregation): argument is string => {
-    return typeof argument === 'string'
-}
+// const isVariable = (argument: SelectQuery["variables"][number]): argument is VariableTerm => {
+//     return "termType" in argument && argument.termType==="Variable"
+// }
 
-const extractIdFromURI = (str: string): string => {
-    // ID is last part of URI separated by /
-    const arr = str.split('/');
-    if (arr)
-    {
-        return arr[arr.length - 1];
-    }
-    return str
-}
+export const parseSparqlQuery = (query: string): SemanticTriple[] => {
+    const parser = new SparqlJs.Parser(); //{skipValidation: true}
 
-export const parseSparqlQuery = (query: string): SemanticTripleQueryData => {
-    const parser = new SparqlJs.Parser({skipValidation: true});
-
-    const parsedQuery = parser.parse(PREFIXES + query);
+    const parsedQuery = parser.parse(PREFIXES + query) as SelectQuery //TODO what about Update and ConstructQuery types?
 
     // We only support bgp nodes. https://www.w3.org/TR/sparql11-query/#sparqlQuery
-    const bgpNodes = parsedQuery.where.filter(isBGP);
+    const bgpNodes = parsedQuery.where?.filter(isBGP) || [];
 
     // Not sure if multiple BGPNodes are possible, but this is safe
     const triples = bgpNodes.map(d => d.triples).flat();
@@ -72,17 +62,8 @@ export const parseSparqlQuery = (query: string): SemanticTripleQueryData => {
     // We do not follow property paths. https://www.w3.org/TR/sparql11-query/#propertypaths
     const nonPathTriples = triples.filter(isNonPathTriple);
 
-
-    const formattedNonPathTriples = nonPathTriples.map(d => {
-        return {
-            object: extractIdFromURI(d.object),
-            predicate: extractIdFromURI(d.predicate),
-            subject: extractIdFromURI(d.subject)
-        };
-    });
-
     // Don't know what aggregations are, so they are filtered out...
-    const variableStrings = parsedQuery.variables?.filter<string>(isString) || [];
+    // const variableStrings = parsedQuery.variables?.filter(isVariable) || [];
 
-    return {'triples': formattedNonPathTriples, 'variables': variableStrings};
+    return nonPathTriples
 }

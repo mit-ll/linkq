@@ -16,7 +16,7 @@ const getColor = (itemType: SPARQLItemType) => {
 }
 
 const createGraphinLabel = (id: string, termLabel?: string): string => {
-    return termLabel ? `${id}\n${termLabel}` : id;
+    return termLabel ? `${id}\n${termLabel}` : id.split("/").at(-1)||"";
 }
 
 export const createNode = (id: string, itemType: SPARQLItemType, termLabel?: string): IUserNode => {
@@ -30,7 +30,7 @@ export const createNode = (id: string, itemType: SPARQLItemType, termLabel?: str
                 type: itemType,
             },
             style: {
-                label: {value: createGraphinLabel(id, termLabel)},
+                label: {value: createGraphinLabel(parseNameFromWikidataUrl(id), termLabel)},
                 keyshape: {
                     fill: color,
                     stroke: color,
@@ -49,10 +49,10 @@ export const createEdge = (triple: SemanticTriple, itemType: SPARQLItemType, ter
             // If you add an ID the graph will automatically filter out duplicates.
             // I think it's actually beneficial to show duplications to catch weird queries.
             // id: `${triple.subject}-${triple.predicate}-${triple.object}`,
-            source: triple.subject,
-            target: triple.object,
+            source: triple.subject.value,
+            target: triple.object.value,
             style: {
-                label: {value: createGraphinLabel(triple.predicate, termLabel), fill: 'black'},
+                label: {value: createGraphinLabel(parseNameFromWikidataUrl(triple.predicate.value), termLabel), fill: 'black'},
                 keyshape: {
                     stroke: getColor(itemType),
                     lineWidth: 2
@@ -61,3 +61,5 @@ export const createEdge = (triple: SemanticTriple, itemType: SPARQLItemType, ter
         }
     )
 }
+
+export const parseNameFromWikidataUrl = (url:string) => url.split("/").at(-1)||""

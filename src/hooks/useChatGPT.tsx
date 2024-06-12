@@ -4,6 +4,7 @@ import { createContext, useContext, useMemo } from "react"
 import { useAppDispatch } from "../redux/store"
 import { ChatGPTAPI, ChatHistoryType } from "../utils/ChatGPTAPI"
 import { setFullChatHistory } from "../redux/chatHistorySlice"
+import { IS_DEMO_MODE } from "../utils/demoData"
 
 const INITIAL_SYSTEM_MESSAGE = `You are a helpful chat assistant. This system will give you access to data in the WikiData Knowledge Graph, that contains encyclopedic data similar to Wikipedia, but in knowledge graph format using the RDF framework. 
 
@@ -28,12 +29,12 @@ export function ChatGPTAPIProvider({children}:{children: React.ReactNode}) {
     return new ChatGPTAPI({
       apiKey,
       dangerouslyAllowBrowser: true, //this is necessary for using a browser
-      updateMessagesCallback: (messages:ChatHistoryType) => dispatch(setFullChatHistory(messages)),
+      updateMessagesCallback: IS_DEMO_MODE ? undefined : (messages:ChatHistoryType) => dispatch(setFullChatHistory(messages)),
       systemMessage: INITIAL_SYSTEM_MESSAGE,
     })
   }, [])
 
-  if(!apiKey) {
+  if(!apiKey && !IS_DEMO_MODE) {
     return (
       <div style={{color: "white", backgroundColor: "#333", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center"}}>
         <p>You need to configure the <code>VITE_OPENAI_API_KEY</code> environment variable in your <code>.env.local</code> file.</p>
