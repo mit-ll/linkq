@@ -1,18 +1,8 @@
 # LinkQ: An LLM-Assisted Visual Interface for Knowledge Graph Question-Answering
 
-<svg
-  viewBox="0 0 425 60"
-  xmlns="http://www.w3.org/2000/svg"
-  fill="none" style="width:250px;">
-  <a xlink:href="https://arxiv.org/abs/2406.06621" target="_blank">
-    <rect x="0" y="0" height="60" width="200" fill="#b31b1b"/>
-    <text x="100" y="30" fill="white" text-anchor="middle" font-size="30" dy="10">Arxiv Paper</text>
-  </a>
-  <a xlink:href="https://mit-ll.github.io/linkq" target="_blank">
-    <rect x="225" y="0" height="60" width="200" fill="#228be6"/>
-    <text x="325" y="30" fill="white" text-anchor="middle" font-size="30" dy="10">Demo Site</text>
-  </a>
-</svg>
+Arxiv Paper: https://arxiv.org/abs/2406.06621
+
+Demo Site: https://mit-ll.github.io/linkq
 
 [![Screenshot](/public/screenshot.png)](https://mit-ll.github.io/linkq)
 
