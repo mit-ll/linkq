@@ -5,23 +5,36 @@ import CodeMirror from '@uiw/react-codemirror';
 import { StreamLanguage } from '@codemirror/language';
 import { sparql } from '@codemirror/legacy-modes/mode/sparql';
 import { ActionIcon, Button, Checkbox, Modal, TextInput } from "@mantine/core";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./Chat.module.scss"
 import { useMutation } from "@tanstack/react-query";
 import { IconCaretRight, IconSettings, IconZoomCode } from '@tabler/icons-react';
 import { ErrorMessage } from '../ErrorMessage';
 import { useRunQuery } from '../../hooks/useRunQuery';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
-import { pushSimpleChatHistory, toggleShowFullChatHistory } from '../../redux/chatHistorySlice';
+
 import { setQueryValue } from '../../redux/queryValueSlice';
 import { queryBuildingWorkflow } from '../../utils/queryBuildingWorkflow';
-import { useChatGPT } from '../../hooks/useChatGPT';
+import { useMakeChatGPTAPIInstance } from '../../hooks/useMakeChatGPTAPIInstance';
+import { addMessageToSimpleChatHistory, toggleShowFullChatHistory } from '../../redux/chatHistorySlice';
+
+export const INITIAL_SYSTEM_MESSAGE = `You are a helpful chat assistant. This system will give you access to data in the WikiData Knowledge Graph, that contains encyclopedic data similar to Wikipedia, but in knowledge graph format using the RDF framework. 
+
+If users ask questions that can be answered via WikiData, your job is not to directly answer their questions, but instead to help them write a SPARQL query to find that data. You can ask the user to clarify their questions if the questions are vague, open-ended, or subjective in nature. 
+
+If you ever need to suggest data to the user, you should only provide recommendations that are directly accessible from Wikidata. Do not ask the user if they would like to proceed with generating the corresponding query unless absolutely necessary.
+
+When you are ready to start building a query, respond with 'BUILD QUERY'. The system will walk you through a guided workflow to get the necessary entity and property IDs from WikiData.
+
+Current date: ${new Date().toDateString()}.`
 
 export function Chat() {
   const dispatch = useAppDispatch()
+
   const fullChatHistory = useAppSelector(state => state.chatHistory.fullChatHistory)
-  const showFullChatHistory = useAppSelector(state => state.chatHistory.showFullChatHistory)
   const simpleChatHistory = useAppSelector(state => state.chatHistory.simpleChatHistory)
+
+  const showFullChatHistory = useAppSelector(state => state.chatHistory.showFullChatHistory)
 
   //based on showFullChatHistory, decide which chat history to display to the user
   const chatHistory = showFullChatHistory ? fullChatHistory : simpleChatHistory
@@ -39,7 +52,13 @@ export function Chat() {
   // const [inputText, setInputText] = useState<string>("Who won the 2023 Formula One Championship?"); // prefill the chat
   const [inputText, setInputText] = useState<string>("");
 
-  const chatGPT = useChatGPT()
+  const makeChatGPTAPIInstance = useMakeChatGPTAPIInstance()
+  const chatGPT = useMemo(() => {
+    return makeChatGPTAPIInstance({
+      chatId: 0,
+      systemMessage: INITIAL_SYSTEM_MESSAGE,
+    })
+  },[])
 
   const {error, isPending, mutate:submitChat, reset} = useMutation({
     mutationKey: ['submit-chat'],
@@ -49,21 +68,28 @@ export function Chat() {
      * @param text  the user's message
      */
     mutationFn: async (text:string) => {
-      //add the user's chat into the simple history
-      dispatch(pushSimpleChatHistory({role: "user", content: text}))
-  
+      const userMessage = { content: text, role: "user" } as const
+      
+      //add the user's message to the simple chat history
+      dispatch(addMessageToSimpleChatHistory({
+        ...userMessage,
+        chatId: chatGPT.chatId,
+        name: "user",
+      }))
+
       //get the LLM to response
-      const llmResponse = await chatGPT.sendMessages([ {content: text,role: "user"} ])
+      let llmResponse = await chatGPT.sendMessages([ userMessage ])
   
       //determine what to do with the LLM's response
-      const content = llmResponse.includes("BUILD QUERY") ? (
-        await queryBuildingWorkflow(chatGPT, text) //if we want to use the dynamic workflow
-      ) : (
-        llmResponse //else converse with the assistant like normal
-      )
-  
-      //add the LLM's chat into the simple history
-      dispatch(pushSimpleChatHistory({ content, role: "assistant" }))
+      if(llmResponse.content.includes("BUILD QUERY")) {
+        //if we want to use the query building workflow
+        llmResponse = await queryBuildingWorkflow(chatGPT, text) 
+      }
+      //else converse with the assistant like normal
+
+      //add the LLM's final response to the simple chat
+      dispatch(addMessageToSimpleChatHistory(llmResponse))
+
     },
     onError(err) {
       console.error(err)
@@ -87,12 +113,15 @@ export function Chat() {
       <div id={styles["chat-scroll-container"]}>
         {chatHistory.map((c, i) => {
           return (
-            <div key={i} className={`${styles["chat-entry"]} ${styles[c.role]}`}>
-              {
-                c.role === "assistant" 
-                ? <RenderLLMResponse text={c.content} setInputText={setInputText}/>
-                : <pre className={styles.chat}>{c.content}</pre> 
-              }
+            <div key={i} className={`${styles["chat-row"]} ${styles[c.role]}`}>
+              <div className={styles["chat-justify"]}>
+                {showFullChatHistory && <p>{c.name}, chat #{c.chatId}</p>}
+                {
+                  c.role === "assistant" 
+                  ? <RenderLLMResponse text={c.content} setInputText={setInputText}/>
+                  : <pre className={styles.chat}>{c.content}</pre> 
+                }
+              </div>
             </div>
           )
         })}

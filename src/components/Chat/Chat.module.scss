@@ -10,10 +10,11 @@
     position: absolute;
     top: 0.5rem;
     left: 0.5rem;
+    z-index: 1;
   }
 
   #chat-scroll-container { 
-    height: calc(100% - 35px - 2rem);
+    height: calc(100% - 35px - 1rem);
     overflow-y: auto;
     margin-bottom: 3px;
     padding: 0.5rem;
@@ -24,14 +25,22 @@
       color: #fff;
     }
   
-    .chat-entry {
+    .chat-row {
       display: flex;
       justify-content: flex-start;
   
+      .chat-justify {
+        max-width: calc(100% - 40px);
+
+        p {
+          color: #ccc;
+          margin-bottom: 0.25rem;
+          margin-top: 0.25rem;
+        }
+      }
       .chat {
         background-color: #444;
         padding: 0.5rem;
-        max-width: calc(100% - 40px);
         margin-bottom: 0.5rem;
         border-radius: 5px;
 
@@ -65,6 +74,13 @@
   .loading {
     margin: 0;
     color: #fff;
+    position: absolute;
+    bottom: 2.5rem;
+    left: 0;
+    right: 0;
+    padding: 0.5rem;
+    background: #22222280;
+    background: linear-gradient(0deg, rgba(34,34,34,0.75) 0%, rgba(34,34,34,0) 100%);
   }
 
   

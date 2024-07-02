@@ -6,12 +6,14 @@ import { chatHistorySliceReducer } from './chatHistorySlice'
 import { queryValueReducer } from './queryValueSlice'
 import { resultsReducer } from './results'
 import { queryHistoryReducer } from './queryHistorySlice'
+import { settingsReducer } from './settings'
 
 export const store = configureStore({
   reducer: {
     chatHistory: chatHistorySliceReducer,
     queryHistory: queryHistoryReducer,
     queryValue: queryValueReducer,
+    settings: settingsReducer,
     results: resultsReducer,
   }
 })

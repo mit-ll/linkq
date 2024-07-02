@@ -13,7 +13,7 @@ import { ChatGPTAPI } from "./ChatGPTAPI";
 export async function summarizeQueryResults(chatGPTAPI: ChatGPTAPI, query:string, data?:WikidataQueryResponseType) {
   //first ask the LLM to come up with a name for the query
   //this is useful for the query history feature
-  const name = await chatGPTAPI.sendMessages([
+  const {content:name} = await chatGPTAPI.sendMessages([
     {
       content: `Respond with a brief name for this query. If you generated this query, it can just be the question that the user asked.
       ${query}`,
@@ -26,7 +26,7 @@ export async function summarizeQueryResults(chatGPTAPI: ChatGPTAPI, query:string
   //else there was data
 
   //ask the LLM to summarize the results
-  const summary = await chatGPTAPI.sendMessages([
+  const {content:summary} = await chatGPTAPI.sendMessages([
     {
       content: `These are the JSON results from the last query. Respond with a brief summary of the results.
       ${JSON.stringify(data, undefined, 2)}`,
