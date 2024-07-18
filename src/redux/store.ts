@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import { chatHistorySliceReducer } from './chatHistorySlice'
 import { queryValueReducer } from './queryValueSlice'
-import { resultsReducer } from './results'
+import { resultsReducer } from './resultsSlice'
 import { queryHistoryReducer } from './queryHistorySlice'
-import { settingsReducer } from './settings'
+import { settingsReducer } from './settingsSlice'
 
 export const store = configureStore({
   reducer: {

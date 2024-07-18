@@ -19,7 +19,7 @@ const queryClient = new QueryClient({
 import { createTheme, MantineProvider } from '@mantine/core';
 const theme = createTheme({});
 
-import { store } from './redux/store'
+import { store } from './redux/store.ts'
 import { Provider } from 'react-redux'
 
 

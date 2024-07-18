@@ -11,7 +11,7 @@ import { IconCaretRight, IconHistory } from '@tabler/icons-react';
 import styles from "./QueryEditor.module.scss"
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { setQueryValue } from '../../redux/queryValueSlice';
-import { setResults } from '../../redux/results';
+import { setResults } from '../../redux/resultsSlice';
 import { useRunQuery } from '../../hooks/useRunQuery';
 
 

@@ -1,3 +1,5 @@
+// Copyright (c) 2024 Massachusetts Institute of Technology
+// SPDX-License-Identifier: MIT
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "../redux/store";
 import { incrementChatIdCounter } from "../redux/chatHistorySlice";
@@ -9,6 +11,7 @@ export function useGetNewChatId() {
   const chatIdCounter = useAppSelector(state => state.chatHistory.chatIdCounter)
 
   return () => {
+    console.log("I RUN")
     dispatch(incrementChatIdCounter())
     return chatIdCounter
   }

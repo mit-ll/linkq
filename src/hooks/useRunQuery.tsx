@@ -5,10 +5,9 @@ import { createContext, useContext } from "react";
 import { WikidataQueryResponseType } from "../types/wikidata.ts";
 import { runQuery as runQueryFunction } from '../utils/runQuery.ts';
 import { summarizeQueryResults } from '../utils/summarizeQueryResults.ts';
-import { setResults } from '../redux/results.ts';
+import { setResults } from '../redux/resultsSlice.ts';
 import { pushQueryHistory } from '../redux/queryHistorySlice.ts';
 import { useAppDispatch } from "../redux/store.ts";
-import { useGetNewChatId } from "./useGetNewChatId.ts";
 import { useMakeChatGPTAPIInstance } from "./useMakeChatGPTAPIInstance.tsx";
 
 //this sets up a context so we can define one runQuery function for the whole app
@@ -27,7 +26,6 @@ export function RunQueryProvider({
   children: React.ReactNode,
 }) {
   const dispatch = useAppDispatch()
-  const getNewChatId = useGetNewChatId()
   const makeChatGPTAPIInstance = useMakeChatGPTAPIInstance()
 
   //useMutation wraps the workflow for running a query
@@ -41,7 +39,7 @@ export function RunQueryProvider({
     onSuccess: async (data, query) => {
       //try to ask the LLM to give the query a name and summarize the results
       try {
-        const chatGPT = makeChatGPTAPIInstance({ chatId: getNewChatId() })
+        const chatGPT = makeChatGPTAPIInstance()
 
         const {name, summary} = await summarizeQueryResults(chatGPT, query, data)
         dispatch(pushQueryHistory({data, name, query, summary})) //update the history with the data
@@ -56,7 +54,7 @@ export function RunQueryProvider({
       console.error(error)
       //try to ask the LLM to give a name for the query
       try {
-        const chatGPT = makeChatGPTAPIInstance({ chatId: getNewChatId() })
+        const chatGPT = makeChatGPTAPIInstance()
 
         const {name, summary} = await summarizeQueryResults(chatGPT, query)
         dispatch(pushQueryHistory({error: error.message, name, query, summary})) //update the history with the data

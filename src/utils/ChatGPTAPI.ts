@@ -11,13 +11,15 @@ export type ChatMessageType = ChatCompletionMessageParam & {
 }
 export type ChatHistoryType = ChatMessageType[]
 
-type PartialMessageType = {
+//this is a basic message type that will be extended by the ChatGPTAPI class
+//to include chatId and name
+type BasicMessageType = {
   content: ChatMessageType["content"]
   role: ChatMessageType["role"]
 }
 
 
-
+//this typing is used to omit the "messages" field from OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 type OpenAICreateOptionsType = Omit<OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming, 'messages'>
 
@@ -43,7 +45,7 @@ export class ChatGPTAPI {
   addMessagesCallback?: (messages: ChatHistoryType) => any //an optional callback function used to reactively update state
 
   constructor({
-    chatId,
+    chatId=0,
     addMessagesCallback,
     openAICreateOptions={ model: 'gpt-4-turbo-preview' }, 
     systemMessage, 
@@ -72,8 +74,8 @@ export class ChatGPTAPI {
    * @param messages  the array of new messages to send to the LLM
    * @returns         the LLM's response content as a string
    */
-  async sendMessages(addPartialMessages: PartialMessageType[]) {
-    const addMessages:ChatMessageType[] = addPartialMessages.map(p => {
+  async sendMessages(basicMessages: BasicMessageType[]) {
+    const addMessages:ChatMessageType[] = basicMessages.map(p => {
       //@ts-ignore TODO figure this out
       const message: ChatMessageType = {
         ...p,
