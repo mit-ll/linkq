@@ -86,7 +86,7 @@ export async function queryBuildingWorkflow(chatGPT:ChatGPTAPI, text: string) {
   while(NO_FOREVER_LOOP < QUERY_BUILDING_MAX_LOOPS) { //don't loop forever
     NO_FOREVER_LOOP++ //increment our loop counter
     
-    const responseText = llmResponse.trim() //trim the LLM response
+    const responseText = llmResponse.content.trim() //trim the LLM response
     if(responseText.toUpperCase() === "STOP") { //if the LLM responded with stop
       break //break out of the while loop
     }

@@ -9,36 +9,35 @@ import { ErrorMessage } from './components/ErrorMessage';
 import { useRunQuery, RunQueryProvider } from './hooks/useRunQuery';
 import {QueryVisualization} from "./components/QueryVisualization/QueryVisualization";
 import { useAppSelector } from './redux/store';
-import { ChatGPTAPIProvider } from './hooks/useChatGPT';
 import styles from './App.module.scss'
 import { DemoModeModal } from './components/DemoModeModal';
+import { ApiKeyWarning } from './components/ApiKeyWarning';
 
 
 function App() {
   return (
-    <ChatGPTAPIProvider>
-      <RunQueryProvider>
-        <div id={styles["app"]}>
-          <div id={styles["sidebar"]}>
-            <Chat/>
-          </div>
-          
-          <div id={styles["content"]}>
-            <QueryEditor/>
+    <RunQueryProvider>
+      <div id={styles["app"]}>
+        <div id={styles["sidebar"]}>
+          <Chat/>
+        </div>
+        
+        <div id={styles["content"]}>
+          <QueryEditor/>
 
-            <IDTableContainer/>
+          <IDTableContainer/>
 
-            <QueryVisualization/>
+          <QueryVisualization/>
 
-            <div id={styles["results-content"]}>
-              <Results/>
-            </div>
+          <div id={styles["results-content"]}>
+            <Results/>
           </div>
         </div>
+      </div>
 
-        <DemoModeModal/>
-      </RunQueryProvider>
-    </ChatGPTAPIProvider>
+      <DemoModeModal/>
+      <ApiKeyWarning/>
+    </RunQueryProvider>
   )
 }
 
