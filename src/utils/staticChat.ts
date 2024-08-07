@@ -1,4 +1,5 @@
-//npx tsx manualChat.ts
+// Copyright (c) 2024 Massachusetts Institute of Technology
+// SPDX-License-Identifier: MIT
 
 import { INITIAL_SYSTEM_MESSAGE } from "../components/Chat/Chat"
 import { ChatGPTAPI } from "./ChatGPTAPI"
