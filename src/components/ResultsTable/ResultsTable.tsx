@@ -1,8 +1,7 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import { WikidataBindingType, WikidataCellType, WikidataQueryResponseType } from "../../types/wikidata";
-
+import { ResultsTableCellType, ResultsTableColumnsType, ResultsTableDataType } from "../../types/resultsTable";
 import { useReactTable, flexRender, createColumnHelper, getCoreRowModel } from "@tanstack/react-table"
 import { downloadJson } from "../../utils/downloadJson";
 
@@ -11,8 +10,8 @@ import { IconDownload } from '@tabler/icons-react';
 
 import styles from "./ResultsTable.module.scss"
 
-export function ResultsTable({data}:{data: WikidataQueryResponseType}) {
-  const columnHelper = createColumnHelper<WikidataBindingType>()
+export function ResultsTable({data}:{data: ResultsTableDataType}) {
+  const columnHelper = createColumnHelper<ResultsTableColumnsType>()
 
   const columns = data.head.vars.map(c => columnHelper.accessor(
     row => row[c],
@@ -69,7 +68,7 @@ export function ResultsTable({data}:{data: WikidataQueryResponseType}) {
   )
 }
 
-function renderCell(cell:WikidataCellType):React.ReactNode {
+function renderCell(cell:ResultsTableCellType):React.ReactNode {
   if(!cell) {
     return <code>undefined</code>
   }

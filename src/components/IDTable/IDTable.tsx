@@ -1,17 +1,17 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import {getEntityDataFromQuery} from "../../utils/getEntityData";
-
-import styles from "./IDTable.module.scss"
+import { getIDTableEntitiesFromQuery } from "../../utils/knowledgeBase/getEntityData";
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { Table, Title } from "@mantine/core";
 import { useAppSelector } from "../../redux/store";
+import { IDTableEntitiesType } from "../../types/idTable";
+import styles from "./IDTable.module.scss"
 
 export function IDTableContainer () {
     const queryValue = useAppSelector(state => state.queryValue.queryValue)
 
-    const {data, error, isLoading} = getEntityDataFromQuery(queryValue);
+    const {data, error, isLoading} = getIDTableEntitiesFromQuery(queryValue);
 
     if(!isLoading && !error && !data) {
         return null
@@ -25,12 +25,7 @@ export function IDTableContainer () {
             return <p>Error: {error.message}</p>
         }
         else if(data) {
-            const tableData = Object.entries(data.entities).map(([id, value]) => ({
-                id,
-                label: value.labels?.en?.value || "",
-                description: value.descriptions?.en?.value || "",
-            }))
-            return <IDTable data={tableData}/>
+            return <IDTable data={data}/>
         }
         else {
             return <p>No ID data</p>
@@ -45,11 +40,8 @@ export function IDTableContainer () {
     )
 }
 
-type IDTableDataType = {id:string, label: string | null, description: string | null}
-function IDTable({data}:{
-    data: IDTableDataType[],
-}) {
-    const columnHelper = createColumnHelper<IDTableDataType>()
+function IDTable({data}:{data: IDTableEntitiesType[]}) {
+    const columnHelper = createColumnHelper<IDTableEntitiesType>()
 
     const columns = [
         columnHelper.accessor("id",{}),

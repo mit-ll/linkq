@@ -3,8 +3,8 @@
 
 import {SemanticTriple} from "../types/semanticTypes.ts";
 import {GraphinData, Utils} from "@antv/graphin";
-import {EntityDictionary} from "../types/wikidata.ts";
 import {createEdge, createNode, parseNameFromWikidataUrl} from "./graphin.ts";
+import { IDTableEntitiesType } from "../types/idTable.ts";
 
 export enum SPARQLItemType {
     Term = "Term",
@@ -39,19 +39,19 @@ const extractUniqueEntitiesFromTriples = (triples: SemanticTriple[]): (SemanticT
 /**
  * This function tries to get the label of the ID from the entity dictionary.
  * @param id                The entity or proeprty id, ex "P166"
- * @param entityDictionary  The entity dictionary from Wikidata
+ * @param idTableEntities   The array of entities for the ID table
  * @returns                 The label for the id if it exists in the dictionary, ex "award received"
  */
-const getTermLabel = (id: string, entityDictionary?: EntityDictionary) => entityDictionary?.[id]?.labels?.en?.value
+const getTermLabel = (id: string, idTableEntities?: IDTableEntitiesType[]) => idTableEntities?.find(e => e.id===id)?.label
 
-export const transformTripleQueryToGraphin = (triples: SemanticTriple[], entityDictionary?: EntityDictionary): GraphinData => {
+export const transformTripleQueryToGraphin = (triples: SemanticTriple[], idTableEntities?: IDTableEntitiesType[]): GraphinData => {
     //create the nodes for the graph
     const uniqueEntities = extractUniqueEntitiesFromTriples(triples);
     const nodes = uniqueEntities.map(entity => (
         createNode(
             entity.value,
             getSPARQLItemType(entity.termType),
-            getTermLabel(entity.value.split("/").at(-1)||"", entityDictionary)
+            getTermLabel(entity.value.split("/").at(-1)||"", idTableEntities)
         )
     ));
 
@@ -60,7 +60,7 @@ export const transformTripleQueryToGraphin = (triples: SemanticTriple[], entityD
         createEdge(
             triple, 
             getSPARQLItemType(triple.predicate.termType), 
-            getTermLabel(parseNameFromWikidataUrl(triple.predicate.value), entityDictionary)
+            getTermLabel(parseNameFromWikidataUrl(triple.predicate.value), idTableEntities)
         )
     )), { poly: 50 });
 

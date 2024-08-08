@@ -1,6 +1,6 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
-import { WikidataQueryResponseType } from "../types/wikidata";
+import { ResultsTableDataType } from "../types/resultsTable";
 import { ChatGPTAPI } from "./ChatGPTAPI";
 
 /**
@@ -10,7 +10,7 @@ import { ChatGPTAPI } from "./ChatGPTAPI";
  * @param data        the data if applicable (there could have been an error)
  * @returns           the name and summary as a key-value object
  */
-export async function summarizeQueryResults(chatGPTAPI: ChatGPTAPI, query:string, data?:WikidataQueryResponseType) {
+export async function summarizeQueryResults(chatGPTAPI: ChatGPTAPI, query:string, data?:ResultsTableDataType) {
   //first ask the LLM to come up with a name for the query
   //this is useful for the query history feature
   const {content:name} = await chatGPTAPI.sendMessages([
