@@ -10,7 +10,7 @@ import { wbk } from "./wbk"
  * @param search  the search string, ex "Google"
  * @returns       a search response of possible matching entities
  */
-export function fuzzySearchEntities(search: string):Promise<SearchResponse> {
+function fuzzySearchEntities(search: string):Promise<SearchResponse> {
   const url = wbk.searchEntities({
     search,
     limit: 5,
@@ -19,16 +19,34 @@ export function fuzzySearchEntities(search: string):Promise<SearchResponse> {
 }
 
 /**
- * This function fuzzy searches Wikidata for properties by label name.
- * This fuzzy search feature is implemented by Wikidata, not us
- * @param search  the search string, ex "winner"
- * @returns       a search response of possible matching properties
+ * Calls fuzzySearchEntities and returns a formatted string response to send to the LLM
+ * If there is no data, return null
+ * @param search  the search string, ex "Google"
+ * @returns       all possible matching entities as a string, else null if there is no data
  */
-export function fuzzySearchProperties(search: string):Promise<SearchResponse> {
-  const url = wbk.searchEntities({
-    search,
-    limit: 5,
-    type: 'property',
-  })
-  return fetch(url).then(handleFetchJsonResponse)
+export async function fuzzySearchEntitiesResponse(search: string) {
+  const entities = (await fuzzySearchEntities(search)).search
+
+  return entities.map(
+    e => `ID: ${e.id}, label: ${e.label}, description: ${e.description}`
+  ).join("\n") || null
 }
+
+
+
+
+
+// /**
+//  * This function fuzzy searches Wikidata for properties by label name.
+//  * This fuzzy search feature is implemented by Wikidata, not us
+//  * @param search  the search string, ex "winner"
+//  * @returns       a search response of possible matching properties
+//  */
+// function fuzzySearchProperties(search: string):Promise<SearchResponse> {
+//   const url = wbk.searchEntities({
+//     search,
+//     limit: 5,
+//     type: 'property',
+//   })
+//   return fetch(url).then(handleFetchJsonResponse)
+// }

@@ -17,16 +17,9 @@ import { setQueryValue } from '../../redux/queryValueSlice';
 import { queryBuildingWorkflow } from '../../utils/queryBuildingWorkflow';
 import { useMakeChatGPTAPIInstance } from '../../hooks/useMakeChatGPTAPIInstance';
 import { addMessageToSimpleChatHistory, toggleShowFullChatHistory } from '../../redux/chatHistorySlice';
+import { INITIAL_SYSTEM_MESSAGE } from '../../utils/knowledgeBase/prompts';
 
-export const INITIAL_SYSTEM_MESSAGE = `You are a helpful chat assistant. This system will give you access to data in the WikiData Knowledge Graph, that contains encyclopedic data similar to Wikipedia, but in knowledge graph format using the RDF framework. 
 
-If users ask questions that can be answered via WikiData, your job is not to directly answer their questions, but instead to help them write a SPARQL query to find that data. You can ask the user to clarify their questions if the questions are vague, open-ended, or subjective in nature. 
-
-If you ever need to suggest data to the user, you should only provide recommendations that are directly accessible from Wikidata. Do not ask the user if they would like to proceed with generating the corresponding query unless absolutely necessary.
-
-When you are ready to start building a query, respond with 'BUILD QUERY'. The system will walk you through a guided workflow to get the necessary entity and property IDs from WikiData.
-
-Current date: ${new Date().toDateString()}.`
 
 export function Chat() {
   const dispatch = useAppDispatch()
