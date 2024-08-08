@@ -1,6 +1,6 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
-import { WikidataQueryResponseType } from "../../types/wikidata";
+import { SparqlResultsJsonType } from "../../types/sparql";
 import { handleFetchJsonResponse } from "../handleFetchJsonResponse";
 
 /**
@@ -13,5 +13,5 @@ export function runQuery(query: string) {
     headers: {
       'Accept': 'application/sparql-results+json',
     }
-  }).then(handleFetchJsonResponse) as Promise<WikidataQueryResponseType>
+  }).then(handleFetchJsonResponse) as Promise<SparqlResultsJsonType>
 }
