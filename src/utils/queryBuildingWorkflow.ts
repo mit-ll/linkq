@@ -1,8 +1,8 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
-import { fuzzySearchEntities } from "./fuzzySearch"
-import { getPropertiesForEntity } from "./getPropertiesForEntity"
-import { findTailEntities } from "./findTailEntities"
+import { fuzzySearchEntities } from "./knowledgeBase/fuzzySearch"
+import { getPropertiesForEntity } from "./knowledgeBase/getPropertiesForEntity"
+import { findTailEntities } from "./knowledgeBase/findTailEntities"
 import { ChatGPTAPI } from "./ChatGPTAPI"
 
 //these prefixes are defined as constants here, so we can modify them in one place

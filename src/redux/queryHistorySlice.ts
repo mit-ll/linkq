@@ -1,15 +1,15 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { WikidataQueryResponseType } from '../types/wikidata'
 import { DEMO_QUERY_HISTORY, IS_DEMO_MODE } from '../utils/demoData'
+import { ResultsTableDataType } from '../types/resultsTable'
 
 
 type QueryRecordType = {
   name: string | null,
   query: string,
   results: {
-    data: WikidataQueryResponseType | null,
+    data: ResultsTableDataType | null,
     error: string | null,
     summary: string | null,
   },
@@ -23,7 +23,7 @@ const initialState: {
 }
 
 type PushQueryHistoryPayloadType = {
-  data:WikidataQueryResponseType, name: string|null, query: string, summary: string|null
+  data:ResultsTableDataType, name: string|null, query: string, summary: string|null
 } | {
   error: string, name: string|null, query: string, summary: string|null
 }

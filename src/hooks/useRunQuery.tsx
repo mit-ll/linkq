@@ -2,17 +2,17 @@
 // SPDX-License-Identifier: MIT
 import { UseMutateFunction, useMutation } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
-import { WikidataQueryResponseType } from "../types/wikidata.ts";
-import { runQuery as runQueryFunction } from '../utils/runQuery.ts';
+import { runQuery as runQueryFunction } from '../utils/knowledgeBase/runQuery.ts';
 import { summarizeQueryResults } from '../utils/summarizeQueryResults.ts';
 import { setResults } from '../redux/resultsSlice.ts';
 import { pushQueryHistory } from '../redux/queryHistorySlice.ts';
 import { useAppDispatch } from "../redux/store.ts";
 import { useMakeChatGPTAPIInstance } from "./useMakeChatGPTAPIInstance.tsx";
+import { ResultsTableDataType } from "../types/resultsTable.ts";
 
 //this sets up a context so we can define one runQuery function for the whole app
 const RunQueryContext = createContext<{
-  runQuery: UseMutateFunction<WikidataQueryResponseType, Error, string, unknown>,
+  runQuery: UseMutateFunction<ResultsTableDataType, Error, string, unknown>,
   runQueryIsPending: boolean,
 }>({
   runQuery: async () => {},
@@ -30,7 +30,7 @@ export function RunQueryProvider({
 
   //useMutation wraps the workflow for running a query
   //including asking the LLM for a name and summary
-  const {isPending: runQueryIsPending, mutate:runQuery} = useMutation<WikidataQueryResponseType, Error, string>({
+  const {isPending: runQueryIsPending, mutate:runQuery} = useMutation<ResultsTableDataType, Error, string>({
     mutationKey: ['runQuery'],
     mutationFn: async (query: string) => {
       dispatch(setResults(null)) //clear the current results

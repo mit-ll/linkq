@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 import Graphin, {Components, LegendChildrenProps} from "@antv/graphin";
 import {parseSparqlQuery} from "../../../utils/parseSparqlQuery.ts";
-import {getEntityDataFromQuery} from "../../../utils/getEntityData.ts";
+import {getIDTableEntitiesFromQuery} from "../../../utils/knowledgeBase/getEntityData.ts";
 import {transformTripleQueryToGraphin} from "../../../utils/transformTripleDataToGraphin.ts";
 import {useMemo} from "react";
 import { Title } from '@mantine/core';
@@ -14,13 +14,13 @@ const { Legend } = Components;
 export const QueryGraph = () => {
     const queryValue = useAppSelector(state => state.queryValue.queryValue)
 
-    const {data: entityData} = getEntityDataFromQuery(queryValue);
+    const {data: idTableEntities} = getIDTableEntitiesFromQuery(queryValue);
 
     const queryGraphData = useMemo(() => {
         const semanticTriples = parseSparqlQuery(queryValue);
 
-        return transformTripleQueryToGraphin(semanticTriples, entityData?.entities);
-    }, [queryValue, entityData]);
+        return transformTripleQueryToGraphin(semanticTriples, idTableEntities||undefined);
+    }, [queryValue, idTableEntities]);
 
     if(queryGraphData.nodes.length===0) return null
 

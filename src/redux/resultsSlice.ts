@@ -1,10 +1,10 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { WikidataQueryResponseType } from '../types/wikidata'
 import { DEMO_RESULTS, IS_DEMO_MODE } from '../utils/demoData'
+import { ResultsTableDataType } from '../types/resultsTable'
 
-type ResultsType = {error: string | null, data: WikidataQueryResponseType | null, summary: string | null} | null
+type ResultsType = {error: string | null, data: ResultsTableDataType | null, summary: string | null} | null
 
 const initialState: {
   results: ResultsType,

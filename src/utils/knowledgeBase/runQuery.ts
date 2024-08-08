@@ -1,7 +1,7 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
-import { WikidataQueryResponseType } from "../types/wikidata";
-import { handleFetchJsonResponse } from "./handleFetchJsonResponse";
+import { WikidataQueryResponseType } from "../../types/wikidata";
+import { handleFetchJsonResponse } from "../handleFetchJsonResponse";
 
 /**
  * This function runs a SPARQL query on Wikidata
