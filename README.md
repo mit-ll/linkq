@@ -27,6 +27,9 @@ npm run dev
 7. Open the webapp in your browser at http://localhost:5173/
 
 
+## Change KG Data Source
+`src/utils/knowledgeBase` contains most of the code that you would have to change to switch to a different KG data source. There are also some types in `src/types/idTable.ts` and `src/types/resultsTable.ts` that would need to be changed.
+
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
