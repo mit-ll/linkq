@@ -1,7 +1,7 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import { SparqlBindingType, SparqlCellType, SparqlResultsJsonType } from "../../types/sparql";
+import { SparqlBindingType, SparqlValueObjectType, SparqlResultsJsonType } from "../../types/sparql";
 import { useReactTable, flexRender, createColumnHelper, getCoreRowModel } from "@tanstack/react-table"
 import { downloadJson } from "../../utils/downloadJson";
 
@@ -68,7 +68,7 @@ export function ResultsTable({data}:{data: SparqlResultsJsonType}) {
   )
 }
 
-function renderCell(cell:SparqlCellType):React.ReactNode {
+function renderCell(cell:SparqlValueObjectType):React.ReactNode {
   if(!cell) {
     return <code>undefined</code>
   }
