@@ -1,7 +1,7 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import { INITIAL_SYSTEM_MESSAGE } from "../components/Chat/Chat"
+import { INITIAL_SYSTEM_MESSAGE } from "./knowledgeBase/prompts"
 import { ChatGPTAPI } from "./ChatGPTAPI"
 
 //this function is useful for running a static chat step by step in the browser console
