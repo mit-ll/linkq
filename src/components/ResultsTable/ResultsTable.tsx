@@ -1,7 +1,7 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import { ResultsTableCellType, ResultsTableColumnsType, ResultsTableDataType } from "../../types/resultsTable";
+import { SparqlBindingType, SparqlCellType, SparqlResultsJsonType } from "../../types/sparql";
 import { useReactTable, flexRender, createColumnHelper, getCoreRowModel } from "@tanstack/react-table"
 import { downloadJson } from "../../utils/downloadJson";
 
@@ -10,8 +10,8 @@ import { IconDownload } from '@tabler/icons-react';
 
 import styles from "./ResultsTable.module.scss"
 
-export function ResultsTable({data}:{data: ResultsTableDataType}) {
-  const columnHelper = createColumnHelper<ResultsTableColumnsType>()
+export function ResultsTable({data}:{data: SparqlResultsJsonType}) {
+  const columnHelper = createColumnHelper<SparqlBindingType>()
 
   const columns = data.head.vars.map(c => columnHelper.accessor(
     row => row[c],
@@ -68,7 +68,7 @@ export function ResultsTable({data}:{data: ResultsTableDataType}) {
   )
 }
 
-function renderCell(cell:ResultsTableCellType):React.ReactNode {
+function renderCell(cell:SparqlCellType):React.ReactNode {
   if(!cell) {
     return <code>undefined</code>
   }

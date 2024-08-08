@@ -1,20 +1,22 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-export type WikidataQueryResponseType = {
+//you could alternatively use the SparqlResults interface from "wikibase-sdk"
+
+export type SparqlResultsJsonType = {
   "head": {
     "vars": string[] //ex "property", "propertyLabel", ...
   },
   "results": {
-    "bindings": WikidataBindingType[]
+    "bindings": SparqlBindingType[]
   }
 }
 
-export type WikidataBindingType = {
-  [key:string]: WikidataCellType
+export type SparqlBindingType = {
+  [key:string]: SparqlValueObjectType
 }
 
-export type WikidataCellType = {
+export type SparqlValueObjectType = {
   "datatype"?: string //"http://www.w3.org/2001/XMLSchema#dateTime",
   "xml:lang"?: string //"en",
   "type": string //"literal",
