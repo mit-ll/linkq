@@ -14,7 +14,6 @@ import { useRunQuery } from '../../hooks/useRunQuery';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 
 import { setQueryValue } from '../../redux/queryValueSlice';
-import { queryBuildingWorkflow } from '../../utils/queryBuildingWorkflow';
 import { useMakeChatGPTAPIInstance } from '../../hooks/useMakeChatGPTAPIInstance';
 import { addMessageToSimpleChatHistory, toggleShowFullChatHistory } from '../../redux/chatHistorySlice';
 import { INITIAL_SYSTEM_MESSAGE } from '../../utils/knowledgeBase/prompts';

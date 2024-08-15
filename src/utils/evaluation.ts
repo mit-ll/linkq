@@ -1,8 +1,8 @@
 //npx tsx evaluation.ts
 
-import fs from "fs"
+// import fs from "fs"
 import papaparse from "papaparse"
-import { loadEnv } from 'vite'
+// import { loadEnv } from 'vite'
 
 import { ChatGPTAPI } from "./ChatGPTAPI"
 import { INITIAL_SYSTEM_MESSAGE } from "./knowledgeBase/prompts"
@@ -11,10 +11,11 @@ import { tryParsingOutQuery } from "./tryParsingOutQuery"
 import { runQuery } from "./knowledgeBase/runQuery"
 import { summarizeQueryResults } from "./summarizeQueryResults"
 
-const ENV = loadEnv("development","../../")
+// const ENV = loadEnv("development","../../")
+// const INPUT_QUESTIONS_PATH = "./questions.csv"
+// const OUTPUT_PATH = "./output.csv"
 
-const INPUT_QUESTIONS_PATH = "./questions.csv"
-const OUTPUT_PATH = "./output.csv"
+const INPUT_CSV_STRING = ``
 
 type InputRowType = {
   Question: string,
@@ -30,20 +31,21 @@ type OutputRowType = InputRowType & {
   fullChatHistory: string,
 }
 
-function parseCSVFile<T>(path:string):Promise<T[]> {
-  return new Promise((resolve) => {
-    const file = fs.createReadStream(path)
-    papaparse.parse<T>(file, {
-      header: true,
-      complete: function(results) {
-        resolve(results.data)
-      }
-    })
-  })
-}
+// function parseCSVFile<T>(path:string):Promise<T[]> {
+//   return new Promise((resolve) => {
+//     const file = fs.createReadStream(path)
+//     papaparse.parse<T>(file, {
+//       header: true,
+//       complete: function(results) {
+//         resolve(results.data)
+//       }
+//     })
+//   })
+// }
 
-async function runEvaluation(inputQuestionsPath:string) {
-  const inputQuestions = await parseCSVFile<InputRowType>(inputQuestionsPath)
+export async function runEvaluation() {
+  // const inputQuestions = await parseCSVFile<InputRowType>(inputQuestionsPath)
+  const inputQuestions = papaparse.parse<InputRowType>(INPUT_CSV_STRING,{header: true}).data
   console.log("inputQuestions",inputQuestions)
 
   const promiseResults = await Promise.allSettled(
@@ -51,22 +53,24 @@ async function runEvaluation(inputQuestionsPath:string) {
   )
   const outputResults = promiseResults.filter(p => p.status==="fulfilled").map(p => p.value)
 
-  fs.writeFile("./output.json", JSON.stringify(outputResults, undefined, 2), function(err) {
-    if(err) {
-      return console.error(err)
-    }
-    console.log("The JSON file was saved!")
-  })
+  console.log("JSON")
+  console.log(JSON.stringify(outputResults, undefined, 2))
+  // fs.writeFile("./output.json", JSON.stringify(outputResults, undefined, 2), function(err) {
+  //   if(err) {
+  //     return console.error(err)
+  //   }
+  //   console.log("The JSON file was saved!")
+  // })
 
-  fs.writeFile(OUTPUT_PATH, papaparse.unparse(outputResults, {header: true}), function(err) {
-    if(err) {
-      return console.error(err)
-    }
-    console.log("The CSV file was saved!")
-  })
+  console.log("CSV")
+  console.log(papaparse.unparse(outputResults, {header: true}))
+  // fs.writeFile(OUTPUT_PATH, papaparse.unparse(outputResults, {header: true}), function(err) {
+  //   if(err) {
+  //     return console.error(err)
+  //   }
+  //   console.log("The CSV file was saved!")
+  // })
 }
-
-runEvaluation(INPUT_QUESTIONS_PATH)
 
 
 
@@ -82,9 +86,11 @@ async function runOneLinkQPipeline(inputRow:InputRowType):Promise<OutputRowType>
   }
 
   const chatGPT = new ChatGPTAPI({
-    apiKey: ENV.VITE_OPENAI_API_KEY,
+    // apiKey: ENV.VITE_OPENAI_API_KEY,
+    apiKey: import.meta.env.VITE_OPENAI_API_KEY?.trim() || "",
     chatId: 0,
     systemMessage: INITIAL_SYSTEM_MESSAGE,
+    dangerouslyAllowBrowser: true,
   })
 
   try {
