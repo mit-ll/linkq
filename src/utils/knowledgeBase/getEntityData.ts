@@ -16,7 +16,7 @@ interface EntityDictionary {
  * @param ids array of entity IDs
  * @returns   the data for each entity that we can display in the graph and table
  */
-async function getEntityData(ids: EntityId[]):Promise<{entities: EntityDictionary}> {
+export async function getEntityData(ids: EntityId[]):Promise<IDTableEntitiesType[]> {
   //use the wikibase SDK to help us generate the right URL
   const url = wbk.getEntities({
     ids,
@@ -24,7 +24,34 @@ async function getEntityData(ids: EntityId[]):Promise<{entities: EntityDictionar
     format: "json",
   })
 
-  return await fetch(url).then(handleFetchJsonResponse)
+  const entityData = await fetch(url).then(handleFetchJsonResponse) as {entities: EntityDictionary}
+
+  //convert the entity data into the format the ID table expects
+  const idTableEntities:IDTableEntitiesType[] = Object.entries(entityData.entities).map(([id,value]) => ({
+    id,
+    label: value.labels?.en?.value || "",
+    description: value.descriptions?.en?.value || "",
+  }))
+  return idTableEntities
+}
+
+function parseIdsFromQuery(query:string) {
+  //this magical regex parses the entity and property IDs from the query
+  return query.match(/(?:wd|wdt|ps|pq):[QP]\d+/g);
+}
+
+
+export async function getEntityDataFromQuery(query:string) {
+  const parsedIds = parseIdsFromQuery(query)
+  if (parsedIds) { //if we parsed any IDs from the query
+    //get the data for the IDs
+    const idTableEntities = await getEntityData(
+      parsedIds.map(str => str.split(":")[1]) as EntityId[]
+    )
+
+    return idTableEntities
+  }
+  return null
 }
 
 
@@ -34,28 +61,11 @@ async function getEntityData(ids: EntityId[]):Promise<{entities: EntityDictionar
  * @param query the query string from the editor
  * @returns     useQuery outputs (ie data, isLoading, etc)
  */
-export const getIDTableEntitiesFromQuery = (query: string):UseQueryResult<IDTableEntitiesType[] | null, Error> => {
+export const useQueryGetIDTableEntitiesFromQuery = (query: string):UseQueryResult<IDTableEntitiesType[] | null, Error> => {
   //this magical regex parses the entity and property IDs from the query
-  const IDs = query.match(/(?:wd|wdt|ps|pq):[QP]\d+/g);
+  const parsedIds = parseIdsFromQuery(query)
   return useQuery({
-    queryKey: [`entity-ids-${IDs?.join(", ")}`],
-    queryFn: async () => {
-      console.log("IDs",IDs)
-      if (IDs) { //if we parsed any IDs from the query
-        //get the data for the IDs
-        const entityData = await getEntityData(IDs.map(str => {
-          return str.split(":")[1]
-        }) as EntityId[])
-
-        //convert the entity data into the format the ID table expects
-        const idTableEntities:IDTableEntitiesType[] = Object.entries(entityData.entities).map(([id,value]) => ({
-          id,
-          label: value.labels?.en?.value || "",
-          description: value.descriptions?.en?.value || "",
-        }))
-        return idTableEntities
-      }
-      return null
-    }
+    queryKey: [`entity-ids-${parsedIds?.join(", ")}`],
+    queryFn: () => getEntityDataFromQuery(query)
   });
 }

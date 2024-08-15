@@ -1,7 +1,7 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import { getIDTableEntitiesFromQuery } from "../../utils/knowledgeBase/getEntityData";
+import { useQueryGetIDTableEntitiesFromQuery } from "../../utils/knowledgeBase/getEntityData";
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { Table, Title } from "@mantine/core";
 import { useAppSelector } from "../../redux/store";
@@ -11,7 +11,7 @@ import styles from "./IDTable.module.scss"
 export function IDTableContainer () {
     const queryValue = useAppSelector(state => state.queryValue.queryValue)
 
-    const {data, error, isLoading} = getIDTableEntitiesFromQuery(queryValue);
+    const {data, error, isLoading} = useQueryGetIDTableEntitiesFromQuery(queryValue);
 
     if(!isLoading && !error && !data) {
         return null
