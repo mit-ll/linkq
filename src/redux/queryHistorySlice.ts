@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: MIT
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { DEMO_QUERY_HISTORY, IS_DEMO_MODE } from '../utils/demoData'
-import { ResultsTableDataType } from '../types/resultsTable'
+import { SparqlResultsJsonType } from '../types/sparql'
 
 
 type QueryRecordType = {
   name: string | null,
   query: string,
   results: {
-    data: ResultsTableDataType | null,
+    data: SparqlResultsJsonType | null,
     error: string | null,
     summary: string | null,
   },
@@ -23,7 +23,7 @@ const initialState: {
 }
 
 type PushQueryHistoryPayloadType = {
-  data:ResultsTableDataType, name: string|null, query: string, summary: string|null
+  data:SparqlResultsJsonType, name: string|null, query: string, summary: string|null
 } | {
   error: string, name: string|null, query: string, summary: string|null
 }
