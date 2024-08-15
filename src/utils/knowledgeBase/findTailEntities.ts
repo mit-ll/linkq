@@ -30,7 +30,7 @@ WHERE {
 export async function findTailEntitiesResponse(headEntityId:string,propertyId:string) {
   const results = await findTailEntities(headEntityId, propertyId)
 
-  const propertiesMessageText = results.results.bindings.map(b => {
+  const responseText = results.results.bindings.map(b => {
     const id = b?.["child"]?.value.replace("http://www.wikidata.org/entity/","")
     const label = b?.["childLabel"]?.value
     const description = b?.["childDescription"]?.value
@@ -38,5 +38,5 @@ export async function findTailEntitiesResponse(headEntityId:string,propertyId:st
     return `ID: ${id}, label: ${label}, description: ${description}`
   }).join("\n")
 
-  return propertiesMessageText || null
+  return responseText || null
 }

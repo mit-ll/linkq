@@ -17,13 +17,13 @@ Current date: ${new Date().toDateString()}.`
 //these prefixes are defined as constants here, so we can modify them in one place
 export const ENTITY_SEARCH_PREFIX = "ENTITY SEARCH:"
 export const PROPERTIES_SEARCH_PREFIX = "PROPERTIES SEARCH:"
-export const ENTITY_PROPERTY_SEARCH_PREFIX = "ENTITY PROPERTY SEARCH:"
+export const TAIL_SEARCH_PREFIX = "TAIL SEARCH:"
 
 //this is the system message that we send to the LLM to tell it how to use our query building workflow
 export const INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE = `Your goal is to find the necessary entity and property IDs to construct a SPARQL query that answers the user's question. Do not respond with a trailing period. Do not assume you already know the correct entity and property IDs; you should search for them. Make sure to filter the IDs for the ones that are most relevant to the question. Respond in one of these ways:
 - To fuzzy search for an entity, start the response with '${ENTITY_SEARCH_PREFIX}', followed by an entity name you want to search for. The system will respond with possible entity resolutions in ${KG_NAME}. 
-- To get all the properties for an entity, start the response with '${PROPERTIES_SEARCH_PREFIX}', followed by the ID of the entity. The user will respond with all the properties associated with that entity.
-- To find what entities are connected to the original entity via a property, start the response with '${ENTITY_PROPERTY_SEARCH_PREFIX}', followed by the entity ID then the property ID. Ex: '${ENTITY_PROPERTY_SEARCH_PREFIX} Q123 P456'
+- To get all the properties for an entity, start the response with '${PROPERTIES_SEARCH_PREFIX}', followed by the ID of the entity. The system will respond with all the properties associated with that entity.
+- To find what tail entities are connected to the original entity via a property, start the response with '${TAIL_SEARCH_PREFIX}', followed by the entity ID then the property ID. Ex: '${TAIL_SEARCH_PREFIX} Q123 P456'
 - Respond with 'STOP' if and only if you have searched for and successfully identified all necessary IDs from ${KG_NAME} to construct the query.`
 
 //this is the few shot training system message we give the LLM to prompt it to generate a query

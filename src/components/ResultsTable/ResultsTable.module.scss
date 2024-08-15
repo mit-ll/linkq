@@ -8,8 +8,12 @@
     top: 0;
     right: 0;
   }
-  
-  img {
-    max-width: 200px;
+
+  #results-table-scroll-container {
+    overflow-x: auto;
+    
+    img {
+      max-width: 200px;
+    }
   }
 }

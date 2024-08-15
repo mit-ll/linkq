@@ -5,12 +5,12 @@ import { getPropertiesForEntityResponse } from "./knowledgeBase/getPropertiesFor
 import { findTailEntitiesResponse } from "./knowledgeBase/findTailEntities"
 import { ChatGPTAPI } from "./ChatGPTAPI"
 import { 
-  ENTITY_PROPERTY_SEARCH_PREFIX, 
   ENTITY_SEARCH_PREFIX, 
   INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE, 
   KG_NAME, 
   PROPERTIES_SEARCH_PREFIX, 
-  QUERY_BUILDING_SYSTEM_MESSAGE
+  QUERY_BUILDING_SYSTEM_MESSAGE,
+  TAIL_SEARCH_PREFIX
 } from "./knowledgeBase/prompts"
 
 
@@ -52,10 +52,10 @@ export async function queryBuildingWorkflow(chatGPT:ChatGPTAPI, text: string) {
     }
     //else if the LLM wants to traverse the graph to find all tail entities
     //that are connected to this head entity via a relation
-    else if(responseText.startsWith(ENTITY_PROPERTY_SEARCH_PREFIX)) {
+    else if(responseText.startsWith(TAIL_SEARCH_PREFIX)) {
       llmResponse = await handleFindTailEntities(
         chatGPT,
-        responseText.replace(ENTITY_PROPERTY_SEARCH_PREFIX,"").trim(),
+        responseText.replace(TAIL_SEARCH_PREFIX,"").trim(),
       )
     }
     //else the LLM didn't give us an expected response
@@ -82,9 +82,9 @@ export async function queryBuildingWorkflow(chatGPT:ChatGPTAPI, text: string) {
 
 async function handleFuzzySearchForEntity(chatGPT:ChatGPTAPI, text:string) {
   //try to resolve these entities by requesting data from the KG
-  const response = await fuzzySearchEntitiesResponse(text)
+  const responseText = await fuzzySearchEntitiesResponse(text)
 
-  if(!response) {
+  if(!responseText) {
     return await chatGPT.sendMessages([
       {
         content: `${KG_NAME} did not resolve any entities. You may need to rephrase or simplify your entity search`,
@@ -95,16 +95,16 @@ async function handleFuzzySearchForEntity(chatGPT:ChatGPTAPI, text:string) {
  
   return await chatGPT.sendMessages([
     {
-      content: response,
+      content: responseText,
       role: "system",
     }
   ])
 }
 
 async function handleGetPropertiesForEntity(chatGPT:ChatGPTAPI, entityId: string) {
-  const response = await getPropertiesForEntityResponse(entityId)
+  const responseText = await getPropertiesForEntityResponse(entityId)
 
-  if(!response) {
+  if(!responseText) {
     return await chatGPT.sendMessages([
       {
         content: `${KG_NAME} did not resolve any properties for that entity. Are you sure that entity exists?`,
@@ -115,7 +115,7 @@ async function handleGetPropertiesForEntity(chatGPT:ChatGPTAPI, entityId: string
 
   return await chatGPT.sendMessages([
     {
-      content: response,
+      content: responseText,
       role: "system",
     }
   ])
@@ -136,9 +136,9 @@ async function handleFindTailEntities(chatGPT:ChatGPTAPI, text: string) {
   }
 
   const [entityId, propertyId] = split
-  const response = await findTailEntitiesResponse(entityId, propertyId)
+  const responseText = await findTailEntitiesResponse(entityId, propertyId)
 
-  if(!response) {
+  if(!responseText) {
     return await chatGPT.sendMessages([
       {
         content: `${KG_NAME} did not resolve any entities for that entity and property. Are you sure that entity has that property?`,
@@ -149,7 +149,7 @@ async function handleFindTailEntities(chatGPT:ChatGPTAPI, text: string) {
 
   return await chatGPT.sendMessages([
     {
-      content: response,
+      content: responseText,
       role: "system",
     }
   ])
