@@ -14,6 +14,7 @@ import { runQuery } from "./knowledgeBase/runQuery"
 import { summarizeQueryResults } from "./summarizeQueryResults"
 import { EntityId } from "wikibase-sdk"
 import { getEntityData } from "./knowledgeBase/getEntityData"
+import { formatSparqlResultsAsString } from "./formatSparqlResultsAsString"
 
 // const ENV = loadEnv("development","../../")
 // const INPUT_QUESTIONS_PATH = "./questions.csv"
@@ -133,7 +134,7 @@ async function runOneLinkQPipeline(inputRow:InputRowType):Promise<OutputRowType>
     //execute the query
     const sparqlResults = await runQuery(parsedQuery.query)
     output["Does query execute?"] = "Yes"
-    output["Result from Wikidata"] = JSON.stringify(sparqlResults, undefined, 2)
+    output["Result from Wikidata"] = formatSparqlResultsAsString(sparqlResults)
 
 
     //summarize the results
