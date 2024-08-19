@@ -89,14 +89,14 @@ export async function runEvaluation() {
 async function runOneLinkQPipeline(inputRow:InputRowType):Promise<OutputRowType> {
   const output:OutputRowType = {
     ...inputRow,
-      "IDs Table": "",
-      "LinkQ generated query": "",
-      "Does query execute?": "No",
-      "Result from Wikidata": "",
-      "LLM Summary": "",
-      "Correct answer?": "",
-      "Total Seconds": "",
-      fullChatHistory: "",
+    "IDs Table": "",
+    "LinkQ generated query": "",
+    "Does query execute?": "No",
+    "Result from Wikidata": "",
+    "LLM Summary": "",
+    "Correct answer?": "",
+    "Total Seconds": "",
+    fullChatHistory: "",
   }
 
 
