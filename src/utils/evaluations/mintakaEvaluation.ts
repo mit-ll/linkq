@@ -3,17 +3,17 @@
 
 import papaparse from "papaparse"
 
-import { ChatGPTAPI } from "./ChatGPTAPI"
-import { INITIAL_SYSTEM_MESSAGE } from "./knowledgeBase/prompts"
-import { handleUserChat } from "./handleUserChat"
-import { tryParsingOutQuery } from "./tryParsingOutQuery"
-import { runQuery } from "./knowledgeBase/runQuery"
-import { summarizeQueryResults } from "./summarizeQueryResults"
-import { getEntityDataFromQuery } from "./knowledgeBase/getEntityData"
-import { formatSparqlResultsAsString } from "./formatSparqlResultsAsString"
+import { ChatGPTAPI } from "../ChatGPTAPI"
+import { tryParsingOutQuery } from "../tryParsingOutQuery"
+import { runQuery } from "../knowledgeBase/runQuery"
+import { summarizeQueryResults } from "../summarizeQueryResults"
+import { getEntityDataFromQuery } from "../knowledgeBase/getEntityData"
+import { formatSparqlResultsAsString } from "../formatSparqlResultsAsString"
+import { QUESTIONS } from "./questions"
+import { INITIAL_SYSTEM_MESSAGE } from "../knowledgeBase/prompts"
+import { queryBuildingWorkflow } from "../queryBuildingWorkflow"
 
-
-type MintakaQuestionType = {
+export type MintakaQuestionType = {
   "id": string //"bfc9807b",
   "question": string //"What state is the author of Misery from?",
   "translations"?: any
@@ -49,14 +49,18 @@ type MintakaQuestionType = {
   "complexityType": string //"multihop"
 }
 
-type OutputRowType = {
+
+export type OutputRowType = {
   "id": string,
   "question": string,
+  "attemptNumber": string,
+  "complexityType": string,
+  "category": string,
   "questionEntity": string,
   "answer": string,
   "IDs Table": string,
   "LLM message we tried to parse for a query": string,
-  "LinkQ generated query": string,
+  "Generated query": string,
   "Does query execute?": string,
   "Result from Wikidata": string,
   "LLM Summary": string,
@@ -65,16 +69,30 @@ type OutputRowType = {
   fullChatHistory: string,
 }
 
+const ATTEMPTS_PER_QUESTION = 3
 
-const QUESTIONS:MintakaQuestionType[] = []
+type ApproachCallbackFunctionType = (
+  chatGPT: ChatGPTAPI,
+  question:string
+) => ReturnType<ChatGPTAPI["sendMessages"]>
 
-export async function runEvaluation() {
+async function runMintakaEvaluation(
+  outputFileName:string,
+  approachCallback: ApproachCallbackFunctionType,
+) {
   const outputResults:OutputRowType[] = []
   for(const question of QUESTIONS) {
-    console.log(`Running LinkQ on question: ${question.question}`)
-    outputResults.push(
-      await runOneLinkQPipeline(question)
-    )
+    for(let i=1; i<=ATTEMPTS_PER_QUESTION; ++i) {
+      console.log(`Running LinkQ on question: ${question.question}, attempt ${i}`)
+      outputResults.push(
+        await runOneLinkQPipeline(
+          question,
+          i,
+          approachCallback,
+        )
+      )
+    }
+    
   }
 
   console.log("JSON")
@@ -82,20 +100,74 @@ export async function runEvaluation() {
 
   console.log("CSV")
   console.log(papaparse.unparse(outputResults, {header: true}))
-  downloadCSV("output.csv",papaparse.unparse(outputResults, {header: true}))
+  downloadCSV(outputFileName,papaparse.unparse(outputResults, {header: true}))
+}
+
+export async function runLinkQMintakaEvaluation() {
+  return await runMintakaEvaluation(
+    "LinkQ Evaluation Output.csv",
+    async (chatGPT:ChatGPTAPI, question:string) => {
+      //force the LLM to start the query building workflow
+      chatGPT.messages = [
+        {
+          content: INITIAL_SYSTEM_MESSAGE,
+          chatId: 0,
+          name: "system",
+          role: "system",
+        },
+        {
+          content: question,
+          chatId: 0,
+          name: "user",
+          role: "user",
+        },
+        {
+          content: "BUILD QUERY",
+          chatId: 0,
+          name: "gpt-4-turbo-preview",
+          role: "assistant",
+        },
+      ]
+
+      return await queryBuildingWorkflow(chatGPT, question)
+    }
+  )
+}
+
+export async function runPlainLLMMintakaEvaluation() {
+  return await runMintakaEvaluation(
+    "Plain LLM Evaluation Output.csv",
+    async (chatGPT:ChatGPTAPI, question:string) => {
+      return await chatGPT.sendMessages([
+        {
+          content: `You are an expert at generating SPARQL queries for the Wikidata, which is a knowledge graph of encyclopedic data from Wikipedia. Your job is not to directly answer the question, but instead to write a SPARQL query to find the answer. Start the SPARQL query with \`\`\`sparql and end the query with \`\`\`. Now generate a SPARQL query to answer the question: ${question}`,
+          role: "system",
+        },
+      ])
+    }
+  )
 }
 
 
 
-async function runOneLinkQPipeline(question:MintakaQuestionType):Promise<OutputRowType> {
+async function runOneLinkQPipeline(
+  question:MintakaQuestionType, 
+  attemptNumber:number,
+  approachCallback: ApproachCallbackFunctionType,
+):Promise<OutputRowType> {
+  if(attemptNumber < 1) throw new Error("Expected 'attemptNumber' to be positive")
+
   const output:OutputRowType = {
     id: question.id,
     question: question.question,
+    attemptNumber: attemptNumber.toString(),
+    complexityType: question.complexityType,
+    category: question.category,
     questionEntity: JSON.stringify(question.questionEntity),
     answer: JSON.stringify(question.answer),
     "IDs Table": "ID | Label | Description",
     "LLM message we tried to parse for a query": "",
-    "LinkQ generated query": "",
+    "Generated query": "",
     "Does query execute?": "No",
     "Result from Wikidata": "",
     "LLM Summary": "",
@@ -107,10 +179,8 @@ async function runOneLinkQPipeline(question:MintakaQuestionType):Promise<OutputR
 
   //set up ChatGPT
   const chatGPT = new ChatGPTAPI({
-    // apiKey: ENV.VITE_OPENAI_API_KEY,
     apiKey: import.meta.env.VITE_OPENAI_API_KEY?.trim() || "",
     chatId: 0,
-    systemMessage: INITIAL_SYSTEM_MESSAGE,
     dangerouslyAllowBrowser: true,
   })
 
@@ -127,25 +197,27 @@ async function runOneLinkQPipeline(question:MintakaQuestionType):Promise<OutputR
     }
 
 
-    //run the LinkQ pipeline
+    //run the approach
     const startTime = new Date().getTime()
-    const llmResponse = await handleUserChat(question.question,chatGPT)
+    const llmResponse = await approachCallback(chatGPT, question.question)
     const queryGenerationTime = new Date().getTime() - startTime
     output["LLM message we tried to parse for a query"] = llmResponse.content
+
+
+    //try to parse the query
     const parsedQuery = tryParsingOutQuery(llmResponse.content)
     if(!parsedQuery) {
       throw new Error("Could not parse SPARQL query from LLM response")
     }
     output["Total Seconds"] = `${queryGenerationTime/1000}`
     const query = parsedQuery.query
-    output["LinkQ generated query"] = query
+    output["Generated query"] = query
     const queryEntityData = await getEntityDataFromQuery(query)
     if(queryEntityData) {
       output["IDs Table"] += "\n" + queryEntityData.map(({id,label,description}) => {
         return `${id} | ${label} | ${description}`
       }).join("\n")
     }
-    
     
 
     //execute the query
@@ -192,7 +264,7 @@ async function runOneLinkQPipeline(question:MintakaQuestionType):Promise<OutputR
 
       if(type === "date") { //the regex doesn't work on dates for some reason
         present ||= (
-          output["LinkQ generated query"].includes(criteria)
+          output["Generated query"].includes(criteria)
         ) || (
           output["Result from Wikidata"].includes(criteria)
         )
@@ -201,7 +273,7 @@ async function runOneLinkQPipeline(question:MintakaQuestionType):Promise<OutputR
         // //we don't want "Q1" to match on "Q123"
         const wordRegex = new RegExp(String.raw`\b${criteria}\b`, "i")
         present ||= (
-          output["LinkQ generated query"].search(wordRegex)>=0
+          output["Generated query"].search(wordRegex)>=0
         ) || (
           output["Result from Wikidata"].search(wordRegex)>=0
         )
@@ -233,6 +305,3 @@ export function downloadCSV(filename:string, data:string) {
 
   document.body.removeChild(element);
 }
-
-
-
