@@ -50,7 +50,7 @@ export type MintakaQuestionType = {
 }
 
 
-export type OutputRowType = {
+export type EvaluationOutputRowType = {
   "id": string,
   "question": string,
   "attemptNumber": string,
@@ -80,7 +80,7 @@ async function runMintakaEvaluation(
   outputFileName:string,
   approachCallback: ApproachCallbackFunctionType,
 ) {
-  const outputResults:OutputRowType[] = []
+  const outputResults:EvaluationOutputRowType[] = []
   for(const question of QUESTIONS) {
     for(let i=1; i<=ATTEMPTS_PER_QUESTION; ++i) {
       console.log(`Running LinkQ on question: ${question.question}, attempt ${i}`)
@@ -154,10 +154,10 @@ async function runOneLinkQPipeline(
   question:MintakaQuestionType, 
   attemptNumber:number,
   approachCallback: ApproachCallbackFunctionType,
-):Promise<OutputRowType> {
+):Promise<EvaluationOutputRowType> {
   if(attemptNumber < 1) throw new Error("Expected 'attemptNumber' to be positive")
 
-  const output:OutputRowType = {
+  const output:EvaluationOutputRowType = {
     id: question.id,
     question: question.question,
     attemptNumber: attemptNumber.toString(),
