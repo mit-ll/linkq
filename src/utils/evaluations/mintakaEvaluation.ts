@@ -1,6 +1,18 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
+//npx tsx mintakaEvaluation.ts
+
+//you may need to manually add a User-Agent to the headers of src/utils/knowledgeBase/runQuery.ts
+
+//set up this script to work behind a proxy, if applicable
+import { setGlobalDispatcher, ProxyAgent } from "undici";
+if (process.env.HTTPS_PROXY) {
+  const dispatcher = new ProxyAgent({uri: new URL(process.env.HTTPS_PROXY).toString() });
+  setGlobalDispatcher(dispatcher);
+}
+
+import fs from "fs"
 import papaparse from "papaparse"
 
 import { ChatGPTAPI } from "../ChatGPTAPI"
@@ -12,6 +24,11 @@ import { formatSparqlResultsAsString } from "../formatSparqlResultsAsString"
 import { QUESTIONS } from "./questions"
 import { INITIAL_SYSTEM_MESSAGE } from "../knowledgeBase/prompts"
 import { queryBuildingWorkflow } from "../queryBuildingWorkflow"
+
+import { loadEnv } from 'vite'
+const ENV = loadEnv("development","../../../")
+
+runLinkQMintakaEvaluation()
 
 export type MintakaQuestionType = {
   "id": string //"bfc9807b",
@@ -64,12 +81,12 @@ export type EvaluationOutputRowType = {
   "Does query execute?": string,
   "Result from Wikidata": string,
   "LLM Summary": string,
-  "Correct answer?": string,
+  "Try to detect correct answer": string,
+  "Correct": string,
   "Total Seconds": string,
   fullChatHistory: string,
 }
 
-const ATTEMPTS_PER_QUESTION = 3
 
 type ApproachCallbackFunctionType = (
   chatGPT: ChatGPTAPI,
@@ -80,6 +97,7 @@ async function runMintakaEvaluation(
   outputFileName:string,
   approachCallback: ApproachCallbackFunctionType,
 ) {
+  const ATTEMPTS_PER_QUESTION = 1
   const outputResults:EvaluationOutputRowType[] = []
   for(const question of QUESTIONS) {
     for(let i=1; i<=ATTEMPTS_PER_QUESTION; ++i) {
@@ -100,7 +118,13 @@ async function runMintakaEvaluation(
 
   console.log("CSV")
   console.log(papaparse.unparse(outputResults, {header: true}))
-  downloadCSV(outputFileName,papaparse.unparse(outputResults, {header: true}))
+  fs.writeFile(outputFileName, papaparse.unparse(outputResults, {header: true}), err => {
+    if (err) {
+      console.error("Error writing output CSV",err);
+    } else {
+      console.log("Successfully wrote output CSV!")
+    }
+  });
 }
 
 export async function runLinkQMintakaEvaluation() {
@@ -171,7 +195,8 @@ async function runOneLinkQPipeline(
     "Does query execute?": "No",
     "Result from Wikidata": "",
     "LLM Summary": "",
-    "Correct answer?": "",
+    "Try to detect correct answer": "",
+    "Correct": "",
     "Total Seconds": "",
     fullChatHistory: "",
   }
@@ -179,9 +204,8 @@ async function runOneLinkQPipeline(
 
   //set up ChatGPT
   const chatGPT = new ChatGPTAPI({
-    apiKey: import.meta.env.VITE_OPENAI_API_KEY?.trim() || "",
+    apiKey: ENV.VITE_OPENAI_API_KEY,
     chatId: 0,
-    dangerouslyAllowBrowser: true,
   })
 
 
@@ -281,7 +305,7 @@ async function runOneLinkQPipeline(
 
       return { criteria, present }
     })
-    output["Correct answer?"] = `${searchCriteriaPresentInResults.reduce((acc, {present}) => acc && present,true)}\n\n${searchCriteriaPresentInResults.map(({criteria, present}) => `${criteria}: ${present}`).join("\n")}`
+    output["Try to detect correct answer"] = `${searchCriteriaPresentInResults.reduce((acc, {present}) => acc && present,true)}\n\n${searchCriteriaPresentInResults.map(({criteria, present}) => `${criteria}: ${present}`).join("\n")}`
   }
   catch(err) {
     console.error(err)
@@ -293,15 +317,15 @@ async function runOneLinkQPipeline(
   }
 }
 
-export function downloadCSV(filename:string, data:string) {
-  const element = document.createElement('a');
-  element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(data));
-  element.setAttribute('download', filename);
+// export function downloadCSV(filename:string, data:string) {
+//   const element = document.createElement('a');
+//   element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(data));
+//   element.setAttribute('download', filename);
 
-  element.style.display = 'none';
-  document.body.appendChild(element);
+//   element.style.display = 'none';
+//   document.body.appendChild(element);
 
-  element.click();
+//   element.click();
 
-  document.body.removeChild(element);
-}
+//   document.body.removeChild(element);
+// }

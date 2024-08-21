@@ -99,7 +99,7 @@ async function calculateMetrics(
 }
 
 function isCorrect(row: EvaluationOutputRowType) {
-  return row["Correct answer?"].split("\n")[0].trim().toUpperCase() === "TRUE"
+  return row["Correct"].split("\n")[0].trim().toUpperCase() === "TRUE"
 }
 
 
