@@ -78,9 +78,15 @@ async function calculateMetrics(
   )
 
   //make sure the questions are in the same order
+  const oneCorrectResultForQuestion = {
+    linkq: 0,
+    plainLLM: 0,
+  }
   const supplementalCSVString = papaparse.unparse(
     orderedQuestionIds.map(id => {
       const metrics = METRICS[id]
+      oneCorrectResultForQuestion.linkq += metrics.linkqCorrect>0?1:0
+      oneCorrectResultForQuestion.plainLLM += metrics.plainLLMCorrect>0?1:0
       return {
         ...metrics,
         "LinkQ # Correct": `${metrics.linkqCorrect}/${metrics.total}`,
@@ -96,14 +102,19 @@ async function calculateMetrics(
       console.log("Successfully wrote output CSV!")
     }
   });
+  console.log("oneCorrectResultForQuestion",oneCorrectResultForQuestion)
 }
 
 function isCorrect(row: EvaluationOutputRowType) {
-  return row["Correct"].split("\n")[0].trim().toUpperCase() === "TRUE"
+  const value = row["Correct"].split("\n")[0].trim().toUpperCase()
+  if(value !== "YES" && value!=="NO") {
+    throw new Error(`Encountered unexpected correct value ${value}`)
+  }
+  return value === "YES"
 }
 
 
-function parseCSVFile<T>(path:string):Promise<T[]> {
+export function parseCSVFile<T>(path:string):Promise<T[]> {
   return new Promise((resolve) => {
     const file = fs.createReadStream(path)
     papaparse.parse<T>(file, {

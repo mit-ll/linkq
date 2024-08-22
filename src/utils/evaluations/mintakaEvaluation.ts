@@ -29,15 +29,16 @@ import { loadEnv } from 'vite'
 const ENV = loadEnv("development","../../../")
 
 runLinkQMintakaEvaluation()
+// runPlainLLMMintakaEvaluation()
 
 export type MintakaQuestionType = {
   "id": string //"bfc9807b",
   "question": string //"What state is the author of Misery from?",
   "translations"?: any
   "questionEntity": {
-    "name": string | number //"Q596874",
+    "name": string | number | null //"Q596874",
     "entityType": string //"entity",
-    "label"?: string //"Misery",
+    "label"?: string | null //"Misery",
     "mention": string //"Misery",
     "span": number[] //[28,34]
   }[],
@@ -97,7 +98,7 @@ async function runMintakaEvaluation(
   outputFileName:string,
   approachCallback: ApproachCallbackFunctionType,
 ) {
-  const ATTEMPTS_PER_QUESTION = 1
+  const ATTEMPTS_PER_QUESTION = 3
   const outputResults:EvaluationOutputRowType[] = []
   for(const question of QUESTIONS) {
     for(let i=1; i<=ATTEMPTS_PER_QUESTION; ++i) {
@@ -109,27 +110,21 @@ async function runMintakaEvaluation(
           approachCallback,
         )
       )
+
+      fs.writeFile(outputFileName, papaparse.unparse(outputResults, {header: true}), err => {
+        if (err) {
+          console.error("Error writing output CSV",err);
+        }
+      })
     }
-    
   }
 
-  console.log("JSON")
-  console.log(JSON.stringify(outputResults, undefined, 2))
-
-  console.log("CSV")
-  console.log(papaparse.unparse(outputResults, {header: true}))
-  fs.writeFile(outputFileName, papaparse.unparse(outputResults, {header: true}), err => {
-    if (err) {
-      console.error("Error writing output CSV",err);
-    } else {
-      console.log("Successfully wrote output CSV!")
-    }
-  });
+  console.log("Done with evaluation!")
 }
 
 export async function runLinkQMintakaEvaluation() {
   return await runMintakaEvaluation(
-    "LinkQ Evaluation Output.csv",
+    `LinkQ Evaluation Output ${new Date().getTime()}.csv`,
     async (chatGPT:ChatGPTAPI, question:string) => {
       //force the LLM to start the query building workflow
       chatGPT.messages = [
@@ -160,7 +155,7 @@ export async function runLinkQMintakaEvaluation() {
 
 export async function runPlainLLMMintakaEvaluation() {
   return await runMintakaEvaluation(
-    "Plain LLM Evaluation Output.csv",
+    `Plain LLM Evaluation Output ${new Date().getTime()}.csv`,
     async (chatGPT:ChatGPTAPI, question:string) => {
       return await chatGPT.sendMessages([
         {
