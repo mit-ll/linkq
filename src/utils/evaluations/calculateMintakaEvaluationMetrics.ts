@@ -15,8 +15,10 @@ type MetricType = {
   category: string,
   id: string,
   question: string,
-  linkqCorrect: number,
-  plainLLMCorrect: number,
+  linkqQuerySyntaxCorrect: number,
+  linkqAnswerCorrect: number,
+  plainLLMQuerySyntaxCorrect: number,
+  plainLLMAnswerCorrect: number,
   total: number,
 }
 
@@ -51,18 +53,24 @@ async function calculateMetrics(
         category: linkqRow.category,
         id,
         question: linkqRow.question,
-        linkqCorrect: 0,
-        plainLLMCorrect: 0,
+        linkqAnswerCorrect: 0,
+        linkqQuerySyntaxCorrect: 0,
+        plainLLMAnswerCorrect: 0,
+        plainLLMQuerySyntaxCorrect: 0,
         total: 0,
       }
     }
 
     //determine if this question was answered correctly
-    const linkqIsCorrect = isCorrect(linkqRow)
-    METRICS[id].linkqCorrect += linkqIsCorrect ? 1 : 0
+    const linkqIsAnswerCorrect = isAnswerCorrect(linkqRow)
+    const linkqIsSyntaxCorrect = isSyntaxCorrect(linkqRow)
+    METRICS[id].linkqAnswerCorrect += getSum(linkqIsAnswerCorrect)
+    METRICS[id].linkqQuerySyntaxCorrect += getSum(linkqIsSyntaxCorrect)
 
-    const plainLLMIsCorrect = isCorrect(plainLLMRow)
-    METRICS[id].plainLLMCorrect += plainLLMIsCorrect ? 1 : 0
+    const plainLLMIsAnswerCorrect = isAnswerCorrect(plainLLMRow)
+    const plainLLMIsSyntaxCorrect = isSyntaxCorrect(plainLLMRow)
+    METRICS[id].plainLLMAnswerCorrect += getSum(plainLLMIsAnswerCorrect)
+    METRICS[id].plainLLMQuerySyntaxCorrect += getSum(plainLLMIsSyntaxCorrect)
 
     METRICS[id].total += 1
   })
@@ -77,20 +85,28 @@ async function calculateMetrics(
     }, new Set<string>())
   )
 
-  //make sure the questions are in the same order
-  const oneCorrectResultForQuestion = {
+  const oneCorrectAnswerForQuestion = {
+    linkq: 0,
+    plainLLM: 0,
+  }
+  const oneCorrectQuerySyntaxForQuestion = {
     linkq: 0,
     plainLLM: 0,
   }
   const supplementalCSVString = papaparse.unparse(
+    //make sure the questions are in the same order
     orderedQuestionIds.map(id => {
       const metrics = METRICS[id]
-      oneCorrectResultForQuestion.linkq += metrics.linkqCorrect>0?1:0
-      oneCorrectResultForQuestion.plainLLM += metrics.plainLLMCorrect>0?1:0
+      oneCorrectAnswerForQuestion.linkq += metrics.linkqAnswerCorrect>0?1:0
+      oneCorrectQuerySyntaxForQuestion.linkq += metrics.linkqQuerySyntaxCorrect>0?1:0
+      oneCorrectAnswerForQuestion.plainLLM += metrics.plainLLMAnswerCorrect>0?1:0
+      oneCorrectQuerySyntaxForQuestion.plainLLM += metrics.plainLLMQuerySyntaxCorrect>0?1:0
       return {
         ...metrics,
-        "LinkQ # Correct": `${metrics.linkqCorrect}/${metrics.total}`,
-        "Plain LLM # Correct": `${metrics.plainLLMCorrect}/${metrics.total}`,
+        "LinkQ # Answer Correct": `${metrics.linkqAnswerCorrect}/${metrics.total}`,
+        "LinkQ # Syntax Correct": `${metrics.linkqQuerySyntaxCorrect}/${metrics.total}`,
+        "Plain LLM # Answer Correct": `${metrics.plainLLMAnswerCorrect}/${metrics.total}`,
+        "Plain LLM # Syntax Correct": `${metrics.plainLLMQuerySyntaxCorrect}/${metrics.total}`,
       }
     }),
     {header: true}
@@ -102,13 +118,27 @@ async function calculateMetrics(
       console.log("Successfully wrote output CSV!")
     }
   });
-  console.log("oneCorrectResultForQuestion",oneCorrectResultForQuestion)
+  console.log("oneCorrectAnswerForQuestion",oneCorrectAnswerForQuestion)
+  console.log("oneCorrectQuerySyntaxForQuestion",oneCorrectQuerySyntaxForQuestion)
 }
 
-function isCorrect(row: EvaluationOutputRowType) {
+
+function getSum(correct:boolean) {
+  return correct ? 1 : 0
+}
+
+function isAnswerCorrect(row: EvaluationOutputRowType) {
   const value = row["Correct"].split("\n")[0].trim().toUpperCase()
   if(value !== "YES" && value!=="NO") {
-    throw new Error(`Encountered unexpected correct value ${value}`)
+    throw new Error(`Encountered unexpected correct answer value ${value}`)
+  }
+  return value === "YES"
+}
+
+function isSyntaxCorrect(row: EvaluationOutputRowType) {
+  const value = row["Does query execute?"].split("\n")[0].trim().toUpperCase()
+  if(value !== "YES" && value!=="NO") {
+    throw new Error(`Encountered unexpected correct syntax value ${value}`)
   }
   return value === "YES"
 }
