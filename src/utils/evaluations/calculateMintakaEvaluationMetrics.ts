@@ -22,6 +22,13 @@ type MetricType = {
   total: number,
 }
 
+
+type CounterType = {
+  _total_: number,
+  [complexityType:string]: number,
+}
+
+
 async function calculateMetrics(
   linkqDataPath:string,
   plainLLMDataPath:string,
@@ -43,7 +50,7 @@ async function calculateMetrics(
   linkqData.forEach((linkqRow,i) => {
     const plainLLMRow = plainLLMData[i]
     if(linkqRow.id !== plainLLMRow.id) {
-      throw new Error(`The question ID at index ${i} did not match between the LinkQ and plain LLM data`)
+      throw new Error(`The question ID at index ${i} did not match between the LinkQ ${linkqRow.id} and plain LLM data ${plainLLMRow.id}`)
     }
 
     const id = linkqRow.id
@@ -85,22 +92,33 @@ async function calculateMetrics(
     }, new Set<string>())
   )
 
-  const oneCorrectAnswerForQuestion = {
-    linkq: 0,
-    plainLLM: 0,
+  const oneCorrectAnswerForQuestion:{linkq:CounterType,plainLLM:CounterType} = {
+    linkq: { _total_: 0 },
+    plainLLM: { _total_: 0 },
   }
-  const oneCorrectQuerySyntaxForQuestion = {
-    linkq: 0,
-    plainLLM: 0,
+  const oneCorrectQuerySyntaxForQuestion:{linkq:CounterType,plainLLM:CounterType} = {
+    linkq: { _total_: 0 },
+    plainLLM: { _total_: 0 },
   }
   const supplementalCSVString = papaparse.unparse(
     //make sure the questions are in the same order
     orderedQuestionIds.map(id => {
       const metrics = METRICS[id]
-      oneCorrectAnswerForQuestion.linkq += metrics.linkqAnswerCorrect>0?1:0
-      oneCorrectQuerySyntaxForQuestion.linkq += metrics.linkqQuerySyntaxCorrect>0?1:0
-      oneCorrectAnswerForQuestion.plainLLM += metrics.plainLLMAnswerCorrect>0?1:0
-      oneCorrectQuerySyntaxForQuestion.plainLLM += metrics.plainLLMQuerySyntaxCorrect>0?1:0
+      if(!oneCorrectAnswerForQuestion.linkq[metrics.complexityType]) {
+        oneCorrectAnswerForQuestion.linkq[metrics.complexityType] = 0
+        oneCorrectQuerySyntaxForQuestion.linkq[metrics.complexityType] = 0
+        oneCorrectAnswerForQuestion.plainLLM[metrics.complexityType] = 0
+        oneCorrectQuerySyntaxForQuestion.plainLLM[metrics.complexityType] = 0
+      }
+
+      oneCorrectAnswerForQuestion.linkq._total_ += metrics.linkqAnswerCorrect>0?1:0
+      oneCorrectAnswerForQuestion.linkq[metrics.complexityType] += metrics.linkqAnswerCorrect>0?1:0
+      oneCorrectQuerySyntaxForQuestion.linkq._total_ += metrics.linkqQuerySyntaxCorrect>0?1:0
+      oneCorrectQuerySyntaxForQuestion.linkq[metrics.complexityType] += metrics.linkqQuerySyntaxCorrect>0?1:0
+      oneCorrectAnswerForQuestion.plainLLM._total_ += metrics.plainLLMAnswerCorrect>0?1:0
+      oneCorrectAnswerForQuestion.plainLLM[metrics.complexityType] += metrics.plainLLMAnswerCorrect>0?1:0
+      oneCorrectQuerySyntaxForQuestion.plainLLM._total_ += metrics.plainLLMQuerySyntaxCorrect>0?1:0
+      oneCorrectQuerySyntaxForQuestion.plainLLM[metrics.complexityType] += metrics.plainLLMQuerySyntaxCorrect>0?1:0
       return {
         ...metrics,
         "LinkQ # Answer Correct": `${metrics.linkqAnswerCorrect}/${metrics.total}`,

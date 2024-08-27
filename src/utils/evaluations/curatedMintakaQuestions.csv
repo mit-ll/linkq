@@ -95,3 +95,27 @@ Intersection,sports3,85ac6b62,Which team plays in Cleveland and used to have Fra
 Intersection,videogames1,95b4ddf3,Which game is in the Final Fantasy series and has Kuja as the main villain?
 Intersection,videogames2,8a337a62,Which game is in the Borderlands series and was developed by Telltale Games?
 Intersection,videogames3,46c82906,Which GTA game came out in 2004 and was set in California?
+Comparative,books1,13bbf715,"What series has more books, Hunger Games or Game of Thrones?"
+Comparative,books2,7576776d,"Which came out first, The Hobbit or The Lord of the Rings?"
+Comparative,books3,c2fe4d0e,Who was older at death between Carl Sagan and Ray Bradbury?
+Comparative,geography1,76f0c12d,"Which country is bigger in area, the U.S.A or Albania?"
+Comparative,geography2,917f3dc5,"Which tower is taller, Tokyo Tower or the Eiffel Tower?"
+Comparative,geography3,05770fb8,"Which is the most populated state, California or New York?"
+Comparative,history1,3a55e6b9,"Which war lasted longer, the Spanish-American War or the Vietnam War?"
+Comparative,history2,e6ff8df3,"Who was born first, Queen Victoria or Elizabeth Cady Stanton?"
+Comparative,history3,99e9637a,"Which war had a larger death toll, World War I or World War II?"
+Comparative,movies1,27d19315,"Who is the older actor, Morgan Freeman or Kevin Spacey?"
+Comparative,movies2,96599edb,"Which movie made more money at the box office, Avengers: Endgame or Avengers: Infinity War?"
+Comparative,movies3,b3d206a4,"Which movie came out first, Transformers or Toy Story 2?"
+Comparative,music1,2ac68339,"Which band came first, NSYNC or Backstreet Boys?"
+Comparative,music2,276a5680,"Who won more Grammys, Britney Spears or Beyoncé?"
+Comparative,music3,06b6a8b1,"Who sang It Ain't Me Babe first, Johnny Cash or Bob Dylan?"
+Comparative,politics1,6ad0be15,"Who was elected president first, George Washington or Thomas Jefferson?"
+Comparative,politics2,cc8fd9e5,Is Joe Biden a Democrat or Republican?
+Comparative,politics3,c2bc39fd,"Which country joined NATO earlier, Turkey or Poland?"
+Comparative,sports1,a5ff8969,"Who has won more NBA Season MVPs, LeBron James or Steph Curry?"
+Comparative,sports2,186595b5,"Who is younger, Venus Williams or Serena Williams?"
+Comparative,sports3,112e2782,"Who scored more career points, Wayne Gretzky or Mario Lemieux?"
+Comparative,videogames1,653c4261,"Which series has more games, Jak and Daxter or Ratchet & Clank?"
+Comparative,videogames2,919c28ec,"Which system was released first in North America, Sega Genesis or Super Nintendo?"
+Comparative,videogames3,c49d2d40,"Who is taller, Mario or Luigi?"
