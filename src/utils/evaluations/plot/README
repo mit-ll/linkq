@@ -1,0 +1,6 @@
+1.) Go to the evaluation results in google drive.
+2.) Download the results as a CSV without any extraneous tables that may be in the sheet
+3.) Create a new folder within this one called 'raw_data'
+4.) Place the results CSV from step 2 in the 'raw_data' folder
+5.) Rename the results CSV to 'evaluation-results.csv'
+6.) Run validation_figures.py in an environment with seaborn installed. (An example requirements.txt is provided.)
