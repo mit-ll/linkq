@@ -46,6 +46,10 @@ async function calculateMetrics(
     throw new Error(`linkqData and plainLLMData lengths do not match`)
   }
 
+  const queryGenerationTimes:{linkq:number[],plainLLM:number[]} = {
+    linkq: [],
+    plainLLM: [],
+  }
   //process each row
   linkqData.forEach((linkqRow,i) => {
     const plainLLMRow = plainLLMData[i]
@@ -80,6 +84,19 @@ async function calculateMetrics(
     METRICS[id].plainLLMQuerySyntaxCorrect += getSum(plainLLMIsSyntaxCorrect)
 
     METRICS[id].total += 1
+
+
+    //track timings
+    if(linkqRow["Total Seconds"].trim()) {
+      queryGenerationTimes.linkq.push(
+        parseFloat(linkqRow["Total Seconds"].trim())
+      )
+    }
+    if(plainLLMRow["Total Seconds"].trim()) {
+      queryGenerationTimes.plainLLM.push(
+        parseFloat(plainLLMRow["Total Seconds"].trim())
+      )
+    }
   })
   console.log("Done processing")
 
@@ -92,6 +109,7 @@ async function calculateMetrics(
     }, new Set<string>())
   )
 
+  
   const oneCorrectAnswerForQuestion:{linkq:CounterType,plainLLM:CounterType} = {
     linkq: { _total_: 0 },
     plainLLM: { _total_: 0 },
@@ -138,6 +156,9 @@ async function calculateMetrics(
   });
   console.log("oneCorrectAnswerForQuestion",oneCorrectAnswerForQuestion)
   console.log("oneCorrectQuerySyntaxForQuestion",oneCorrectQuerySyntaxForQuestion)
+
+  console.log("Average time for LinkQ query generation", meanAndStd(queryGenerationTimes.linkq))
+  console.log("Average time for Plain LLM query generation", meanAndStd(queryGenerationTimes.plainLLM))
 }
 
 
@@ -172,4 +193,27 @@ export function parseCSVFile<T>(path:string):Promise<T[]> {
       }
     })
   })
+}
+
+function meanAndStd(numArray: number[]) {
+  let min = Infinity
+  let max = -Infinity
+  const mean = numArray.reduce((sum, n) => {
+    if(min===null || n < min) {
+      min = n
+    }
+    if(max===null || n > max) {
+      max = n
+    }
+
+    return sum + n
+  }) / numArray.length;
+  const variance = numArray.reduce((s, n) => s + (n - mean) ** 2, 0) / (numArray.length - 1);
+  return {
+    max,
+    mean,
+    min,
+    variance,
+    std: Math.sqrt(variance),
+  }
 }
