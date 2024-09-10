@@ -1,3 +1,6 @@
+# Copyright (c) 2024 Massachusetts Institute of Technology
+# SPDX-License-Identifier: MIT
+
 from pathlib import Path
 
 import pandas as pd
