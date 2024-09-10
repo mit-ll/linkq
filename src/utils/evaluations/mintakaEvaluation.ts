@@ -29,7 +29,7 @@ import { loadEnv } from 'vite'
 const ENV = loadEnv("development","../../../")
 
 runLinkQMintakaEvaluation()
-// runPlainLLMMintakaEvaluation()
+runPlainLLMMintakaEvaluation()
 
 export type MintakaQuestionType = {
   "id": string //"bfc9807b",
