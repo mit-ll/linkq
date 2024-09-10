@@ -4,23 +4,36 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-sns.set(rc={'figure.dpi': 300, 'savefig.dpi': 300, 'figure.figsize':(8, 6)})
+sns.set(rc={'figure.dpi': 300, 'savefig.dpi': 300})
 
 ROOT = Path(__file__).parent
 DATA = Path(ROOT / 'raw_data')
 PLOTS = Path(ROOT / 'plots')
 
-def get_data():
-    df = pd.read_csv(Path(DATA, 'evaluation-results.csv'), usecols=['linkqAnswerCorrect', 'plainLLMAnswerCorrect', 'complexityType', 'category', 'id', 'question'])
+def get_aggregated_accuracy_data():
+    df = pd.read_csv(Path(DATA, 'aggregated-evaluation-results.csv'), usecols=['linkqAnswerCorrect', 'plainLLMAnswerCorrect', 'complexityType', 'category', 'id', 'question'])
     df = df.rename(columns={'linkqAnswerCorrect': 'LinkQ', 'plainLLMAnswerCorrect': 'GPT', 'complexityType': 'Category', 'category': 'Domain'})
     df = df.replace(to_replace={'multihop': 'MultiHop', 'generic': 'Generic', 'intersection': 'Intersection', 'yesno': 'Yes/No', 'comparative': 'Comparative'})
     return df
 
+def get_raw_timing_data():
+    timing_columns = ['Total Seconds', 'id', 'complexityType', 'category']
+    linkq_df = pd.read_csv(Path(DATA, 'linq-evaluation-results.csv'), usecols=timing_columns)
+    linkq_df['Algorithm'] = 'LinkQ'
+    plainllm_df = pd.read_csv(Path(DATA, 'plainllm-evaluation-results.csv'), usecols=timing_columns)
+    plainllm_df['Algorithm'] = 'GPT'
+    combined_df = pd.concat([linkq_df, plainllm_df]).reset_index(drop=True)
+    combined_df = combined_df.rename(columns={'complexityType': 'Category', 'category': 'Domain'})
+    return combined_df.replace(to_replace={'multihop': 'MultiHop', 'generic': 'Generic', 'intersection': 'Intersection', 'yesno': 'Yes/No', 'comparative': 'Comparative'})
+
 def percent_formatter(x):
     return f'{round(x)}%'
 
-def bar_chart_percent_correct_by_category(df):
-    num_questions_per_category = len(df) / len(df['Category'].unique())
+def accuracy_barchart_by_category():
+    df = get_aggregated_accuracy_data()
+    # Assumes same number of questions per category
+    # If so must be int
+    num_questions_per_category = len(df) // len(df['Category'].unique())
     df['LinkQ'] = (df['LinkQ'] > 0).astype(int)
     df['GPT'] = (df['GPT'] > 0).astype(int)
     df = pd.melt(df, id_vars=['id', 'Domain', 'Category', 'question'], var_name='Algorithm', value_name='Correct')
@@ -31,13 +44,19 @@ def bar_chart_percent_correct_by_category(df):
 
     for container in ax.containers:
         ax.bar_label(container, fmt=percent_formatter)
-    plt.savefig(Path(PLOTS, 'evaluation_results.pdf'), bbox_inches='tight', format='pdf')
+    plt.savefig(Path(PLOTS, 'accuracy_barchart_by_category.pdf'), bbox_inches='tight', format='pdf')
+    plt.close()
 
+def timing_boxplot_by_category():
+    df = get_raw_timing_data()
+    sns.boxplot(df, x='Category', y='Total Seconds', hue='Algorithm')
+    plt.savefig(Path(PLOTS, 'timing_boxplot_by_category.pdf'), bbox_inches='tight', format='pdf')
+    plt.close()
 
 def main():
     PLOTS.mkdir(exist_ok=True)
-    df = get_data()
-    bar_chart_percent_correct_by_category(df)
+    accuracy_barchart_by_category()
+    timing_boxplot_by_category()
 
 
 if __name__ == '__main__':
