@@ -1,0 +1,12 @@
+1.) Go to the evaluation results in google drive.
+2.) Download as a CSV without any extraneous tables that may be in the sheet
+    - aggregated results
+    - linkq results
+    - plainllm results
+3.) Create a new folder within this one called 'raw_data'
+4.) Place the CSVs from step 2 in the 'raw_data' folder
+5.) Rename the CSVs:
+    - 'Evaluation for CHI - Aggregated Results': 'aggregated-evaluation-results.csv'
+    - 'Evaluation for CHI - Plain LLM Evaluation Output': 'plainllm-evaluation-results.csv'
+    - 'Evaluation for CHI - LinkQ Evaluation Output': 'linq-evaluation-results.csv'
+6.) Run validation_figures.py in an environment with seaborn installed. (An example requirements.txt is provided.)

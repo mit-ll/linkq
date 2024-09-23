@@ -1,0 +1,121 @@
+complexityType,category,id,question
+Multihop,books1,72dfb112,When did the author who wrote The House of Mirth die?
+Multihop,books2,f25c49a0,Where was the author who wrote Oliver Twist born?
+Multihop,books3,d701867e,Where was the Nobel Prize in Literature winner from 2002 born?
+Multihop,geography1,2f46cfa2,What is the tallest mountain in the largest country in Asia?
+Multihop,geography2,916271fd,What is the capital of the country where Mount Fuji is located?
+Multihop,geography3,2023d048,What is the smallest country containing part of the Sahara desert?
+Multihop,history1,ad2cb44f,How old was Queen Elizabeth II when her father King George VI died?
+Multihop,history2,376635f2,"During WWI, which country was a part of the Allied alliance until 1917?"
+Multihop,history3,57025a25,In what year did the inventor of the printing press die?
+Multihop,movies1,c8de95e4,When was the actor who played Ron Weasley born?
+Multihop,movies2,9f65ffbf,Where is the actor who played Henry Hill from?
+Multihop,movies3,a199458c,How tall is the actor who played the title role in the Harry Potter movies?
+Multihop,music1,c25ca16b,"How old was the singer of ""All Along the Watchtower"" when he died?"
+Multihop,music2,4460f91b,How old was the lead singer of Creedence Clearwater Revival when they performed at Woodstock?
+Multihop,music3,e22a184f,Where was the guitarist from R.E.M. born?
+Multihop,politics1,b95c2731,What party did the US president during the Mexican-American War belong to?
+Multihop,politics2,bb6aa601,Who was the wife of the 38th US president?
+Multihop,politics3,788a7265,How many children did the second president of the United States have?
+Multihop,sports1,9e2e84fb,Where was the men's winner of Wimbledon 2019 born?
+Multihop,sports2,11dd3a69,From which country was the men's Springboard Diving Gold medal winner at the Olympics in 1908?
+Multihop,sports3,203bdcce,Which quarterback has six Super Bowl rings from winning?
+Multihop,videogames1,47fb38e9,Who is the protagonist in the eighth Final Fantasy game?
+Multihop,videogames2,113d342a,Who is the grass-type starter Pokémon of Pokémon Diamond?
+Multihop,videogames3,2a337efe,What is the first game for the SNES in the series that features Link as the hero?
+Yes/no,books1,8ad0b061,Is Nick Carraway the narrator of The Great Gatsby?
+Yes/no,books2,de1ed0a6,Did George R.R. Martin write a Star Wars novel?
+Yes/no,books3,a74beceb,Is Exodus a book by Leon Uris?
+Yes/no,geography1,a7b4695f,Is Amsterdam the capital of the Netherlands?
+Yes/no,geography2,e7446181,Is the Bermuda Triangle located in the Caribbean?
+Yes/no,geography3,dd810f51,Is Luxembourg in Asia?
+Yes/no,history1,a87ee365,Did Virginia become a U.S. state before Tennessee?
+Yes/no,history2,9201a6f5,Did Marie Antoinette die by execution?
+Yes/no,history3,70807fd1,Did John F. Kennedy die in 1960?
+Yes/no,movies1,4b8e5cb3,Was Johnny Depp in the movie Dazed and Confused?
+Yes/no,movies2,0a9270d8,Was Con Air released in 1990?
+Yes/no,movies3,4e452720,Was the movie American Sniper based on real-life events?
+Yes/no,music1,d4a491cd,Are R.E.M. in the Rock n' Roll Hall of Fame?
+Yes/no,music2,d37ba23f,Has Kendrick Lamar won a Grammy?
+Yes/no,music3,38a4a081,Did Michael Jackson's Thriller come out before Off the Wall?
+Yes/no,politics1,5b9f65c5,Was John Adams the second president of the United States?
+Yes/no,politics2,faa32973,Is France a monarchy country?
+Yes/no,politics3,f9e139cb,Does Japan have a communist political system?
+Yes/no,sports1,4b40eb1f,Is LeBron James a Manchester United Player?
+Yes/no,sports2,8009a865,Is gymnastics a sport in the Winter Olympics?
+Yes/no,sports3,55cce8c3,Did the US women's soccer team win a gold medal in the 1996 Olympics?
+Yes/no,videogames1,9b5ebad7,Did Mario originate in Donkey Kong?
+Yes/no,videogames2,d4a0de85,Was Dragon Age Origins developed by Bethesda?
+Yes/no,videogames3,436483a7,Does Final Fantasy have more than one game?
+Generic,books1,9167dc04,What is J. K. Rowling's real name?
+Generic,books2,0b382a20,How many Maze Runner books are there?
+Generic,books3,56ec4e64,What year did Hemingway publish The Old Man and the Sea?
+Generic,geography1,3b4a2856,Djibouti city is the capital of which country?
+Generic,geography2,523fceec,What is the largest city in Texas?
+Generic,geography3,c9ce0587,What city is the Pantheon located in?
+Generic,history1,c89a25c2,What year did Marie Curie win the Nobel Prize for Chemistry?
+Generic,history2,1c005b1f,Who was the president of the United States during the Civil War?
+Generic,history3,c4511174,Who was the 5th emperor of the Romans?
+Generic,movies1,4c68a501,How many years after Terminator was Terminator Dark Fate released?
+Generic,movies2,98e02349,Who directed the first Spider-Man trilogy?
+Generic,movies3,2d528e99,What is Jerry Seinfeld's wife's name?
+Generic,music1,6b817742,What Black Sabbath album contains the song Iron Man?
+Generic,music2,6df4a45c,Which movie did Trent Reznor of Nine Inch Nails win an Oscar for producing the score?
+Generic,music3,684112e6,What was Lady Gaga's first album?
+Generic,politics1,a85e28c3,Did Bill Clinton belong to the Republican or Democratic Party?
+Generic,politics2,5d672e05,Who was the 22nd president?
+Generic,politics3,758b20b6,What type of government does Angola have?
+Generic,sports1,2725e9c1,What was the previous name of Truist Park?
+Generic,sports2,73f4ff86,Who won the 2006 NBA Finals?
+Generic,sports3,1210528f,When were the Dallas Cowboys founded?
+Generic,videogames1,a0dacedc,What is the name of Mario's brother?
+Generic,videogames2,863bcc3d,What character do you play as in Metal Gear Solid?
+Generic,videogames3,4bba027c,What was the name of Joel's daughter in The Last of Us?
+Intersection,books1,a0462782,"Who won two Pulitzer Prizes for fiction and was born in Reading, PA?"
+Intersection,books2,512730cb,Which book in the A Song of Ice and Fire series was first published in 1998?
+Intersection,books3,07f850f2,Who was an English instructor at Clarke University and a novelist?
+Intersection,geography1,4ddd4a5a,Which state has the tallest mountain and the most rivers?
+Intersection,geography2,477f487f,What state is in New England and doesn't border Massachusetts?
+Intersection,geography3,5c73b97c,Which state is the 47th largest state by area and home to Kilauea?
+Intersection,history1,695e3f04,Who was a Nobel Peace Prize winner and a president of the Soviet Union?
+Intersection,history2,1b659978,What U.S. president was born in Massachusetts and was a Republican?
+Intersection,history3,7fbb80ca,Who was the king of Egypt and was married to Ankhesenamun?
+Intersection,movies1,28332e38,Which live-action movie did Adam Sandler produce and was directed by Dennis Dugan?
+Intersection,movies2,d7a1ef27,Which movie starred Edward Norton and Brad Pitt?
+Intersection,movies3,a451078b,Which movie was directed by Martin Scorsese and won an Academy Award for Best Director?
+Intersection,music1,64e929a2,Which member of Black Eyed Peas appeared in Poseidon?
+Intersection,music2,85b38360,Which member of the New Kids on the Block was the brother of Mark Wahlberg?
+Intersection,music3,d08f41bc,Who is the singer in G-Idle who was born in Thailand?
+Intersection,politics1,c3513429,Who was governor of Pennsylvania and also the first Secretary of Homeland Security?
+Intersection,politics2,bf58b2be,"Who ran for president in 2008 and was born in Honolulu, Hawaii?"
+Intersection,politics3,192af9d2,"Who was a U.S. president and was born on October 30, 1735?"
+Intersection,sports1,d653484b,Which team did Kobe Bryant used to play in 2016 that founded was in 1947?
+Intersection,sports2,44594446,"Who was a member of the 2004 U.S. Olympic men's swim team and born in Odessa, Odessa, Ukrainian SSR, Soviet Union?"
+Intersection,sports3,85ac6b62,Which team plays in Cleveland and used to have Frank Ryan?
+Intersection,videogames1,95b4ddf3,Which game is in the Final Fantasy series and has Kuja as the main villain?
+Intersection,videogames2,8a337a62,Which game is in the Borderlands series and was developed by Telltale Games?
+Intersection,videogames3,46c82906,Which GTA game came out in 2004 and was set in California?
+Comparative,books1,13bbf715,"What series has more books, Hunger Games or Game of Thrones?"
+Comparative,books2,7576776d,"Which came out first, The Hobbit or The Lord of the Rings?"
+Comparative,books3,c2fe4d0e,Who was older at death between Carl Sagan and Ray Bradbury?
+Comparative,geography1,76f0c12d,"Which country is bigger in area, the U.S.A or Albania?"
+Comparative,geography2,917f3dc5,"Which tower is taller, Tokyo Tower or the Eiffel Tower?"
+Comparative,geography3,05770fb8,"Which is the most populated state, California or New York?"
+Comparative,history1,3a55e6b9,"Which war lasted longer, the Spanish-American War or the Vietnam War?"
+Comparative,history2,e6ff8df3,"Who was born first, Queen Victoria or Elizabeth Cady Stanton?"
+Comparative,history3,99e9637a,"Which war had a larger death toll, World War I or World War II?"
+Comparative,movies1,27d19315,"Who is the older actor, Morgan Freeman or Kevin Spacey?"
+Comparative,movies2,96599edb,"Which movie made more money at the box office, Avengers: Endgame or Avengers: Infinity War?"
+Comparative,movies3,b3d206a4,"Which movie came out first, Transformers or Toy Story 2?"
+Comparative,music1,2ac68339,"Which band came first, NSYNC or Backstreet Boys?"
+Comparative,music2,276a5680,"Who won more Grammys, Britney Spears or Beyoncé?"
+Comparative,music3,06b6a8b1,"Who sang It Ain't Me Babe first, Johnny Cash or Bob Dylan?"
+Comparative,politics1,6ad0be15,"Who was elected president first, George Washington or Thomas Jefferson?"
+Comparative,politics2,cc8fd9e5,Is Joe Biden a Democrat or Republican?
+Comparative,politics3,c2bc39fd,"Which country joined NATO earlier, Turkey or Poland?"
+Comparative,sports1,a5ff8969,"Who has won more NBA Season MVPs, LeBron James or Steph Curry?"
+Comparative,sports2,186595b5,"Who is younger, Venus Williams or Serena Williams?"
+Comparative,sports3,112e2782,"Who scored more career points, Wayne Gretzky or Mario Lemieux?"
+Comparative,videogames1,653c4261,"Which series has more games, Jak and Daxter or Ratchet & Clank?"
+Comparative,videogames2,919c28ec,"Which system was released first in North America, Sega Genesis or Super Nintendo?"
+Comparative,videogames3,c49d2d40,"Who is taller, Mario or Luigi?"

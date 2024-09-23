@@ -14,10 +14,11 @@ import { useRunQuery } from '../../hooks/useRunQuery';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 
 import { setQueryValue } from '../../redux/queryValueSlice';
-import { queryBuildingWorkflow } from '../../utils/queryBuildingWorkflow';
 import { useMakeChatGPTAPIInstance } from '../../hooks/useMakeChatGPTAPIInstance';
 import { addMessageToSimpleChatHistory, toggleShowFullChatHistory } from '../../redux/chatHistorySlice';
 import { INITIAL_SYSTEM_MESSAGE } from '../../utils/knowledgeBase/prompts';
+import { handleUserChat } from '../../utils/handleUserChat';
+import { tryParsingOutQuery } from '../../utils/tryParsingOutQuery';
 
 
 
@@ -61,28 +62,18 @@ export function Chat() {
      * @param text  the user's message
      */
     mutationFn: async (text:string) => {
-      const userMessage = { content: text, role: "user" } as const
-      
       //add the user's message to the simple chat history
       dispatch(addMessageToSimpleChatHistory({
-        ...userMessage,
         chatId: chatGPT.chatId,
+        content: text, 
         name: "user",
+        role: "user",
       }))
 
-      //get the LLM to response
-      let llmResponse = await chatGPT.sendMessages([ userMessage ])
-  
-      //determine what to do with the LLM's response
-      if(llmResponse.content.includes("BUILD QUERY")) {
-        //if we want to use the query building workflow
-        llmResponse = await queryBuildingWorkflow(chatGPT, text) 
-      }
-      //else converse with the assistant like normal
+      const llmResponse = await handleUserChat(text, chatGPT)
 
       //add the LLM's final response to the simple chat
       dispatch(addMessageToSimpleChatHistory(llmResponse))
-
     },
     onError(err) {
       console.error(err)
@@ -172,25 +163,7 @@ function RenderLLMResponse({
   return <pre className={styles.chat}>{text}</pre>
 }
 
-function tryParsingOutQuery(text: string) {
-  let split = text.split("```sparql")
-  if(split.length === 2) {
-    const [query, post] = split[1].split("```")
-    return {pre: split[0], query, post}
-  }
-  
-  split = text.split("```\nSELECT")
-  if(split.length === 2) {
-    const [queryWithoutSelect, post] = split[1].split("```")
-    return {pre: split[0], query: "SELECT" + queryWithoutSelect, post}
-  }
-  split = text.split("SELECT")
-  if(split.length === 2) {
-    const [queryWithoutSelect, post] = split[1].split("\n\n")
-    return {pre: split[0], query: "SELECT" + queryWithoutSelect, post}
-  }
-  return null
-}
+
 
 function RenderSparqlQuery({
   pre,

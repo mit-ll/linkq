@@ -8,11 +8,11 @@ import { setResults } from '../redux/resultsSlice.ts';
 import { pushQueryHistory } from '../redux/queryHistorySlice.ts';
 import { useAppDispatch } from "../redux/store.ts";
 import { useMakeChatGPTAPIInstance } from "./useMakeChatGPTAPIInstance.tsx";
-import { ResultsTableDataType } from "../types/resultsTable.ts";
+import { SparqlResultsJsonType } from "../types/sparql.ts";
 
 //this sets up a context so we can define one runQuery function for the whole app
 const RunQueryContext = createContext<{
-  runQuery: UseMutateFunction<ResultsTableDataType, Error, string, unknown>,
+  runQuery: UseMutateFunction<SparqlResultsJsonType, Error, string, unknown>,
   runQueryIsPending: boolean,
 }>({
   runQuery: async () => {},
@@ -30,7 +30,7 @@ export function RunQueryProvider({
 
   //useMutation wraps the workflow for running a query
   //including asking the LLM for a name and summary
-  const {isPending: runQueryIsPending, mutate:runQuery} = useMutation<ResultsTableDataType, Error, string>({
+  const {isPending: runQueryIsPending, mutate:runQuery} = useMutation<SparqlResultsJsonType, Error, string>({
     mutationKey: ['runQuery'],
     mutationFn: async (query: string) => {
       dispatch(setResults(null)) //clear the current results

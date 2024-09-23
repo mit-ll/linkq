@@ -28,7 +28,8 @@ export const INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE = `Your goal is to find the n
 
 //this is the few shot training system message we give the LLM to prompt it to generate a query
 export const QUERY_BUILDING_SYSTEM_MESSAGE = `You are an expert at generating SPARQL queries for the ${KG_NAME} Knowledge Graph from natural language. 
-Entity IDs are prepended with 'wd' and property IDs are prepended with 'wdt'. 
+Entity IDs are prepended with 'wd' and property IDs are prepended with 'wdt'.
+Always request the variable names in your SELECT statements so that the IDs are returned.
 Your task is to convert the natural language instruction into a SPARQL query.
 The following are four examples in which I am showcasing a natural language instruction (NLI) and the converted SPARQL Query. 
   NLI: Who are creators of Apple and what are their birthdates?

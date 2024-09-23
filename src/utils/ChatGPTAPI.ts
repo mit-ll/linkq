@@ -100,8 +100,9 @@ export class ChatGPTAPI {
       });
     }
     catch(err) {
+      console.error(err)
       //if there was an error sending the message, check if there is a network issue
-      window.open("https://api.openai.com/v1/chat/completions", '_blank')?.focus()
+      typeof window!=="undefined" && window.open("https://api.openai.com/v1/chat/completions", '_blank')?.focus()
       throw err
     }
 

@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { DEMO_RESULTS, IS_DEMO_MODE } from '../utils/demoData'
-import { ResultsTableDataType } from '../types/resultsTable'
+import { SparqlResultsJsonType } from '../types/sparql'
 
-type ResultsType = {error: string | null, data: ResultsTableDataType | null, summary: string | null} | null
+type ResultsType = {error: string | null, data: SparqlResultsJsonType | null, summary: string | null} | null
 
 const initialState: {
   results: ResultsType,
