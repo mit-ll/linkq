@@ -37,6 +37,12 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
+      - name: Set env
+        shell: bash
+        run: |
+          echo "VITE_OPENAI_API_KEY=test" >> $GITHUB_ENV
+          echo "VITE_DEMO_MODE=true" >> $GITHUB_ENV
+          echo "GITHUB_PAGES=true" >> $GITHUB_ENV
       - name: Build
         run: npm run build
       - name: Setup Pages
