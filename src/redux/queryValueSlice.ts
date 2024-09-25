@@ -1,7 +1,8 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { DEMO_QUERY, IS_DEMO_MODE } from '../utils/demoData'
+
+import { DEMO_QUERY, IS_DEMO_MODE } from 'utils/demoData'
 
 
 // const GET_GOOGLE_FOUNDERS_AND_BIRTHDAYS = `SELECT ?founder ?founderLabel ?birthdate

@@ -53,6 +53,7 @@
     "typescript": "^5.2.2",
     "undici": "^6.19.8",
     "vite": "^5.1.0",
-    "vite-plugin-commonjs": "^0.10.1"
+    "vite-plugin-commonjs": "^0.10.1",
+    "vite-tsconfig-paths": "^5.0.1"
   }
 }

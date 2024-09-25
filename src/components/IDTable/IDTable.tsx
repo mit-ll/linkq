@@ -1,11 +1,15 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import { useQueryGetIDTableEntitiesFromQuery } from "../../utils/knowledgeBase/getEntityData";
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { Table, Title } from "@mantine/core";
-import { useAppSelector } from "../../redux/store";
-import { IDTableEntitiesType } from "../../types/idTable";
+
+import { useAppSelector } from "redux/store";
+
+import { IDTableEntitiesType } from "types/idTable";
+
+import { useQueryGetIDTableEntitiesFromQuery } from "utils/knowledgeBase/getEntityData";
+
 import styles from "./IDTable.module.scss"
 
 export function IDTableContainer () {

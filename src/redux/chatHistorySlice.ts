@@ -1,8 +1,9 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { ChatHistoryType, ChatMessageType } from '../utils/ChatGPTAPI'
-import { DEMO_FULL_HISTORY, DEMO_SIMPLE_HISTORY, IS_DEMO_MODE } from '../utils/demoData'
+
+import { ChatHistoryType, ChatMessageType } from 'utils/ChatGPTAPI'
+import { DEMO_FULL_HISTORY, DEMO_SIMPLE_HISTORY, IS_DEMO_MODE } from 'utils/demoData'
 
 
 const initialState: {

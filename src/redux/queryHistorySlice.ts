@@ -1,8 +1,10 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { DEMO_QUERY_HISTORY, IS_DEMO_MODE } from '../utils/demoData'
-import { SparqlResultsJsonType } from '../types/sparql'
+
+import { DEMO_QUERY_HISTORY, IS_DEMO_MODE } from 'utils/demoData'
+
+import { SparqlResultsJsonType } from 'types/sparql'
 
 
 type QueryRecordType = {

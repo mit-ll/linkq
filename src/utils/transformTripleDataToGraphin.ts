@@ -1,10 +1,11 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import {SemanticTriple} from "../types/semanticTypes.ts";
 import {GraphinData, Utils} from "@antv/graphin";
 import {createEdge, createNode, parseNameFromWikidataUrl} from "./graphin.ts";
-import { IDTableEntitiesType } from "../types/idTable.ts";
+
+import { IDTableEntitiesType } from "types/idTable.ts";
+import {SemanticTriple} from "types/semanticTypes.ts";
 
 export enum SPARQLItemType {
     Term = "Term",

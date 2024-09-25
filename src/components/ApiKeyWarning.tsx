@@ -1,5 +1,9 @@
-import { useAppSelector } from "../redux/store"
-import { IS_DEMO_MODE } from "../utils/demoData"
+// Copyright (c) 2024 Massachusetts Institute of Technology
+// SPDX-License-Identifier: MIT
+
+import { useAppSelector } from "redux/store"
+
+import { IS_DEMO_MODE } from "utils/demoData"
 
 export function ApiKeyWarning() {
   const apiKey = useAppSelector((state) => state.settings.apiKey)

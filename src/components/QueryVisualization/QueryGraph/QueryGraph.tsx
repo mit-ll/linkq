@@ -1,13 +1,17 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
-import Graphin, {Components, LegendChildrenProps} from "@antv/graphin";
-import {parseSparqlQuery} from "../../../utils/parseSparqlQuery.ts";
-import {useQueryGetIDTableEntitiesFromQuery} from "../../../utils/knowledgeBase/getEntityData.ts";
-import {transformTripleQueryToGraphin} from "../../../utils/transformTripleDataToGraphin.ts";
+
 import {useMemo} from "react";
-import { Title } from '@mantine/core';
+
+import Graphin, {Components, LegendChildrenProps} from "@antv/graphin";
 import '@antv/graphin/dist/index.css';
-import { useAppSelector } from "../../../redux/store.ts";
+import { Title } from '@mantine/core';
+
+import { useAppSelector } from "redux/store.ts";
+
+import { parseSparqlQuery } from "utils/parseSparqlQuery.ts";
+import { transformTripleQueryToGraphin } from "utils/transformTripleDataToGraphin.ts";
+import { useQueryGetIDTableEntitiesFromQuery } from "utils/knowledgeBase/getEntityData.ts";
 
 const { Legend } = Components;
 

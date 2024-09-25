@@ -1,8 +1,10 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 import { SearchResponse } from "wikibase-sdk"
-import { handleFetchJsonResponse } from "../handleFetchJsonResponse"
 import { wbk } from "./wbk"
+
+import { handleFetchJsonResponse } from "utils/handleFetchJsonResponse"
+
 
 /**
  * This function fuzzy searches Wikidata for entities by label name.

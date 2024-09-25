@@ -1,7 +1,9 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 import {IUserEdge, IUserNode} from "@antv/graphin";
-import {SemanticTriple} from "../types/semanticTypes.ts";
+
+import {SemanticTriple} from "types/semanticTypes.ts";
+
 import {SPARQLItemType} from "./transformTripleDataToGraphin.ts";
 
 const getColor = (itemType: SPARQLItemType) => {

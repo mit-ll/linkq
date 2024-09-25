@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import SparqlJs, { BgpPattern, SelectQuery } from "sparqljs";
-import {SemanticTriple} from "../types/semanticTypes.ts";
+
+import {SemanticTriple} from "types/semanticTypes.ts";
 
 const PREFIXES = `PREFIX bd: <bd:>
 PREFIX cc: <http://creativecommons.org/ns#>

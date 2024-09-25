@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 import { useDispatch, useSelector } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
+
 import { chatHistorySliceReducer } from './chatHistorySlice'
 import { queryValueReducer } from './queryValueSlice'
 import { resultsReducer } from './resultsSlice'

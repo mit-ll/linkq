@@ -8,12 +8,13 @@ import { useDisclosure } from '@mantine/hooks';
 import { ActionIcon, Button, Divider, Modal, Title } from '@mantine/core';
 import { IconCaretRight, IconHistory } from '@tabler/icons-react';
 
-import styles from "./QueryEditor.module.scss"
-import { useAppDispatch, useAppSelector } from '../../redux/store';
-import { setQueryValue } from '../../redux/queryValueSlice';
-import { setResults } from '../../redux/resultsSlice';
-import { useRunQuery } from '../../hooks/useRunQuery';
+import { setResults } from 'redux/resultsSlice';
+import { setQueryValue } from 'redux/queryValueSlice';
+import { useAppDispatch, useAppSelector } from 'redux/store';
 
+import { useRunQuery } from 'hooks/useRunQuery';
+
+import styles from "./QueryEditor.module.scss"
 
 export function QueryEditor() {
   const dispatch = useAppDispatch()

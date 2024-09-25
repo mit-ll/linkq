@@ -1,7 +1,11 @@
+// Copyright (c) 2024 Massachusetts Institute of Technology
+// SPDX-License-Identifier: MIT
+
 import { Button, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconBrandGithub } from "@tabler/icons-react";
-import { IS_DEMO_MODE } from "../utils/demoData";
+
+import { IS_DEMO_MODE } from "utils/demoData";
 
 export function DemoModeModal() {
   const [opened, { close }] = useDisclosure(true);

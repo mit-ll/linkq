@@ -1,14 +1,19 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
-import { UseMutateFunction, useMutation } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
-import { runQuery as runQueryFunction } from '../utils/knowledgeBase/runQuery.ts';
-import { summarizeQueryResults } from '../utils/summarizeQueryResults.ts';
-import { setResults } from '../redux/resultsSlice.ts';
-import { pushQueryHistory } from '../redux/queryHistorySlice.ts';
-import { useAppDispatch } from "../redux/store.ts";
+
+import { UseMutateFunction, useMutation } from "@tanstack/react-query";
+
+import { pushQueryHistory } from 'redux/queryHistorySlice.ts';
+import { setResults } from 'redux/resultsSlice.ts';
+import { useAppDispatch } from "redux/store.ts";
+
+import { runQuery as runQueryFunction } from 'utils/knowledgeBase/runQuery.ts';
+import { summarizeQueryResults } from 'utils/summarizeQueryResults.ts';
+
+import { SparqlResultsJsonType } from "types/sparql.ts";
+
 import { useMakeChatGPTAPIInstance } from "./useMakeChatGPTAPIInstance.tsx";
-import { SparqlResultsJsonType } from "../types/sparql.ts";
 
 //this sets up a context so we can define one runQuery function for the whole app
 const RunQueryContext = createContext<{
