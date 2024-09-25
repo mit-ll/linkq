@@ -6,20 +6,23 @@ import { StreamLanguage } from '@codemirror/language';
 import { sparql } from '@codemirror/legacy-modes/mode/sparql';
 import { ActionIcon, Button, Checkbox, Modal, TextInput } from "@mantine/core";
 import { useEffect, useMemo, useRef, useState } from "react";
-import styles from "./Chat.module.scss"
 import { useMutation } from "@tanstack/react-query";
 import { IconCaretRight, IconSettings, IconZoomCode } from '@tabler/icons-react';
-import { ErrorMessage } from '../ErrorMessage';
-import { useRunQuery } from '../../hooks/useRunQuery';
-import { useAppDispatch, useAppSelector } from '../../redux/store';
 
-import { setQueryValue } from '../../redux/queryValueSlice';
-import { useMakeChatGPTAPIInstance } from '../../hooks/useMakeChatGPTAPIInstance';
-import { addMessageToSimpleChatHistory, toggleShowFullChatHistory } from '../../redux/chatHistorySlice';
-import { INITIAL_SYSTEM_MESSAGE } from '../../utils/knowledgeBase/prompts';
-import { handleUserChat } from '../../utils/handleUserChat';
-import { tryParsingOutQuery } from '../../utils/tryParsingOutQuery';
+import { ErrorMessage } from 'components/ErrorMessage';
 
+import { useMakeChatGPTAPIInstance } from 'hooks/useMakeChatGPTAPIInstance';
+import { useRunQuery } from 'hooks/useRunQuery';
+
+import { addMessageToSimpleChatHistory, toggleShowFullChatHistory } from 'redux/chatHistorySlice';
+import { setQueryValue } from 'redux/queryValueSlice';
+import { useAppDispatch, useAppSelector } from 'redux/store';
+
+import { handleUserChat } from 'utils/handleUserChat';
+import { INITIAL_SYSTEM_MESSAGE } from 'utils/knowledgeBase/prompts';
+import { tryParsingOutQuery } from 'utils/tryParsingOutQuery';
+
+import styles from "./Chat.module.scss"
 
 
 export function Chat() {

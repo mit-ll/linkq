@@ -1,17 +1,21 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
-import { QueryEditor } from './components/QueryEditor/QueryEditor'
-import { ResultsTable } from './components/ResultsTable/ResultsTable';
-import { Chat } from './components/Chat/Chat';
-import { IDTableContainer } from './components/IDTable/IDTable';
 import { Title } from '@mantine/core';
-import { ErrorMessage } from './components/ErrorMessage';
-import { useRunQuery, RunQueryProvider } from './hooks/useRunQuery';
-import {QueryVisualization} from "./components/QueryVisualization/QueryVisualization";
-import { useAppSelector } from './redux/store';
-import styles from './App.module.scss'
-import { DemoModeModal } from './components/DemoModeModal';
-import { ApiKeyWarning } from './components/ApiKeyWarning';
+
+import { ApiKeyWarning } from 'components/ApiKeyWarning';
+import { Chat } from 'components/Chat/Chat';
+import { DemoModeModal } from 'components/DemoModeModal';
+import { ErrorMessage } from 'components/ErrorMessage';
+import { IDTableContainer } from 'components/IDTable/IDTable';
+import { QueryEditor } from 'components/QueryEditor/QueryEditor'
+import { QueryVisualization } from "components/QueryVisualization/QueryVisualization";
+import { ResultsTable } from 'components/ResultsTable/ResultsTable';
+
+import { useAppSelector } from 'redux/store';
+
+import { useRunQuery, RunQueryProvider } from 'hooks/useRunQuery';
+
+import styles from 'App.module.scss'
 
 
 function App() {

@@ -1,9 +1,10 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import { SparqlBindingType, SparqlValueObjectType, SparqlResultsJsonType } from "../../types/sparql";
+import { SparqlBindingType, SparqlValueObjectType, SparqlResultsJsonType } from "types/sparql";
 import { useReactTable, flexRender, createColumnHelper, getCoreRowModel } from "@tanstack/react-table"
-import { downloadJson } from "../../utils/downloadJson";
+import { downloadJson } from "utils/downloadJson";
+import { formatURI, getHrefFromURI } from "utils/knowledgeBase/formatURI";
 
 import { ActionIcon, Table } from '@mantine/core';
 import { IconDownload } from '@tabler/icons-react';
@@ -84,7 +85,7 @@ function renderCell(cell:SparqlValueObjectType):React.ReactNode {
     return <img src={cell.value}/>
   }
   if(cell.type === "uri") {
-    return <a href={cell.value} target="_blank">{cell.value.replace("http://www.wikidata.org/","")}</a>
+    return <a href={getHrefFromURI(cell.value)} target="_blank">{formatURI(cell.value)}</a>
   }
   return cell.value
 }

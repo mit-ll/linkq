@@ -1,8 +1,10 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
-import { useAppDispatch, useAppSelector } from "../redux/store"
-import { ChatGPTAPI, ChatGPTAPIConstructorArgsType, ChatHistoryType } from "../utils/ChatGPTAPI"
-import { addMessagesToFullChatHistory } from "../redux/chatHistorySlice"
+import { addMessagesToFullChatHistory } from "redux/chatHistorySlice"
+import { useAppDispatch, useAppSelector } from "redux/store"
+
+import { ChatGPTAPI, ChatGPTAPIConstructorArgsType, ChatHistoryType } from "utils/ChatGPTAPI"
+
 import { useGetNewChatId } from "./useGetNewChatId"
 
 

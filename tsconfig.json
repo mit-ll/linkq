@@ -21,7 +21,9 @@
     "noFallthroughCasesInSwitch": true,
     "typeRoots": [
       "./node_modules/sparqljs-legacy-type/"
-    ]
+    ],
+
+    "baseUrl": "src/"
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

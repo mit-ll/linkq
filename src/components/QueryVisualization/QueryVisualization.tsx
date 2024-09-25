@@ -1,9 +1,11 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
-import {QueryGraph} from "./QueryGraph/QueryGraph.tsx";
-import {ErrorBoundary} from "react-error-boundary";
-import {useEffect, useState} from "react";
-import { useAppSelector } from "../../redux/store.ts";
+import { ErrorBoundary } from "react-error-boundary";
+import { useEffect, useState } from "react";
+
+import { useAppSelector } from "redux/store.ts";
+
+import { QueryGraph } from "./QueryGraph/QueryGraph.tsx";
 
 const QueryVisualizationFallback = () => {
     return (<></>)

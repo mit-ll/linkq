@@ -1,6 +1,7 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
-import { SparqlResultsJsonType } from "../types/sparql";
+import { SparqlResultsJsonType } from "types/sparql";
+
 import { ChatGPTAPI } from "./ChatGPTAPI";
 import { getEntityDataFromQuery } from "./knowledgeBase/getEntityData";
 

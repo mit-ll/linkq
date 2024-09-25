@@ -1,10 +1,12 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 import { EntityId, Item } from "wikibase-sdk";
-import { handleFetchJsonResponse } from "../handleFetchJsonResponse.ts";
 import { wbk } from "./wbk.ts";
 import {useQuery, UseQueryResult} from "@tanstack/react-query";
-import { IDTableEntitiesType } from "../../types/idTable.ts";
+
+import { handleFetchJsonResponse } from "utils/handleFetchJsonResponse.ts";
+
+import { IDTableEntitiesType } from "types/idTable.ts";
 
 
 interface EntityDictionary {

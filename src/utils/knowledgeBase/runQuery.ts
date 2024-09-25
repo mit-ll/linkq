@@ -1,7 +1,8 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
-import { SparqlResultsJsonType } from "../../types/sparql";
-import { handleFetchJsonResponse } from "../handleFetchJsonResponse";
+import { handleFetchJsonResponse } from "utils/handleFetchJsonResponse";
+
+import { SparqlResultsJsonType } from "types/sparql";
 
 /**
  * This function runs a SPARQL query on Wikidata
