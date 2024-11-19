@@ -6,9 +6,10 @@
 import fs from "fs"
 import papaparse from "papaparse"
 import { EvaluationOutputRowType } from "./mintakaEvaluation";
+import { parseCSVFile } from "utils/parseCSVFile";
 
 
-calculateMetrics("./LinkQ Evaluation Output.csv","./Plain LLM Evaluation Output.csv","./output.csv")
+calculateMetrics("./data/linkq-evaluation-results.csv","./data/plainllm-evaluation-results.csv","./data/aggregated-evaluation-results.csv")
 
 type MetricType = {
   complexityType: string,
@@ -41,6 +42,7 @@ async function calculateMetrics(
     parseCSVFile<EvaluationOutputRowType>(linkqDataPath),
     parseCSVFile<EvaluationOutputRowType>(plainLLMDataPath),
   ])
+  console.log("linkqData",linkqData)
   console.log("Parsed data")
   if(linkqData.length !== plainLLMData.length) {
     throw new Error(`linkqData and plainLLMData lengths do not match`)
@@ -180,19 +182,6 @@ function isSyntaxCorrect(row: EvaluationOutputRowType) {
     throw new Error(`Encountered unexpected correct syntax value ${value}`)
   }
   return value === "YES"
-}
-
-
-export function parseCSVFile<T>(path:string):Promise<T[]> {
-  return new Promise((resolve) => {
-    const file = fs.createReadStream(path)
-    papaparse.parse<T>(file, {
-      header: true,
-      complete: function(results) {
-        resolve(results.data)
-      }
-    })
-  })
 }
 
 function meanAndStd(numArray: number[]) {

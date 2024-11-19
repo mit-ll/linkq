@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 sns.set(rc={'figure.dpi': 300, 'savefig.dpi': 300})
 
 ROOT = Path(__file__).parent
-DATA = Path(ROOT / 'raw_data')
+DATA = Path(ROOT)
 PLOTS = Path(ROOT / 'plots')
 
 def get_aggregated_accuracy_data():
@@ -21,7 +21,7 @@ def get_aggregated_accuracy_data():
 
 def get_raw_timing_data():
     timing_columns = ['Total Seconds', 'id', 'complexityType', 'category']
-    linkq_df = pd.read_csv(Path(DATA, 'linq-evaluation-results.csv'), usecols=timing_columns)
+    linkq_df = pd.read_csv(Path(DATA, 'linkq-evaluation-results.csv'), usecols=timing_columns)
     linkq_df['Algorithm'] = 'LinkQ'
     plainllm_df = pd.read_csv(Path(DATA, 'plainllm-evaluation-results.csv'), usecols=timing_columns)
     plainllm_df['Algorithm'] = 'GPT'
