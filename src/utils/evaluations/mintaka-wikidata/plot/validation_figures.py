@@ -138,28 +138,38 @@ def correctness_stacked_barchart():
             lambda x: algorithm_data.loc[algorithm_data['Correctness'] == x]['Value'].reset_index(drop=True),
             correctness))
         
+        plot_x = x + (alg_idx - 0.5) * width
+        bottom = np.zeros(len(question_types)) # The first correctness bars will be stacked from the bottom
         # Loop over all the correctness to stack the bars on top of each other
-        bottom = None # The first correctness bars will be stacked from the bottom
         for correct_idx, correct in enumerate(correctness):
             values = filtered_values[correct_idx] # Series containing the values for this algorithm + correctness, by question type
             color = CORRECTNESS_PALETTE[f'{algorithm} {correct}'] # Get the color palette for this algorithm + correctness
             # Stack the bars for this correctness
             bar = ax.bar(
-                x=x + (alg_idx - 0.5) * width,
+                x=plot_x,
                 height=values, 
                 width=width, 
                 color=color, 
-                label=f'{algorithm} {correct} Correct',
+                label=f'{algorithm} {correct}',
                 bottom=bottom)
+            
+            # for xpos, value, y in zip(plot_x, values, bottom):
+            #     if value != 0.0:
+            #         ax.text(x=xpos, y=y + value/2, s=percent_formatter(value), ha='center', va='center', fontsize=10)
+                
             # For the next set of stacked bars, we need to add these count values so we know where we should stack from
-            bottom = values if (bottom is None) else (bottom + values)
+            bottom += values
+
+        # Label the percentage sums
+        for xpos, total in zip(plot_x, bottom):
+            ax.text(x=xpos, y=total + 0.5, s=percent_formatter(total), ha='center', va='bottom', fontsize=10)
 
     ax.set_xlabel('Question Type')
     ax.set_ylabel('% Correct')
-    ax.set_title('Side-by-Side Stacked Bar Chart')
+    # ax.set_title('Side-by-Side Stacked Bar Chart')
     ax.set_xticks(x)
     ax.set_xticklabels(question_types)
-    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    ax.legend(title="# Correct / 3 Attempts", title_fontsize=10, bbox_to_anchor=(1, 1), loc='upper left')
     plt.tight_layout()
     plt.savefig(Path(PLOTS, 'correctness_stacked.pdf'), bbox_inches='tight', format='pdf')
     plt.close()
