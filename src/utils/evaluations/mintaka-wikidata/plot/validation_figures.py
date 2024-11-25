@@ -103,20 +103,20 @@ def correctness_barchart():
     df['tmp'] = 0
     print(df)
     df = df.groupby(['Question Type', 'Correctness']).agg(
-        {'tmp': 'count'})
+        {'tmp': 'count'}).unstack(fill_value=0).stack().reset_index()
     df['tmp'] = (df['tmp'] / num_questions_per_category) * 100
     print("-----------------------------------------------------------------------------")
     print(df)
 
 
     ax = sns.barplot(df, x='Question Type', y="tmp", order=QUESTION_TYPE_ORDER, hue='Correctness', 
-                     hue_order=["LinkQ 3/3","LinkQ 2/3","LinkQ 1/3","GPT-4 3/3","GPT-4 2/3","GPT-4 1/3"], 
+                     hue_order=["LinkQ 3/3","GPT-4 3/3","LinkQ 2/3","GPT-4 2/3","LinkQ 1/3","GPT-4 1/3"], 
                      palette=tmp_palette)
 
     for container in ax.containers:
         ax.bar_label(container, fmt=percent_formatter)
     plt.savefig(Path(PLOTS, f'correctness.pdf'), bbox_inches='tight', format='pdf')
-    plt.show()
+    # plt.show()
     plt.close()
 
 def correctness_stacked_barchart():
@@ -216,7 +216,7 @@ def correctness_stacked_barchart():
     ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.tight_layout()
     plt.savefig(Path(PLOTS, f'correctness_stacked_zeros.pdf'), bbox_inches='tight', format='pdf')
-    plt.show()
+    # plt.show()
     plt.close()
 
 def main():
@@ -225,7 +225,7 @@ def main():
     timing_boxplot_by_category()
     # correctness_barchart_by_algorithm(target_column_name="linkqAnswerCorrect",y_axis_label="LinkQ Correctness",output_name="linkq_correctness",palette={"0/3": '#999999', "1/3": '#c8ddec', "2/3": '#72aad0', "3/3": '#1f78b4'})
     # correctness_barchart_by_algorithm(target_column_name="plainLLMAnswerCorrect",y_axis_label="GPT-4 Correctness",output_name="plainllm_correctness",palette={"0/3": '#999999', "1/3": '#fff4e5', "2/3": '#ffdeb3', "3/3": '#fdbf6f'})
-    # correctness_barchart()
+    correctness_barchart()
     correctness_stacked_barchart()
     print("Done creating plots!")
 
