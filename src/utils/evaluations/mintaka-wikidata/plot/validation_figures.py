@@ -126,10 +126,11 @@ def correctness_stacked_barchart():
     x = np.arange(len(question_types))  # X-axis positions for question_types
     algorithms = ['LinkQ', 'GPT-4'] # this list determines left to right ordering of the algorithms
     correctness = ['3/3','2/3','1/3'] # this list determines bottom to top stacking order of correctness
-    width = 0.35  # Width of the bar
+    width = 0.38  # Width of the bar
 
     # Plot side-by-side stacked bars
     fig, ax = plt.subplots()
+    fig.set_figwidth(7)
     for alg_idx, algorithm in enumerate(algorithms):
         # Filter data for the current algorithm
         algorithm_data = df[df['Algorithm'] == algorithm]
@@ -162,7 +163,7 @@ def correctness_stacked_barchart():
 
         # Label the percentage sums
         for xpos, total in zip(plot_x, bottom):
-            ax.text(x=xpos, y=total + 0.5, s=percent_formatter(total), ha='center', va='bottom', fontsize=10)
+            ax.text(x=xpos, y=total + 0.5, s=percent_formatter(total), ha='center', va='bottom', fontsize=11)
 
     ax.set_xlabel('Question Type')
     ax.set_ylabel('% Correct')
@@ -170,6 +171,7 @@ def correctness_stacked_barchart():
     ax.set_xticks(x)
     ax.set_xticklabels(question_types)
     ax.legend(title="# Correct / 3 Attempts", title_fontsize=10, bbox_to_anchor=(1, 1), loc='upper left')
+    plt.grid(axis='x', which='both', visible=False)
     plt.tight_layout()
     plt.savefig(Path(PLOTS, 'correctness_stacked.pdf'), bbox_inches='tight', format='pdf')
     plt.close()
