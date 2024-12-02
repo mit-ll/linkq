@@ -16,7 +16,7 @@ DATA = Path(ROOT.parent / 'data')
 PLOTS = Path(ROOT / 'plots')
 
 def percent_formatter(x):
-    return f'{round(x)}%'
+    return f'{'{:.1%}'.format(x/100)}'
 
 CORRECTNESS_PALETTE = {"LinkQ 0/3": '#999999', "LinkQ 1/3": '#c8ddec', "LinkQ 2/3": '#72aad0', "LinkQ 3/3": '#1f78b4', "GPT-4 0/3": '#999999', "GPT-4 1/3": '#fff4e5', "GPT-4 2/3": '#ffdeb3', "GPT-4 3/3": '#fdbf6f'}
 QUESTION_TYPE_ORDER = ['Comparative', 'Yes/No', 'Generic', 'MultiHop', "Intersection"]
@@ -130,7 +130,7 @@ def correctness_stacked_barchart():
 
     # Plot side-by-side stacked bars
     fig, ax = plt.subplots()
-    fig.set_figwidth(7)
+    fig.set_figwidth(8)
     for alg_idx, algorithm in enumerate(algorithms):
         # Filter data for the current algorithm
         algorithm_data = df[df['Algorithm'] == algorithm]
@@ -152,6 +152,8 @@ def correctness_stacked_barchart():
                 width=width, 
                 color=color, 
                 label=f'{algorithm} {correct}',
+                edgecolor="black",
+                linewidth=0.5,
                 bottom=bottom)
             
             # for xpos, value, y in zip(plot_x, values, bottom):
@@ -163,7 +165,7 @@ def correctness_stacked_barchart():
 
         # Label the percentage sums
         for xpos, total in zip(plot_x, bottom):
-            ax.text(x=xpos, y=total + 0.5, s=percent_formatter(total), ha='center', va='bottom', fontsize=11)
+            ax.text(x=xpos, y=total + 0.5, s=percent_formatter(total), ha='center', va='bottom', fontsize=9)
 
     ax.set_xlabel('Question Type')
     ax.set_ylabel('% Correct')
