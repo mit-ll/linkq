@@ -4,9 +4,9 @@
 //npx tsx prepMintakaQuestions.ts
 
 import fs from "fs"
-import papaparse from "papaparse"
 
 import { MintakaQuestionType } from "./mintakaEvaluation";
+import { parseCSVFile } from "utils/parseCSVFile";
 
 prepMintakaQuestions()
 
@@ -85,16 +85,4 @@ export const QUESTIONS:MintakaQuestionType[] = ${JSON.stringify(filteredQuestion
 
   fs.writeFileSync("./questions.ts",questionsFileContent)
   console.log("Done prepping Mintaka questions!")
-}
-
-export function parseCSVFile<T>(path:string):Promise<T[]> {
-  return new Promise((resolve) => {
-    const file = fs.createReadStream(path)
-    papaparse.parse<T>(file, {
-      header: true,
-      complete: function(results) {
-        resolve(results.data)
-      }
-    })
-  })
 }

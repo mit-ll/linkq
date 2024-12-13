@@ -15,15 +15,15 @@ if (process.env.HTTPS_PROXY) {
 import fs from "fs"
 import papaparse from "papaparse"
 
-import { ChatGPTAPI } from "../ChatGPTAPI"
-import { tryParsingOutQuery } from "../tryParsingOutQuery"
-import { runQuery } from "../knowledgeBase/runQuery"
-import { summarizeQueryResults } from "../summarizeQueryResults"
-import { getEntityDataFromQuery } from "../knowledgeBase/getEntityData"
-import { formatSparqlResultsAsString } from "../formatSparqlResultsAsString"
+import { ChatGPTAPI } from "../../ChatGPTAPI"
+import { tryParsingOutQuery } from "../../tryParsingOutQuery"
+import { runQuery } from "../../knowledgeBase/runQuery"
+import { summarizeQueryResults } from "../../summarizeQueryResults"
+import { getEntityDataFromQuery } from "../../knowledgeBase/getEntityData"
+import { formatSparqlResultsAsString } from "../../formatSparqlResultsAsString"
 import { QUESTIONS } from "./questions"
-import { INITIAL_SYSTEM_MESSAGE } from "../knowledgeBase/prompts"
-import { queryBuildingWorkflow } from "../queryBuildingWorkflow"
+import { INITIAL_SYSTEM_MESSAGE } from "../../knowledgeBase/prompts"
+import { queryBuildingWorkflow } from "../../queryBuildingWorkflow"
 
 import { loadEnv } from 'vite'
 const ENV = loadEnv("development","../../../")
@@ -124,7 +124,7 @@ async function runMintakaEvaluation(
 
 export async function runLinkQMintakaEvaluation() {
   return await runMintakaEvaluation(
-    `LinkQ Evaluation Output ${new Date().getTime()}.csv`,
+    `linkq-evaluation-output-${new Date().getTime()}.csv`,
     async (chatGPT:ChatGPTAPI, question:string) => {
       //force the LLM to start the query building workflow
       chatGPT.messages = [
@@ -155,7 +155,7 @@ export async function runLinkQMintakaEvaluation() {
 
 export async function runPlainLLMMintakaEvaluation() {
   return await runMintakaEvaluation(
-    `Plain LLM Evaluation Output ${new Date().getTime()}.csv`,
+    `plainllm-evaluation-results-${new Date().getTime()}.csv`,
     async (chatGPT:ChatGPTAPI, question:string) => {
       return await chatGPT.sendMessages([
         {
