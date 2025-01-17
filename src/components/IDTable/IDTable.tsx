@@ -4,6 +4,8 @@
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { Table, Title } from "@mantine/core";
 
+import { InfoModal } from "components/InfoModal";
+
 import { useAppSelector } from "redux/store";
 
 import { IDTableEntitiesType } from "types/idTable";
@@ -38,7 +40,12 @@ export function IDTableContainer () {
 
     return (
         <div id={styles["id-table-container"]}>
-            <Title order={4}>Entity-Relation Table from KG</Title>
+            <Title order={4}>
+                Entity-Relation Table from KG
+                <InfoModal title="Entity-Relation Table from KG">
+                    <p>This table extracts the IDs from your query and explains what they mean in the KG.</p>
+                </InfoModal>
+            </Title>
             {content}
         </div>
     )

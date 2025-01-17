@@ -52,15 +52,12 @@ export function QueryEditor() {
               <Divider/>
               {queryHistory.map((record,i) => {
                 return (
-                  <div key={i}>
-                    <br/>
-                    <Button key={i} variant='default' onClick={() => {
-                      dispatch(setQueryValue(record.query))
-                      dispatch(setResults(record.results))
-                    }}>
-                      {i+1}: {record.name || "There was an error generating a name for this query"}
-                    </Button>
-                  </div>
+                  <Button key={i} className={styles["query-history-button"]} fullWidth variant='default' onClick={() => {
+                    dispatch(setQueryValue(record.query))
+                    dispatch(setResults(record.results))
+                  }}>
+                    {i+1}: {record.name || "There was an error generating a name for this query"}
+                  </Button>
                 )
               })}
               
