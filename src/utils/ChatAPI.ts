@@ -11,98 +11,75 @@ export type ChatMessageType = ChatCompletionMessageParam & {
 }
 export type ChatHistoryType = ChatMessageType[]
 
-//this is a basic message type that will be extended by the ChatGPTAPI class
-//to include chatId and name
-type BasicMessageType = {
-  content: ChatMessageType["content"]
-  role: ChatMessageType["role"]
-}
-
-
 //this typing is used to omit the "messages" field from OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 type OpenAICreateOptionsType = Omit<OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming, 'messages'>
 
 export type ChatGPTAPIConstructorArgsType = ClientOptions & {
-  chatId: number,
-  openAICreateOptions?: OpenAICreateOptionsType,
   addMessagesCallback?:(messages: ChatHistoryType) => any,
-  systemMessage?: string
+  chatCompletionCreateOptions?: OpenAICreateOptionsType,
+  chatId: number,
 }
 
 /**
- * This is our custom ChatGPTAPI class
+ * This is our custom ChatAPI class
  * It manages message history, and lets you send new messages
+ * It uses the OpenAI API protocol which is supposed by many open-source LLM server implementations
  * 
  * We originally used this package on NPM https://www.npmjs.com/package/chatgpt
  * but it doesn't let you send additional system messages, which is annoying
  */
-export class ChatGPTAPI {
-  chatId: number
-  openAI: OpenAI //the openai instance
-  openAICreateOptions: OpenAICreateOptionsType
-  messages: ChatHistoryType = [] //message history
+export class ChatAPI {
   addMessagesCallback?: (messages: ChatHistoryType) => any //an optional callback function used to reactively update state
+  chatCompletionCreateOptions: OpenAICreateOptionsType
+  chatId: number
+  messages: ChatCompletionMessageParam[] = [] //message history
+  openAI: OpenAI //the openai instance
 
   constructor({
-    chatId=0,
     addMessagesCallback,
-    openAICreateOptions={ model: 'gpt-4-turbo-preview' }, 
-    systemMessage, 
+    chatCompletionCreateOptions={ model: 'gpt-4-turbo-preview' }, 
+    chatId,
     ...options //the rest of ClientOptions
   }: ChatGPTAPIConstructorArgsType) {
-    this.chatId = chatId
     this.openAI = new OpenAI(options) //initialize a new OpenAI class instance
-    this.openAICreateOptions = openAICreateOptions
+    this.chatCompletionCreateOptions = chatCompletionCreateOptions
+    this.chatId = chatId
     
     this.addMessagesCallback = addMessagesCallback //save the callback function
-
-    //if we should have an initial system message
-    if(systemMessage) {
-      this.messages.push({ //add the system message to the message history
-        role: "system",
-        content: systemMessage,
-        chatId: this.chatId,
-        name: "system",
-      })
-      this.addMessagesCallback?.(this.messages)
-    }
   }
 
   /**
    * This function sends your new messages to ChatGPT while maintaining the full message history
-   * @param messages  the array of new messages to send to the LLM
+   * @param messages  the array of messages to send to the LLM
    * @returns         the LLM's response content as a string
    */
-  async sendMessages(basicMessages: BasicMessageType[]) {
-    const addMessages:ChatMessageType[] = basicMessages.map(p => {
-      //@ts-ignore TODO figure this out
-      const message: ChatMessageType = {
-        ...p,
-        chatId: this.chatId,
-        name: p.role==="assistant" ? this.openAICreateOptions.model : p.role,
-      }
-      return message
-    })
-
+  async sendMessages(addMessages: ChatCompletionMessageParam[]) {
     //OpenAI's LLMs don't actually manage any state.
     //Instead, you need to send it the entire message history
     //if you want to maintain continuity in your conversation.
     this.messages.push(...addMessages) //push the new messages
-    this.addMessagesCallback?.(addMessages)
+    this.addMessagesCallback?.(
+      addMessages.map(a => ({
+        ...a,
+        chatId: this.chatId,
+        content: a.content as string,
+        name: a.role==="assistant" ? this.chatCompletionCreateOptions.model : a.role,
+      }))
+    )
 
     let chatCompletion: OpenAI.Chat.Completions.ChatCompletion
     try {
       //request a response from the LLM
       chatCompletion = await this.openAI.chat.completions.create({
-        ...this.openAICreateOptions,
+        ...this.chatCompletionCreateOptions,
         messages: this.messages, //send the entire message history
       });
     }
     catch(err) {
       console.error(err)
       //if there was an error sending the message, check if there is a network issue
-      typeof window!=="undefined" && window.open("https://api.openai.com/v1/chat/completions", '_blank')?.focus()
+      typeof window!=="undefined" && window.open(this.openAI.baseURL+"/chat/completions", '_blank')?.focus()
       throw err
     }
 
@@ -115,9 +92,9 @@ export class ChatGPTAPI {
     //add the LLM's response to the message history
     const responseMessage = {
       ...openAiResponseMessage,
-      content: openAiResponseMessage.content, //this makes typescript happy
       chatId: this.chatId,
-      name: this.openAICreateOptions.model,
+      content: openAiResponseMessage.content, //this makes typescript happy
+      name: this.chatCompletionCreateOptions.model,
     }
     this.messages.push(responseMessage)
     this.addMessagesCallback?.([responseMessage])

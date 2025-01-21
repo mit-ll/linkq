@@ -13,7 +13,7 @@ import { summarizeQueryResults } from 'utils/summarizeQueryResults.ts';
 
 import { SparqlResultsJsonType } from "types/sparql.ts";
 
-import { useMakeChatGPTAPIInstance } from "./useMakeChatGPTAPIInstance.tsx";
+import { useMakeChatAPIInstance } from "./useMakeChatAPIInstance.ts";
 
 //this sets up a context so we can define one runQuery function for the whole app
 const RunQueryContext = createContext<{
@@ -31,7 +31,7 @@ export function RunQueryProvider({
   children: React.ReactNode,
 }) {
   const dispatch = useAppDispatch()
-  const makeChatGPTAPIInstance = useMakeChatGPTAPIInstance()
+  const makeChatAPIInstance = useMakeChatAPIInstance()
 
   //useMutation wraps the workflow for running a query
   //including asking the LLM for a name and summary
@@ -44,7 +44,7 @@ export function RunQueryProvider({
     onSuccess: async (data, query) => {
       //try to ask the LLM to give the query a name and summarize the results
       try {
-        const chatGPT = makeChatGPTAPIInstance()
+        const chatGPT = makeChatAPIInstance()
 
         const {name, summary} = await summarizeQueryResults(chatGPT, query, data)
         dispatch(pushQueryHistory({data, name, query, summary})) //update the history with the data
@@ -59,7 +59,7 @@ export function RunQueryProvider({
       console.error(error)
       //try to ask the LLM to give a name for the query
       try {
-        const chatGPT = makeChatGPTAPIInstance()
+        const chatGPT = makeChatAPIInstance()
 
         const {name, summary} = await summarizeQueryResults(chatGPT, query)
         dispatch(pushQueryHistory({error: error.message, name, query, summary})) //update the history with the data

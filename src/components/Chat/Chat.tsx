@@ -4,23 +4,23 @@
 import CodeMirror from '@uiw/react-codemirror';
 import { StreamLanguage } from '@codemirror/language';
 import { sparql } from '@codemirror/legacy-modes/mode/sparql';
-import { ActionIcon, Button, Checkbox, Modal, TextInput } from "@mantine/core";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { ActionIcon, Button, Checkbox, Modal, Select, TextInput } from "@mantine/core";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { IconCaretRight, IconSettings, IconZoomCode } from '@tabler/icons-react';
 
 import { ErrorMessage } from 'components/ErrorMessage';
 import { LLMWarning } from 'components/LLMWarning';
 
-import { useMakeChatGPTAPIInstance } from 'hooks/useMakeChatGPTAPIInstance';
+import { MainChatAPIContext } from 'hooks/useMainChatAPIInstance';
 import { useRunQuery } from 'hooks/useRunQuery';
 
 import { addMessageToSimpleChatHistory, toggleShowFullChatHistory } from 'redux/chatHistorySlice';
+import { setBaseURL, setModel } from 'redux/settingsSlice';
 import { setQueryValue } from 'redux/queryValueSlice';
 import { useAppDispatch, useAppSelector } from 'redux/store';
 
 import { handleUserChat } from 'utils/handleUserChat';
-import { INITIAL_SYSTEM_MESSAGE } from 'utils/knowledgeBase/prompts';
 import { tryParsingOutQuery } from 'utils/tryParsingOutQuery';
 
 import styles from "./Chat.module.scss"
@@ -44,19 +44,11 @@ export function Chat() {
     }
   }, [chatHistory.length])
 
-  const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false)
-  const closeSettingsModal = () => setShowSettingsModal(false)
 
   // const [inputText, setInputText] = useState<string>("Who won the 2023 Formula One Championship?"); // prefill the chat
   const [inputText, setInputText] = useState<string>("");
 
-  const makeChatGPTAPIInstance = useMakeChatGPTAPIInstance()
-  const chatGPT = useMemo(() => {
-    return makeChatGPTAPIInstance({
-      chatId: 0,
-      systemMessage: INITIAL_SYSTEM_MESSAGE,
-    })
-  },[])
+  const chatAPI = useContext(MainChatAPIContext)
 
   const {error, isPending, mutate:submitChat, reset} = useMutation({
     mutationKey: ['submit-chat'],
@@ -68,13 +60,13 @@ export function Chat() {
     mutationFn: async (text:string) => {
       //add the user's message to the simple chat history
       dispatch(addMessageToSimpleChatHistory({
-        chatId: chatGPT.chatId,
+        chatId: chatAPI.chatId,
         content: text, 
         name: "user",
         role: "user",
       }))
 
-      const llmResponse = await handleUserChat(text, chatGPT)
+      const llmResponse = await handleUserChat(text, chatAPI)
 
       //add the LLM's final response to the simple chat
       dispatch(addMessageToSimpleChatHistory(llmResponse))
@@ -86,17 +78,7 @@ export function Chat() {
 
   return (
     <div id={styles["chat-container"]}>
-      <Modal opened={showSettingsModal} onClose={closeSettingsModal} title="Settings">
-        <Checkbox
-          checked={showFullChatHistory}
-          onChange={() => dispatch(toggleShowFullChatHistory())}
-          label="Show full chat history"
-        />
-      </Modal>
-
-      <ActionIcon id={styles["chat-settings-button"]} size="sm" variant="filled" aria-label="Show Settings" onClick={() => setShowSettingsModal(true)}>
-        <IconSettings/>
-      </ActionIcon>
+      <Settings/>
 
       <div id={styles["chat-scroll-container"]}>
         {chatHistory.map((c, i) => {
@@ -222,6 +204,75 @@ function RenderSparqlQuery({
       <Button onClick={() => setInputText("You misunderstood my question. I was actually asking about: ")} style={{marginTop:"0.5rem"}}>You misunderstood my question</Button>
       <br/>
       <Button onClick={() => setInputText("I want to ask something different: ")}>I want to ask something different</Button>
+    </>
+  )
+}
+
+
+
+function Settings() {
+  const dispatch = useAppDispatch()
+
+  const baseURL = useAppSelector(state => state.settings.baseURL)
+  const model = useAppSelector(state => state.settings.model)
+  const showFullChatHistory = useAppSelector(state => state.chatHistory.showFullChatHistory)
+
+  const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false)
+  const closeSettingsModal = () => setShowSettingsModal(false)
+  
+  const chatAPI = useContext(MainChatAPIContext)
+
+  const {data, error, isLoading} = useQuery({
+    queryKey: [baseURL],
+    queryFn: async () => {
+      //https://platform.openai.com/docs/api-reference/models/list
+      const list = await chatAPI.openAI.models.list()
+      return list.data.map(({id}) => id).sort()
+    },
+  })
+  useEffect(() => {
+    //if the model chosen is no longer in the list
+    if(data && !data.includes(model) && data[0]) {
+      //auto-pick the first option
+      dispatch(setModel(data[0]))
+    }
+  }, [data])
+
+  return (
+    <>
+      <Modal opened={showSettingsModal} onClose={closeSettingsModal} title="Settings">
+        <Checkbox
+          checked={showFullChatHistory}
+          onChange={() => dispatch(toggleShowFullChatHistory())}
+          label="Show full chat history"
+        />
+        <hr/>
+        <TextInput
+          label="LLM Base URL"
+          description="Base URL to make chat completion requests to"
+          placeholder="Ex: https://api.openai.com/v1/"
+          value={baseURL}
+          onChange={(event) => dispatch(setBaseURL(event.currentTarget.value))}
+        />
+        <br/>
+        {isLoading ? <p>Loading models...</p> : (
+          <>
+            <Select
+              label="Model"
+              placeholder="Choose your model"
+              data={data}
+              value={model}
+              onChange={(value) => value && dispatch(setModel(value))}
+            />
+            {error && <ErrorMessage>{error.message}</ErrorMessage>}
+          </>
+        )}
+        
+      </Modal>
+
+      <ActionIcon id={styles["chat-settings-button"]} size="sm" variant="filled" aria-label="Show Settings" onClick={() => setShowSettingsModal(true)}>
+        <IconSettings/>
+      </ActionIcon>
     </>
   )
 }

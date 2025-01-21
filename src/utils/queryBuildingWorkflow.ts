@@ -3,7 +3,7 @@
 import { fuzzySearchEntitiesResponse } from "./knowledgeBase/fuzzySearch"
 import { getPropertiesForEntityResponse } from "./knowledgeBase/getPropertiesForEntity"
 import { findTailEntitiesResponse } from "./knowledgeBase/findTailEntities"
-import { ChatGPTAPI } from "./ChatGPTAPI"
+import { ChatAPI } from "./ChatAPI"
 import { 
   ENTITY_SEARCH_PREFIX, 
   INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE, 
@@ -16,7 +16,7 @@ import {
 
 const QUERY_BUILDING_MAX_LOOPS = 20 //HARDCODED we don't want the LLM looping forever
 
-export async function queryBuildingWorkflow(chatGPT:ChatGPTAPI, text: string) {
+export async function queryBuildingWorkflow(chatGPT:ChatAPI, text: string) {
   //send the initial query building message to the LLM as the system role
   let llmResponse = await chatGPT.sendMessages([
     {
@@ -80,7 +80,7 @@ export async function queryBuildingWorkflow(chatGPT:ChatGPTAPI, text: string) {
 }
 
 
-async function handleFuzzySearchForEntity(chatGPT:ChatGPTAPI, text:string) {
+async function handleFuzzySearchForEntity(chatGPT:ChatAPI, text:string) {
   //try to resolve these entities by requesting data from the KG
   const responseText = await fuzzySearchEntitiesResponse(text)
 
@@ -101,7 +101,7 @@ async function handleFuzzySearchForEntity(chatGPT:ChatGPTAPI, text:string) {
   ])
 }
 
-async function handleGetPropertiesForEntity(chatGPT:ChatGPTAPI, entityId: string) {
+async function handleGetPropertiesForEntity(chatGPT:ChatAPI, entityId: string) {
   const responseText = await getPropertiesForEntityResponse(entityId)
 
   if(!responseText) {
@@ -121,7 +121,7 @@ async function handleGetPropertiesForEntity(chatGPT:ChatGPTAPI, entityId: string
   ])
 }
 
-async function handleFindTailEntities(chatGPT:ChatGPTAPI, text: string) {
+async function handleFindTailEntities(chatGPT:ChatAPI, text: string) {
   let split = text.split(" ")
   if(split.length !== 2) {
     split = text.split(", ")

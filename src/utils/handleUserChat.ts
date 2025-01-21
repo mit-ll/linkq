@@ -1,6 +1,6 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
-import { ChatGPTAPI } from "./ChatGPTAPI"
+import { ChatAPI } from "./ChatAPI"
 import { queryBuildingWorkflow } from "./queryBuildingWorkflow"
 
 /**
@@ -10,7 +10,7 @@ import { queryBuildingWorkflow } from "./queryBuildingWorkflow"
  * @param chatGPT   the ChatGPT instance
  * @returns         the LLM response
  */
-export async function handleUserChat(userText: string, chatGPT: ChatGPTAPI) {
+export async function handleUserChat(userText: string, chatGPT: ChatAPI) {
   //get the LLM to respond
   let llmResponse = await chatGPT.sendMessages([
     { content: userText, role: "user" }

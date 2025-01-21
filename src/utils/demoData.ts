@@ -1,4 +1,4 @@
-import { ChatHistoryType } from "./ChatGPTAPI"
+import { ChatHistoryType } from "./ChatAPI"
 
 export const IS_DEMO_MODE = import.meta.env.VITE_DEMO_MODE.trim() === "true"
 

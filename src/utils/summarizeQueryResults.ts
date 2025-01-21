@@ -2,22 +2,22 @@
 // SPDX-License-Identifier: MIT
 import { SparqlResultsJsonType } from "types/sparql";
 
-import { ChatGPTAPI } from "./ChatGPTAPI";
+import { ChatAPI } from "./ChatAPI";
 import { getEntityDataFromQuery } from "./knowledgeBase/getEntityData";
 
 /**
  * This function prompts the LLM to name the query and summarize the results
- * @param chatGPTAPI  the LLM API
+ * @param ChatAPI  the LLM API
  * @param query       the query that was executed
  * @param data        the data if applicable (there could have been an error)
  * @returns           the name and summary as a key-value object
  */
-export async function summarizeQueryResults(chatGPTAPI: ChatGPTAPI, query:string, data?:SparqlResultsJsonType) {
+export async function summarizeQueryResults(ChatAPI: ChatAPI, query:string, data?:SparqlResultsJsonType) {
   const entityData = await getEntityDataFromQuery(query)
 
   //first ask the LLM to come up with a name for the query
   //this is useful for the query history feature
-  const {content:name} = await chatGPTAPI.sendMessages([
+  const {content:name} = await ChatAPI.sendMessages([
     {
       content: `Respond with a brief name for this query. If you generated this query, it can just be the question that the user asked.
       ${query}
@@ -33,7 +33,7 @@ ${entityData?.map(({id,label,description}) => `ID ${id} | Label: ${label} | Desc
   //else there was data
 
   //ask the LLM to summarize the results
-  const {content:summary} = await chatGPTAPI.sendMessages([
+  const {content:summary} = await ChatAPI.sendMessages([
     {
       content: `These are the JSON results from the last query. Respond with a brief summary of the results.
       ${JSON.stringify(data, undefined, 2)}`,
