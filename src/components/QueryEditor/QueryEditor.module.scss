@@ -7,3 +7,12 @@
   width: 100%;
   overflow-x: auto;
 }
+
+.query-history-button {
+  margin-top: 1em;
+
+  span {
+    white-space: wrap;
+    overflow: auto;
+  }
+}
