@@ -15,7 +15,7 @@ if (process.env.HTTPS_PROXY) {
 import fs from "fs"
 import papaparse from "papaparse"
 
-import { ChatGPTAPI } from "../../ChatGPTAPI"
+import { ChatAPI } from "../../ChatAPI"
 import { tryParsingOutQuery } from "../../tryParsingOutQuery"
 import { runQuery } from "../../knowledgeBase/runQuery"
 import { summarizeQueryResults } from "../../summarizeQueryResults"
@@ -90,9 +90,9 @@ export type EvaluationOutputRowType = {
 
 
 type ApproachCallbackFunctionType = (
-  chatGPT: ChatGPTAPI,
+  chatGPT: ChatAPI,
   question:string
-) => ReturnType<ChatGPTAPI["sendMessages"]>
+) => ReturnType<ChatAPI["sendMessages"]>
 
 async function runMintakaEvaluation(
   outputFileName:string,
@@ -125,26 +125,29 @@ async function runMintakaEvaluation(
 export async function runLinkQMintakaEvaluation() {
   return await runMintakaEvaluation(
     `linkq-evaluation-output-${new Date().getTime()}.csv`,
-    async (chatGPT:ChatGPTAPI, question:string) => {
+    async (chatGPT:ChatAPI, question:string) => {
       //force the LLM to start the query building workflow
       chatGPT.messages = [
         {
-          content: INITIAL_SYSTEM_MESSAGE,
           chatId: 0,
+          content: INITIAL_SYSTEM_MESSAGE,
           name: "system",
           role: "system",
+          stage: "Initial System Message",
         },
         {
-          content: question,
           chatId: 0,
+          content: question,
           name: "user",
           role: "user",
+          stage: "Question Refinement",
         },
         {
-          content: "BUILD QUERY",
           chatId: 0,
+          content: "BUILD QUERY",
           name: "gpt-4-turbo-preview",
           role: "assistant",
+          stage: "Query Building",
         },
       ]
 
@@ -156,11 +159,12 @@ export async function runLinkQMintakaEvaluation() {
 export async function runPlainLLMMintakaEvaluation() {
   return await runMintakaEvaluation(
     `plainllm-evaluation-results-${new Date().getTime()}.csv`,
-    async (chatGPT:ChatGPTAPI, question:string) => {
+    async (chatGPT:ChatAPI, question:string) => {
       return await chatGPT.sendMessages([
         {
           content: `You are an expert at generating SPARQL queries for the Wikidata, which is a knowledge graph of encyclopedic data from Wikipedia. Your job is not to directly answer the question, but instead to write a SPARQL query to find the answer. Start the SPARQL query with \`\`\`sparql and end the query with \`\`\`. Now generate a SPARQL query to answer the question: ${question}`,
           role: "system",
+          stage: "Query Building",
         },
       ])
     }
@@ -198,7 +202,7 @@ async function runOneLinkQPipeline(
 
 
   //set up ChatGPT
-  const chatGPT = new ChatGPTAPI({
+  const chatGPT = new ChatAPI({
     apiKey: ENV.VITE_OPENAI_API_KEY,
     chatId: 0,
   })
@@ -246,7 +250,7 @@ async function runOneLinkQPipeline(
 
 
     //summarize the results
-    const { summary } = await summarizeQueryResults(chatGPT,query,sparqlResults)
+    const { summary } = await summarizeQueryResults(chatGPT,query,{data: sparqlResults})
     output["LLM Summary"] = summary
 
 

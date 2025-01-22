@@ -2,43 +2,69 @@
 // SPDX-License-Identifier: MIT
 import { SparqlResultsJsonType } from "types/sparql";
 
-import { ChatGPTAPI } from "./ChatGPTAPI";
+import { ChatAPI } from "./ChatAPI";
 import { getEntityDataFromQuery } from "./knowledgeBase/getEntityData";
+
+export type SummarizeOutcomeType = {
+  data: SparqlResultsJsonType,
+} | {
+  error: Error,
+}
 
 /**
  * This function prompts the LLM to name the query and summarize the results
- * @param chatGPTAPI  the LLM API
- * @param query       the query that was executed
- * @param data        the data if applicable (there could have been an error)
- * @returns           the name and summary as a key-value object
+ * @param ChatAPI  the LLM API
+ * @param query    the query that was executed
+ * @param data     the data if applicable
+ * @param error    the data if applicable, undefined if there was an error executing the query
+ * @returns        a Promise that returns the name and summary as a key-value object
  */
-export async function summarizeQueryResults(chatGPTAPI: ChatGPTAPI, query:string, data?:SparqlResultsJsonType) {
+export async function summarizeQueryResults(chatAPI: ChatAPI, query:string, outcome:SummarizeOutcomeType):Promise<{name:string,summary:string}> {
   const entityData = await getEntityDataFromQuery(query)
 
   //first ask the LLM to come up with a name for the query
   //this is useful for the query history feature
-  const {content:name} = await chatGPTAPI.sendMessages([
+  const {content:name} = await chatAPI.sendMessages([
     {
-      content: `Respond with a brief name for this query. If you generated this query, it can just be the question that the user asked.
-      ${query}
+      content: `Here is a KG query:
+${query}
 
 Where the IDs in the query are:
-${entityData?.map(({id,label,description}) => `ID ${id} | Label: ${label} | Description: ${description}`).join("\n")}`,
+${entityData?.map(({id,label,description}) => `ID ${id} | Label: ${label} | Description: ${description}`).join("\n")}
+
+Respond with a brief name for this query.`,
       role: "system",
+      stage: "Query Summarization",
     }
   ])
 
-  //if there is no data, just return the name and an empty summary
-  if(!data) return {name, summary:""}
-  //else there was data
+  //if there was data, then the query executed successfully
+  if("data" in outcome) {
+    const {content:summary} = await chatAPI.sendMessages([
+      {
+        content: `These are the JSON results from the last query:
+${JSON.stringify(outcome.data, undefined, 2)}
 
-  //ask the LLM to summarize the results
-  const {content:summary} = await chatGPTAPI.sendMessages([
-    {
-      content: `These are the JSON results from the last query. Respond with a brief summary of the results.
-      ${JSON.stringify(data, undefined, 2)}`,
-      role: "system",
-    }
-  ])
-  return {name, summary}
+Respond with a brief summary of the results.`,
+        role: "system",
+        stage: "Query Summarization",
+      }
+    ])
+    return {name, summary}
+  }
+  //else if there was an error
+  else {
+    //ask the LLM to summarize the results
+    const {content:summary} = await chatAPI.sendMessages([
+      {
+        content: `The query did not execute successfully and had this error:.
+${outcome.error}
+
+Respond with a brief guess as to why the query failed.`,
+        role: "system",
+        stage: "Query Summarization",
+      }
+    ])
+    return {name, summary}
+  }
 }

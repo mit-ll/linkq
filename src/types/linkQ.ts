@@ -1,0 +1,1 @@
+export type LinkQStageType = "Initial System Message" | "Question Refinement" | "Entity Fuzzy Searching" | "Property Search" | "Tail Search" | "Query Building" | "Query Summarization" | "Unknown"

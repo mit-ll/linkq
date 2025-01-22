@@ -3,6 +3,8 @@
 
 import { useAppSelector } from "redux/store"
 
+import { Settings } from "./Settings/Settings"
+
 import { IS_DEMO_MODE } from "utils/demoData"
 
 export function ApiKeyWarning() {
@@ -17,7 +19,9 @@ export function ApiKeyWarning() {
         display: "flex", justifyContent: "center", alignItems: "center",
         zIndex: 1,
       }}>
-        <p>You need to configure the <code>VITE_OPENAI_API_KEY</code> environment variable in your <code>.env.local</code> file.</p>
+        <Settings/>
+
+        <p>You need to configure the <code>VITE_OPENAI_API_KEY</code> environment variable in your <code>.env.local</code> file or update your API key in the settings menu.</p>
       </div>
     )
   }
