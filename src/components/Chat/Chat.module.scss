@@ -6,13 +6,6 @@
   height: 100vh;
   position: relative;
 
-  #chat-settings-button {
-    position: absolute;
-    top: 0.5rem;
-    left: 0.5rem;
-    z-index: 1;
-  }
-
   #chat-scroll-container { 
     height: calc(100% - 35px - 2.5rem);
     overflow-y: auto;
