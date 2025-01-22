@@ -22,6 +22,7 @@ export async function queryBuildingWorkflow(chatAPI:ChatAPI, text: string) {
     {
       content: INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE,
       role: "system",
+      stage: "Query Building",
     },
   ])
 
@@ -64,6 +65,7 @@ export async function queryBuildingWorkflow(chatAPI:ChatAPI, text: string) {
         {
           content: `That was an invalid response. If you are done, just respond with STOP. Follow the specified format. ${INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE}`,
           role: "system",
+          stage: "Query Building",
         }
       ])
     }
@@ -75,6 +77,7 @@ export async function queryBuildingWorkflow(chatAPI:ChatAPI, text: string) {
     {
       content: QUERY_BUILDING_SYSTEM_MESSAGE + ` Now construct a query that answers the user's question: ${text}`,
       role: "system",
+      stage: "Query Building",
     }
   ])
 }
@@ -89,6 +92,7 @@ async function handleFuzzySearchForEntity(chatAPI:ChatAPI, text:string) {
       {
         content: `${KG_NAME} did not resolve any entities. You may need to rephrase or simplify your entity search`,
         role: "system",
+        stage: "Entity Fuzzy Searching",
       }
     ])
   }
@@ -97,6 +101,7 @@ async function handleFuzzySearchForEntity(chatAPI:ChatAPI, text:string) {
     {
       content: responseText,
       role: "system",
+      stage: "Entity Fuzzy Searching",
     }
   ])
 }
@@ -109,6 +114,7 @@ async function handleGetPropertiesForEntity(chatAPI:ChatAPI, entityId: string) {
       {
         content: `${KG_NAME} did not resolve any properties for that entity. Are you sure that entity exists?`,
         role: "system",
+        stage: "Property Search",
       }
     ])
   }
@@ -117,6 +123,7 @@ async function handleGetPropertiesForEntity(chatAPI:ChatAPI, entityId: string) {
     {
       content: responseText,
       role: "system",
+      stage: "Property Search",
     }
   ])
 }
@@ -131,6 +138,7 @@ async function handleFindTailEntities(chatAPI:ChatAPI, text: string) {
       {
         content: "Your response did not follow the correct format. Please try again.",
         role: "system",
+        stage: "Tail Search",
       }
     ])
   }
@@ -143,6 +151,7 @@ async function handleFindTailEntities(chatAPI:ChatAPI, text: string) {
       {
         content: `${KG_NAME} did not resolve any entities for that entity and property. Are you sure that entity has that property?`,
         role: "system",
+        stage: "Tail Search",
       }
     ])
   }
@@ -151,6 +160,7 @@ async function handleFindTailEntities(chatAPI:ChatAPI, text: string) {
     {
       content: responseText,
       role: "system",
+      stage: "Tail Search",
     }
   ])
 }
