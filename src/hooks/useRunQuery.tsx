@@ -4,12 +4,12 @@ import { createContext, useContext } from "react";
 
 import { UseMutateFunction, useMutation } from "@tanstack/react-query";
 
-import { pushQueryHistory } from 'redux/queryHistorySlice.ts';
-import { setResults } from 'redux/resultsSlice.ts';
+import { pushQueryHistory, updateLastQueryHistory } from 'redux/queryHistorySlice.ts';
+import { setResults, setResultsSummary } from 'redux/resultsSlice.ts';
 import { useAppDispatch } from "redux/store.ts";
 
 import { runQuery as runQueryFunction } from 'utils/knowledgeBase/runQuery.ts';
-import { summarizeQueryResults } from 'utils/summarizeQueryResults.ts';
+import { SummarizeOutcomeType, summarizeQueryResults } from 'utils/summarizeQueryResults.ts';
 
 import { SparqlResultsJsonType } from "types/sparql.ts";
 
@@ -20,9 +20,11 @@ import { useChatAPIInstance } from "./useChatAPIInstance.ts";
 const RunQueryContext = createContext<{
   runQuery: UseMutateFunction<SparqlResultsJsonType, Error, string, unknown>,
   runQueryIsPending: boolean,
+  summarizeResultsIsPending: boolean,
 }>({
   runQuery: async () => {},
   runQueryIsPending: false,
+  summarizeResultsIsPending: false,
 })
 
 //this defines the context provider that should be placed towards the top of the app to make the runQuery function available as a hook
@@ -37,50 +39,63 @@ export function RunQueryProvider({
     chatId: 1,
   })
   const getNewChatId = useGetNewChatId()
+  const handleSummaryResults = ({name,summary}:{name:string,summary:string}) => {
+    dispatch(updateLastQueryHistory({name, summary}))
+    dispatch(setResultsSummary(summary))
+  }
+  const handleLLMError = (err:Error) => {
+    console.error(err)
+    const summary = `There was an error generating a summary: ${err.message}`
+    dispatch(updateLastQueryHistory({name: "Error generating a query name", summary}))
+    dispatch(setResultsSummary(summary))
+  }
+
+  //useMutation for summarizing query results
+  const {isPending: summarizeResultsIsPending, mutate:summarizeResults} = useMutation<void, Error, {query:string, outcome: SummarizeOutcomeType}>({
+    mutationKey: ['summarizeResults'],
+    mutationFn: async ({query,outcome}) => {
+      //try to ask the LLM to give the query a name and summarize the results
+      try {
+        chatAPI.reset(getNewChatId())
+        handleSummaryResults(
+          await summarizeQueryResults(chatAPI, query, outcome)
+        )
+      }
+      catch(llmError) {
+        handleLLMError(llmError as Error)
+      }
+    },
+  })
 
   //useMutation wraps the workflow for running a query
-  //including asking the LLM for a name and summary
   const {isPending: runQueryIsPending, mutate:runQuery} = useMutation<SparqlResultsJsonType, Error, string>({
     mutationKey: ['runQuery'],
     mutationFn: async (query: string) => {
       dispatch(setResults(null)) //clear the current results
       return await runQueryFunction(query) //run the query
     },
-    onSuccess: async (data, query) => {
-      //try to ask the LLM to give the query a name and summarize the results
-      try {
-        chatAPI.reset(getNewChatId())
-
-        const {name, summary} = await summarizeQueryResults(chatAPI, query, data)
-        dispatch(pushQueryHistory({data, name, query, summary})) //update the history with the data
-        dispatch(setResults({data, error: null, summary}))
-      }
-      catch(llmError) {
-        dispatch(pushQueryHistory({data, name: null, query, summary: null})) //update the history with the data
-        dispatch(setResults({data, error: null, summary: null}))
-      }
+    onSuccess: async (data, query) => { //the query executed properly
+      dispatch(pushQueryHistory({data, query}))
+      dispatch(setResults({data, error: null, summary: null}))
+      summarizeResults({query, outcome:{data}})
     },
-    onError: async (error, query) => {
+    onError: async (error, query) => { //there was an error executing the query
       console.error(error)
-      //try to ask the LLM to give a name for the query
-      try {
-        chatAPI.reset(getNewChatId())
-
-        const {name, summary} = await summarizeQueryResults(chatAPI, query)
-        dispatch(pushQueryHistory({error: error.message, name, query, summary})) //update the history with the data
-        dispatch(setResults({data: null, error: error.message, summary}))
-      }
-      catch(llmError) {
-        dispatch(pushQueryHistory({error: error.message, name: null, query, summary: null})) //update the history with the data
-        dispatch(setResults({data: null, error: error.message, summary: null}))
-      }
+      dispatch(pushQueryHistory({error: error.message, query}))
+      dispatch(setResults({data: null, error: error.message, summary: null}))
+      summarizeResults({query, outcome:{error}})
     },
   })
+
+  //useMutation wraps the workflow for running a query
+  //including asking the LLM for a name and summary
+  
 
   return (
     <RunQueryContext.Provider value={{
       runQuery,
       runQueryIsPending,
+      summarizeResultsIsPending,
     }}>
       {children}
     </RunQueryContext.Provider>

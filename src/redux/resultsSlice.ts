@@ -6,7 +6,11 @@ import { DEMO_RESULTS, IS_DEMO_MODE } from 'utils/demoData'
 
 import { SparqlResultsJsonType } from 'types/sparql'
 
-type ResultsType = {error: string | null, data: SparqlResultsJsonType | null, summary: string | null} | null
+type ResultsType = {
+  error: string | null, 
+  data: SparqlResultsJsonType | null, 
+  summary: string | null, //null means that the LLM summarization is still loading
+} | null
 
 const initialState: {
   results: ResultsType,
@@ -21,8 +25,12 @@ const resultsSlice = createSlice({
   reducers: {
     setResults: (state, action: PayloadAction<ResultsType>) => {
       state.results = action.payload
+    },
+    setResultsSummary: (state, action: PayloadAction<string>) => {
+      if(!state.results) throw new Error("Results are null. There is a state management issue.")
+      state.results.summary = action.payload
     }
   }
 })
 
-export const { reducer: resultsReducer, actions: { setResults } } = resultsSlice
+export const { reducer: resultsReducer, actions: { setResults, setResultsSummary } } = resultsSlice

@@ -59,12 +59,13 @@ export class ChatAPI {
     }
   }
 
-  reset(chatId:number) {
+  public reset(chatId:number) {
     this.chatId = chatId
     this.messages = []
   }
 
-  transformMessage(message: ChatCompletionMessageParam):ChatMessageType {
+  private transformMessage(message: ChatCompletionMessageParam):ChatMessageType {
+    console.log("this",this)
     return ({
       ...message,
       chatId: this.chatId,
@@ -78,11 +79,11 @@ export class ChatAPI {
    * @param messages  the array of messages to send to the LLM
    * @returns         the LLM's response content as a string
    */
-  async sendMessages(addMessages: ChatCompletionMessageParam[]) {
+  public async sendMessages(addMessages: ChatCompletionMessageParam[]) {
     //OpenAI's LLMs don't actually manage any state.
     //Instead, you need to send it the entire message history
     //if you want to maintain continuity in your conversation.
-    const messages = addMessages.map(this.transformMessage)
+    const messages = addMessages.map((m) => this.transformMessage(m))
     this.messages.push(...messages) //push the new messages
     this.addMessagesCallback?.(messages)
 

@@ -25,35 +25,40 @@ const initialState: {
 }
 
 type PushQueryHistoryPayloadType = {
-  data:SparqlResultsJsonType, name: string|null, query: string, summary: string|null
+  data:SparqlResultsJsonType, query: string //the query executed with data
 } | {
-  error: string, name: string|null, query: string, summary: string|null
+  error: string, query: string //there was an error executing the query
+}
+
+type UpdateLastQueryHistoryPayloadType = {
+  name: string, summary: string
 }
 
 const queryHistorySlice = createSlice({
   name: 'queryHistorySlice',
   initialState,
   reducers: {
+    //we want to decouple showing the query results vs showing the LLM summary
     pushQueryHistory: (state, action: PayloadAction<PushQueryHistoryPayloadType>) => {
       if("data" in action.payload) { //if there is data
         state.queryHistory.push({
-          name: action.payload.name,
+          name: null,
           query: action.payload.query,
           results: {
             data: action.payload?.data || null,
             error: null,
-            summary: action.payload.summary,
+            summary: null,
           },
         })
       }
-      else if("error" in action.payload) { //else if there is an error
+      else if("error" in action.payload) { //else if there is an error running the query
         state.queryHistory.push({
-          name: action.payload.name,
+          name: null,
           query: action.payload.query,
           results: {
             data: null,
             error: action.payload.error,
-            summary: action.payload.summary,
+            summary: null,
           },
         })
       }
@@ -61,9 +66,24 @@ const queryHistorySlice = createSlice({
         //this condition should never happen
         throw Error('Unknown action.payload: ' + action.payload);
       }
-    }
+    },
+    updateLastQueryHistory: (state, action: PayloadAction<UpdateLastQueryHistoryPayloadType>) => {
+      const lastHistory = state.queryHistory.at(-1)
+      if(!lastHistory) {
+        throw new Error("Could not find last last query history element. There is a state management issue.")
+      }
+      else if(lastHistory.name !== null) {
+        throw new Error(`Expected last query history name to be null. Received ${lastHistory.name}. There is a state management issue.`)
+      }
+      else if(lastHistory.results.summary !== null) {
+        throw new Error(`Expected last query history results.summary to be null. Received ${lastHistory.results.summary}. There is a state management issue.`)
+      }
+
+      lastHistory.name = action.payload.name
+      lastHistory.results.summary = action.payload.summary
+    },
   }
 })
 
 
-export const { reducer: queryHistoryReducer, actions: { pushQueryHistory } } = queryHistorySlice
+export const { reducer: queryHistoryReducer, actions: { pushQueryHistory, updateLastQueryHistory } } = queryHistorySlice
