@@ -1,14 +1,20 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
+import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 
-import { ChatHistoryType, ChatMessageType } from 'utils/ChatAPI'
 import { DEMO_FULL_HISTORY, DEMO_SIMPLE_HISTORY, IS_DEMO_MODE } from 'utils/demoData'
+
+export type LinkQChatMessageType = ChatCompletionMessageParam & {
+  content:string
+  chatId: number
+  name: string
+}
 
 const initialState: {
   chatIdCounter: number,
-  fullChatHistory: ChatHistoryType,
-  simpleChatHistory: ChatHistoryType,
+  fullChatHistory: LinkQChatMessageType[],
+  simpleChatHistory: LinkQChatMessageType[],
   showFullChatHistory: boolean,
 } = {
   chatIdCounter: 1,
@@ -28,10 +34,10 @@ const chatHistorySlice = createSlice({
   name: 'chatHistorySlice',
   initialState,
   reducers: {
-    addMessagesToFullChatHistory: (state, action: PayloadAction<ChatHistoryType>) => {
+    addMessagesToFullChatHistory: (state, action: PayloadAction<LinkQChatMessageType[]>) => {
       state.fullChatHistory.push(...action.payload)
     },
-    addMessageToSimpleChatHistory: (state, action: PayloadAction<ChatMessageType>) => {
+    addMessageToSimpleChatHistory: (state, action: PayloadAction<LinkQChatMessageType>) => {
       state.simpleChatHistory.push(action.payload)
     },
     incrementChatIdCounter: (state) => {

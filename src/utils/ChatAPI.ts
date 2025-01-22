@@ -3,20 +3,14 @@
 
 import OpenAI, { ClientOptions } from "openai"
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs"
-
-export type ChatMessageType = ChatCompletionMessageParam & {
-  content:string
-  chatId: number
-  name: string
-}
-export type ChatHistoryType = ChatMessageType[]
+import { LinkQChatMessageType } from "redux/chatHistorySlice"
 
 //this typing is used to omit the "messages" field from OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 type OpenAICreateOptionsType = Omit<OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming, 'messages'>
 
 export type ChatAPIConstructorArgsType = ClientOptions & {
-  addMessagesCallback?:(messages: ChatHistoryType) => any,
+  addMessagesCallback?:(messages: LinkQChatMessageType[]) => any,
   chatCompletionCreateOptions?: OpenAICreateOptionsType,
   chatId: number,
   systemMessage?: string,
@@ -31,10 +25,10 @@ export type ChatAPIConstructorArgsType = ClientOptions & {
  * but it doesn't let you send additional system messages, which is annoying
  */
 export class ChatAPI {
-  addMessagesCallback?: (messages: ChatHistoryType) => any //an optional callback function used to reactively update state
+  addMessagesCallback?: (messages: LinkQChatMessageType[]) => any //an optional callback function used to reactively update state
   chatCompletionCreateOptions: OpenAICreateOptionsType
   chatId: number
-  messages: ChatMessageType[] = [] //message history
+  messages: LinkQChatMessageType[] = [] //message history
   openAI: OpenAI //the openai instance
 
   constructor({
@@ -64,7 +58,7 @@ export class ChatAPI {
     this.messages = []
   }
 
-  private transformMessage(message: ChatCompletionMessageParam):ChatMessageType {
+  private transformMessage(message: ChatCompletionMessageParam):LinkQChatMessageType {
     return ({
       ...message,
       chatId: this.chatId,
@@ -108,7 +102,7 @@ export class ChatAPI {
     }
 
     //add the LLM's response to the message history
-    const responseMessage:ChatMessageType = {
+    const responseMessage:LinkQChatMessageType = {
       ...openAiResponseMessage,
       chatId: this.chatId,
       content: openAiResponseMessage.content, //this makes typescript happy

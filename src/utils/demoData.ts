@@ -1,4 +1,4 @@
-import { ChatHistoryType } from "./ChatAPI"
+import { LinkQChatMessageType } from "redux/chatHistorySlice"
 
 export const IS_DEMO_MODE = import.meta.env.VITE_DEMO_MODE.trim() === "true"
 
@@ -261,7 +261,7 @@ export const DEMO_RESULTS = {
   "summary": "The Academy Award for Best Picture between 2022 and 2024 was won by:\n\n1. \"CODA\" directed by Siân Héder, which won the award on March 27, 2022.\n2. \"Everything Everywhere All at Once\" with directors Dan Kwan and Daniel Scheinert, both awarded on January 1, 2023. It's listed twice because there are two directors.\n3. \"Oppenheimer\" directed by Christopher Nolan, which won the award on March 10, 2024."
 }
 
-export const DEMO_SIMPLE_HISTORY:ChatHistoryType = [
+export const DEMO_SIMPLE_HISTORY:LinkQChatMessageType[] = [
   {
     "chatId": 0,
     "name": "user",
@@ -288,7 +288,7 @@ export const DEMO_SIMPLE_HISTORY:ChatHistoryType = [
   }
 ]
 
-export const DEMO_FULL_HISTORY:ChatHistoryType = [
+export const DEMO_FULL_HISTORY:LinkQChatMessageType[] = [
   {
     "chatId": 0,
     "name": "system",
