@@ -16,7 +16,7 @@ import { useMainChatAPI } from 'hooks/useMainChatAPI';
 import { useRunQuery } from 'hooks/useRunQuery';
 
 import { addMessageToSimpleChatHistory, toggleShowFullChatHistory } from 'redux/chatHistorySlice';
-import { setBaseURL, setModel } from 'redux/settingsSlice';
+import { setApiKey, setBaseURL, setModel } from 'redux/settingsSlice';
 import { setQueryValue } from 'redux/queryValueSlice';
 import { useAppDispatch, useAppSelector } from 'redux/store';
 
@@ -216,6 +216,7 @@ function RenderSparqlQuery({
 function Settings() {
   const dispatch = useAppDispatch()
 
+  const apiKey = useAppSelector(state => state.settings.apiKey)
   const baseURL = useAppSelector(state => state.settings.baseURL)
   const model = useAppSelector(state => state.settings.model)
   const showFullChatHistory = useAppSelector(state => state.chatHistory.showFullChatHistory)
@@ -255,7 +256,18 @@ function Settings() {
           description="Base URL to make chat completion requests to"
           placeholder="Ex: https://api.openai.com/v1/"
           value={baseURL}
-          onChange={(event) => dispatch(setBaseURL(event.currentTarget.value))}
+          onChange={(event) => {
+            //IDK if this is necessary, but we don't want to accidentally send an API key to the wrong baseURL
+            dispatch(setApiKey("EMPTY"))
+            dispatch(setBaseURL(event.currentTarget.value))
+          }}
+        />
+        <br/>
+        <TextInput
+          label="API Key"
+          type='password'
+          value={apiKey}
+          onChange={(event) => dispatch(setApiKey(event.currentTarget.value))}
         />
         <br/>
         {isLoading ? <p>Loading models...</p> : (

@@ -16,6 +16,9 @@ const settingsSlice = createSlice({
   name: 'settingsSlice',
   initialState,
   reducers: {
+    setApiKey: (state, action: PayloadAction<string>) => {
+      state.apiKey = action.payload
+    },
     setBaseURL: (state, action: PayloadAction<string>) => {
       state.baseURL = action.payload
     },
@@ -25,4 +28,4 @@ const settingsSlice = createSlice({
   }
 })
 
-export const { reducer: settingsReducer, actions: { setBaseURL, setModel } } = settingsSlice
+export const { reducer: settingsReducer, actions: { setApiKey, setBaseURL, setModel } } = settingsSlice
