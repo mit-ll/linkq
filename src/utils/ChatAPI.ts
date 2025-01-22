@@ -55,6 +55,7 @@ export class ChatAPI {
         content: systemMessage,
         role: "system",
       }))
+      this.addMessagesCallback?.(this.messages)
     }
   }
 

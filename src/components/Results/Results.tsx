@@ -1,3 +1,5 @@
+// Copyright (c) 2024 Massachusetts Institute of Technology
+// SPDX-License-Identifier: MIT
 import { Title } from "@mantine/core"
 import { ErrorMessage } from "components/ErrorMessage"
 import { InfoModal } from "components/InfoModal"

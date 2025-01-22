@@ -45,6 +45,7 @@ export function RunQueryProvider({
   }
   const handleLLMError = (err:Error) => {
     console.error(err)
+    //TODO should we distringuish between a successful LLM summarization vs an error message?
     const summary = `There was an error generating a summary: ${err.message}`
     dispatch(updateLastQueryHistory({name: "Error generating a query name", summary}))
     dispatch(setResultsSummary(summary))
@@ -67,7 +68,7 @@ export function RunQueryProvider({
     },
   })
 
-  //useMutation wraps the workflow for running a query
+  //useMutation for running a query
   const {isPending: runQueryIsPending, mutate:runQuery} = useMutation<SparqlResultsJsonType, Error, string>({
     mutationKey: ['runQuery'],
     mutationFn: async (query: string) => {
@@ -75,20 +76,17 @@ export function RunQueryProvider({
       return await runQueryFunction(query) //run the query
     },
     onSuccess: async (data, query) => { //the query executed properly
-      dispatch(pushQueryHistory({data, query}))
-      dispatch(setResults({data, error: null, summary: null}))
-      summarizeResults({query, outcome:{data}})
+      dispatch(pushQueryHistory({data, query})) //update the query history
+      dispatch(setResults({data, error: null, summary: null})) //set the results
+      summarizeResults({query, outcome:{data}}) //try to summarize the results
     },
     onError: async (error, query) => { //there was an error executing the query
       console.error(error)
-      dispatch(pushQueryHistory({error: error.message, query}))
-      dispatch(setResults({data: null, error: error.message, summary: null}))
-      summarizeResults({query, outcome:{error}})
+      dispatch(pushQueryHistory({error: error.message, query})) //update the query history
+      dispatch(setResults({data: null, error: error.message, summary: null})) //show the error
+      summarizeResults({query, outcome:{error}}) //try to explain the error
     },
   })
-
-  //useMutation wraps the workflow for running a query
-  //including asking the LLM for a name and summary
   
 
   return (

@@ -1,3 +1,5 @@
+// Copyright (c) 2024 Massachusetts Institute of Technology
+// SPDX-License-Identifier: MIT
 import { createContext, useContext } from "react";
 import { ChatAPI } from "utils/ChatAPI";
 import { useChatAPIInstance } from "./useChatAPIInstance";
