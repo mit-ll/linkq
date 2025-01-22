@@ -15,7 +15,7 @@ export const LLMWarning = ({
         {children}
       </Modal>
 
-      <ActionIcon size="xs" variant="filled" aria-label="LLM Hallucination Warning" color="yellow" onClick={open} style={{float:"right"}}>
+      <ActionIcon size="xs" variant="filled" aria-label="LLM Hallucination Warning" color="yellow" onClick={open} style={{float:"right", marginTop: 0}}>
         <IconAlertTriangle/>
       </ActionIcon>
     </>

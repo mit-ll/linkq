@@ -39,7 +39,7 @@ export function Results() {
     else if(results?.error) {
       return (
         <>
-          <p>There was an error running your query</p>
+          <ErrorMessage>There was an error running your query:</ErrorMessage>
           <pre>{results.error}</pre>
         </>
       )

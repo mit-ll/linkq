@@ -55,7 +55,6 @@ export class ChatAPI {
         content: systemMessage,
         role: "system",
       }))
-      this.addMessagesCallback?.(this.messages)
     }
   }
 
@@ -65,7 +64,6 @@ export class ChatAPI {
   }
 
   private transformMessage(message: ChatCompletionMessageParam):ChatMessageType {
-    console.log("this",this)
     return ({
       ...message,
       chatId: this.chatId,
