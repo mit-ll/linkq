@@ -34,6 +34,7 @@ ${entityData?.map(({id,label,description}) => `ID ${id} | Label: ${label} | Desc
 
 Respond with a brief name for this query.`,
       role: "system",
+      stage: "Query Summarization",
     }
   ])
 
@@ -46,6 +47,7 @@ ${JSON.stringify(outcome.data, undefined, 2)}
 
 Respond with a brief summary of the results.`,
         role: "system",
+        stage: "Query Summarization",
       }
     ])
     return {name, summary}
@@ -60,6 +62,7 @@ ${outcome.error}
 
 Respond with a brief guess as to why the query failed.`,
         role: "system",
+        stage: "Query Summarization",
       }
     ])
     return {name, summary}

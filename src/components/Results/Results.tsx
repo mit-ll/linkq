@@ -11,7 +11,7 @@ import { useAppSelector } from "redux/store"
 import styles from "./Results.module.scss"
 
 export function Results() {
-  const { runQueryIsPending, summarizeResultsIsPending } = useRunQuery()
+  const { runQueryIsPending } = useRunQuery()
   const results = useAppSelector(state => state.results.results)
 
   const summaryContent = (() => {

@@ -4,7 +4,7 @@
 import CodeMirror from '@uiw/react-codemirror';
 import { StreamLanguage } from '@codemirror/language';
 import { sparql } from '@codemirror/legacy-modes/mode/sparql';
-import { ActionIcon, Button, Checkbox, Modal, Select, TextInput } from "@mantine/core";
+import { ActionIcon, Badge, Button, Checkbox, Modal, Select, TextInput } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { IconCaretRight, IconSettings, IconZoomCode } from '@tabler/icons-react';
@@ -64,6 +64,7 @@ export function Chat() {
         content: text, 
         name: "user",
         role: "user",
+        stage: "Question Refinement",
       }))
 
       const llmResponse = await handleUserChat(text, chatAPI)
@@ -103,7 +104,8 @@ export function Chat() {
           <ErrorMessage>{error.message}</ErrorMessage>
         </Modal>
       )}
-      {isPending && <p className={styles.loading}>Loading...</p>}
+      {/* {isPending && <p className={styles.loading}>Loading...</p>} */}
+      <LinkQStatus chatIsPending={isPending}/>
 
       <form
         onSubmit={e => {
@@ -275,5 +277,35 @@ function Settings() {
         <IconSettings/>
       </ActionIcon>
     </>
+  )
+}
+
+
+function LinkQStatus({
+  chatIsPending,
+}:{
+  chatIsPending: boolean,
+}) {
+  const fullChatHistory = useAppSelector(state => state.chatHistory.fullChatHistory)
+  const { runQueryIsPending, summarizeResultsIsPending } = useRunQuery()
+
+  let color = "blue"
+  let displayMessage = "Waiting for User Input"
+  const stage = fullChatHistory.at(-1)?.stage
+  if(chatIsPending) {
+    color = "yellow"
+    displayMessage = stage || ""
+  }
+  else if(runQueryIsPending) {
+    color = "yellow"
+    displayMessage = "Executing Query"
+  }
+  else if(summarizeResultsIsPending) {
+    color = "yellow"
+    displayMessage = "Query Summarization"
+  }
+
+  return (
+    <p className={styles.loading}><Badge color={color}>{displayMessage}</Badge></p>
   )
 }

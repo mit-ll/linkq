@@ -13,7 +13,7 @@ import { queryBuildingWorkflow } from "./queryBuildingWorkflow"
 export async function handleUserChat(userText: string, chatAPI: ChatAPI) {
   //get the LLM to respond
   let llmResponse = await chatAPI.sendMessages([
-    { content: userText, role: "user" }
+    { content: userText, role: "user", stage: "Question Refinement" }
   ])
   
   //determine what to do with the LLM's response

@@ -129,19 +129,25 @@ export async function runLinkQMintakaEvaluation() {
       //force the LLM to start the query building workflow
       chatGPT.messages = [
         {
+          chatId: 0,
           content: INITIAL_SYSTEM_MESSAGE,
           name: "system",
           role: "system",
+          stage: "Initial System Message",
         },
         {
+          chatId: 0,
           content: question,
           name: "user",
           role: "user",
+          stage: "Question Refinement",
         },
         {
+          chatId: 0,
           content: "BUILD QUERY",
           name: "gpt-4-turbo-preview",
           role: "assistant",
+          stage: "Query Building",
         },
       ]
 
@@ -158,6 +164,7 @@ export async function runPlainLLMMintakaEvaluation() {
         {
           content: `You are an expert at generating SPARQL queries for the Wikidata, which is a knowledge graph of encyclopedic data from Wikipedia. Your job is not to directly answer the question, but instead to write a SPARQL query to find the answer. Start the SPARQL query with \`\`\`sparql and end the query with \`\`\`. Now generate a SPARQL query to answer the question: ${question}`,
           role: "system",
+          stage: "Query Building",
         },
       ])
     }
@@ -243,7 +250,7 @@ async function runOneLinkQPipeline(
 
 
     //summarize the results
-    const { summary } = await summarizeQueryResults(chatGPT,query,sparqlResults)
+    const { summary } = await summarizeQueryResults(chatGPT,query,{data: sparqlResults})
     output["LLM Summary"] = summary
 
 

@@ -14,7 +14,7 @@
   }
 
   #chat-scroll-container { 
-    height: calc(100% - 35px - 1rem);
+    height: calc(100% - 35px - 2.5rem);
     overflow-y: auto;
     margin-bottom: 3px;
     padding: 0.5rem;
@@ -41,8 +41,11 @@
       .chat {
         background-color: #444;
         padding: 0.5rem;
-        margin-bottom: 0.5rem;
         border-radius: 5px;
+
+        &:not(:last-child) {
+          margin-bottom: 0.5rem;
+        }
 
         button {
           margin-top: 0.5rem;

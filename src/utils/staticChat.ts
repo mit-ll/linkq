@@ -16,11 +16,13 @@ export async function staticChat() {
   const response = await chatAPI.sendMessages([
     {
       role: "system",
-      content: INITIAL_SYSTEM_MESSAGE
+      content: INITIAL_SYSTEM_MESSAGE,
+      stage: "Initial System Message",
     },
     {
       role: "user",
-      content: "Can you tell me about interesting movies?"
+      content: "Can you tell me about interesting movies?",
+      stage: "Question Refinement",
     },
   ])
   
