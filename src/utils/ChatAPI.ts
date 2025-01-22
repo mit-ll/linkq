@@ -15,16 +15,17 @@ export type ChatHistoryType = ChatMessageType[]
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 type OpenAICreateOptionsType = Omit<OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming, 'messages'>
 
-export type ChatGPTAPIConstructorArgsType = ClientOptions & {
+export type ChatAPIConstructorArgsType = ClientOptions & {
   addMessagesCallback?:(messages: ChatHistoryType) => any,
   chatCompletionCreateOptions?: OpenAICreateOptionsType,
   chatId: number,
+  systemMessage?: string,
 }
 
 /**
  * This is our custom ChatAPI class
  * It manages message history, and lets you send new messages
- * It uses the OpenAI API protocol which is supposed by many open-source LLM server implementations
+ * It uses the OpenAI API protocol which is supported by many open-source LLM server implementations
  * 
  * We originally used this package on NPM https://www.npmjs.com/package/chatgpt
  * but it doesn't let you send additional system messages, which is annoying
@@ -33,24 +34,47 @@ export class ChatAPI {
   addMessagesCallback?: (messages: ChatHistoryType) => any //an optional callback function used to reactively update state
   chatCompletionCreateOptions: OpenAICreateOptionsType
   chatId: number
-  messages: ChatCompletionMessageParam[] = [] //message history
+  messages: ChatMessageType[] = [] //message history
   openAI: OpenAI //the openai instance
 
   constructor({
     addMessagesCallback,
     chatCompletionCreateOptions={ model: 'gpt-4-turbo-preview' }, 
     chatId,
+    systemMessage,
     ...options //the rest of ClientOptions
-  }: ChatGPTAPIConstructorArgsType) {
+  }: ChatAPIConstructorArgsType) {
     this.openAI = new OpenAI(options) //initialize a new OpenAI class instance
     this.chatCompletionCreateOptions = chatCompletionCreateOptions
     this.chatId = chatId
     
     this.addMessagesCallback = addMessagesCallback //save the callback function
+
+    if(systemMessage) {
+      this.messages.push(this.transformMessage({ //add the system message to the message history
+        content: systemMessage,
+        role: "system",
+      }))
+      this.addMessagesCallback?.(this.messages)
+    }
+  }
+
+  reset(chatId:number) {
+    this.chatId = chatId
+    this.messages = []
+  }
+
+  transformMessage(message: ChatCompletionMessageParam):ChatMessageType {
+    return ({
+      ...message,
+      chatId: this.chatId,
+      content: message.content as string,
+      name: message.role==="assistant" ? this.chatCompletionCreateOptions.model : message.role,
+    })
   }
 
   /**
-   * This function sends your new messages to ChatGPT while maintaining the full message history
+   * This function sends your new messages to the LLM while maintaining the full message history
    * @param messages  the array of messages to send to the LLM
    * @returns         the LLM's response content as a string
    */
@@ -58,15 +82,9 @@ export class ChatAPI {
     //OpenAI's LLMs don't actually manage any state.
     //Instead, you need to send it the entire message history
     //if you want to maintain continuity in your conversation.
-    this.messages.push(...addMessages) //push the new messages
-    this.addMessagesCallback?.(
-      addMessages.map(a => ({
-        ...a,
-        chatId: this.chatId,
-        content: a.content as string,
-        name: a.role==="assistant" ? this.chatCompletionCreateOptions.model : a.role,
-      }))
-    )
+    const messages = addMessages.map(this.transformMessage)
+    this.messages.push(...messages) //push the new messages
+    this.addMessagesCallback?.(messages)
 
     let chatCompletion: OpenAI.Chat.Completions.ChatCompletion
     try {
@@ -86,11 +104,11 @@ export class ChatAPI {
     //get the message content
     const openAiResponseMessage = chatCompletion.choices[0].message
     if(openAiResponseMessage.content === null) {
-      throw new Error("ChatGPT returned null content")
+      throw new Error("LLM returned null content")
     }
 
     //add the LLM's response to the message history
-    const responseMessage = {
+    const responseMessage:ChatMessageType = {
       ...openAiResponseMessage,
       chatId: this.chatId,
       content: openAiResponseMessage.content, //this makes typescript happy

@@ -5,14 +5,14 @@ import CodeMirror from '@uiw/react-codemirror';
 import { StreamLanguage } from '@codemirror/language';
 import { sparql } from '@codemirror/legacy-modes/mode/sparql';
 import { ActionIcon, Button, Checkbox, Modal, Select, TextInput } from "@mantine/core";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { IconCaretRight, IconSettings, IconZoomCode } from '@tabler/icons-react';
 
 import { ErrorMessage } from 'components/ErrorMessage';
 import { LLMWarning } from 'components/LLMWarning';
 
-import { MainChatAPIContext } from 'hooks/useMainChatAPIInstance';
+import { useMainChatAPI } from 'hooks/useMainChatAPI';
 import { useRunQuery } from 'hooks/useRunQuery';
 
 import { addMessageToSimpleChatHistory, toggleShowFullChatHistory } from 'redux/chatHistorySlice';
@@ -48,7 +48,7 @@ export function Chat() {
   // const [inputText, setInputText] = useState<string>("Who won the 2023 Formula One Championship?"); // prefill the chat
   const [inputText, setInputText] = useState<string>("");
 
-  const chatAPI = useContext(MainChatAPIContext)
+  const chatAPI = useMainChatAPI()
 
   const {error, isPending, mutate:submitChat, reset} = useMutation({
     mutationKey: ['submit-chat'],
@@ -220,7 +220,7 @@ function Settings() {
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false)
   const closeSettingsModal = () => setShowSettingsModal(false)
   
-  const chatAPI = useContext(MainChatAPIContext)
+  const chatAPI = useMainChatAPI()
 
   const {data, error, isLoading} = useQuery({
     queryKey: [baseURL],

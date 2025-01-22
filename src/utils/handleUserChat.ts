@@ -7,19 +7,19 @@ import { queryBuildingWorkflow } from "./queryBuildingWorkflow"
  * This is the main function that handles the user sending one chat message.
  * Currently, it decides whether to initiate the query building workflow or not
  * @param userText  the user's message, as a string
- * @param chatGPT   the ChatGPT instance
+ * @param chatAPI   the ChatAPI instance
  * @returns         the LLM response
  */
-export async function handleUserChat(userText: string, chatGPT: ChatAPI) {
+export async function handleUserChat(userText: string, chatAPI: ChatAPI) {
   //get the LLM to respond
-  let llmResponse = await chatGPT.sendMessages([
+  let llmResponse = await chatAPI.sendMessages([
     { content: userText, role: "user" }
   ])
   
   //determine what to do with the LLM's response
   if(llmResponse.content.includes("BUILD QUERY")) {
     //if we want to use the query building workflow
-    llmResponse = await queryBuildingWorkflow(chatGPT, userText) 
+    llmResponse = await queryBuildingWorkflow(chatAPI, userText) 
   }
   //else converse with the assistant like normal
 

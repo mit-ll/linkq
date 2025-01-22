@@ -130,19 +130,16 @@ export async function runLinkQMintakaEvaluation() {
       chatGPT.messages = [
         {
           content: INITIAL_SYSTEM_MESSAGE,
-          chatId: 0,
           name: "system",
           role: "system",
         },
         {
           content: question,
-          chatId: 0,
           name: "user",
           role: "user",
         },
         {
           content: "BUILD QUERY",
-          chatId: 0,
           name: "gpt-4-turbo-preview",
           role: "assistant",
         },

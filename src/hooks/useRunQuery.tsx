@@ -13,7 +13,8 @@ import { summarizeQueryResults } from 'utils/summarizeQueryResults.ts';
 
 import { SparqlResultsJsonType } from "types/sparql.ts";
 
-import { useMakeChatAPIInstance } from "./useMakeChatAPIInstance.ts";
+import { useGetNewChatId } from "./useGetNewChatId.ts";
+import { useChatAPIInstance } from "./useChatAPIInstance.ts";
 
 //this sets up a context so we can define one runQuery function for the whole app
 const RunQueryContext = createContext<{
@@ -31,7 +32,11 @@ export function RunQueryProvider({
   children: React.ReactNode,
 }) {
   const dispatch = useAppDispatch()
-  const makeChatAPIInstance = useMakeChatAPIInstance()
+
+  const chatAPI = useChatAPIInstance({
+    chatId: 1,
+  })
+  const getNewChatId = useGetNewChatId()
 
   //useMutation wraps the workflow for running a query
   //including asking the LLM for a name and summary
@@ -44,13 +49,13 @@ export function RunQueryProvider({
     onSuccess: async (data, query) => {
       //try to ask the LLM to give the query a name and summarize the results
       try {
-        const chatGPT = makeChatAPIInstance()
+        chatAPI.reset(getNewChatId())
 
-        const {name, summary} = await summarizeQueryResults(chatGPT, query, data)
+        const {name, summary} = await summarizeQueryResults(chatAPI, query, data)
         dispatch(pushQueryHistory({data, name, query, summary})) //update the history with the data
         dispatch(setResults({data, error: null, summary}))
       }
-      catch(chatGPTError) {
+      catch(llmError) {
         dispatch(pushQueryHistory({data, name: null, query, summary: null})) //update the history with the data
         dispatch(setResults({data, error: null, summary: null}))
       }
@@ -59,13 +64,13 @@ export function RunQueryProvider({
       console.error(error)
       //try to ask the LLM to give a name for the query
       try {
-        const chatGPT = makeChatAPIInstance()
+        chatAPI.reset(getNewChatId())
 
-        const {name, summary} = await summarizeQueryResults(chatGPT, query)
+        const {name, summary} = await summarizeQueryResults(chatAPI, query)
         dispatch(pushQueryHistory({error: error.message, name, query, summary})) //update the history with the data
         dispatch(setResults({data: null, error: error.message, summary}))
       }
-      catch(chatGPTError) {
+      catch(llmError) {
         dispatch(pushQueryHistory({error: error.message, name: null, query, summary: null})) //update the history with the data
         dispatch(setResults({data: null, error: error.message, summary: null}))
       }

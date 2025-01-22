@@ -18,7 +18,7 @@ import { useAppSelector } from 'redux/store';
 import { useRunQuery, RunQueryProvider } from 'hooks/useRunQuery';
 
 import styles from 'App.module.scss'
-import { MainChatAPIProvider } from 'hooks/useMainChatAPIInstance';
+import { MainChatAPIProvider } from 'hooks/useMainChatAPI';
 
 
 function App() {
