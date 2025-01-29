@@ -1,0 +1,11 @@
+#graph-container {
+  height: 400px;
+
+  position: relative;
+
+  .recenter-button {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+  }
+}
