@@ -5,7 +5,7 @@ import {useMemo, useRef} from "react";
 
 import Graphin, {Components, LegendChildrenProps} from "@antv/graphin";
 import '@antv/graphin/dist/index.css';
-import { ActionIcon, Button, Title } from '@mantine/core';
+import { ActionIcon, Title } from '@mantine/core';
 
 import { useAppSelector } from "redux/store.ts";
 
