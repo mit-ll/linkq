@@ -1,0 +1,28 @@
+#state-diagram-container {
+  background-color: #666;
+  padding: 0.5rem;
+
+  h4 {
+    margin-bottom: 0.5rem;
+    color: white;
+  }
+
+  #state-diagram {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    position: relative;
+    
+    #line {
+      position: absolute;
+      top: 50%;
+      left: 1em;
+      right: 1em;
+      border-bottom: 2px solid #aaa;
+    }
+
+    .inactive {
+      filter: brightness(0.7);
+    }
+  }
+}

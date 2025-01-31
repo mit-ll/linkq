@@ -13,6 +13,7 @@ import { MainChatAPIProvider } from 'hooks/useMainChatAPI';
 import { RunQueryProvider } from 'hooks/useRunQuery';
 
 import styles from 'App.module.scss'
+import { LinkQStateDiagramStatus } from 'components/LinkQStateDiagramStatus/LinkQStateDiagramStatus';
 
 
 function App() {
@@ -20,19 +21,25 @@ function App() {
     <MainChatAPIProvider>
       <RunQueryProvider>
         <div id={styles["app"]}>
-          <div id={styles["sidebar"]}>
-            <Chat/>
+          <div id={styles["state-diagram-container"]}>
+            <LinkQStateDiagramStatus/>
           </div>
-          
-          <div id={styles["content"]}>
-            <QueryEditor/>
 
-            <IDTableContainer/>
+          <div id={styles["sidebar-content-container"]}>
+            <div id={styles["sidebar"]}>
+              <Chat/>
+            </div>
+            
+            <div id={styles["content"]}>
+              <QueryEditor/>
 
-            <QueryVisualization/>
+              <IDTableContainer/>
 
-            <div id={styles["results-content"]}>
-              <Results/>
+              <QueryVisualization/>
+
+              <div id={styles["results-content"]}>
+                <Results/>
+              </div>
             </div>
           </div>
         </div>

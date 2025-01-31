@@ -4,7 +4,6 @@
 import OpenAI, { ClientOptions } from "openai"
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs"
 import { LinkQChatMessageType } from "redux/chatHistorySlice"
-import { LinkQStageType } from "types/linkQ"
 
 //this typing is used to omit the "messages" field from OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
@@ -18,7 +17,7 @@ export type ChatAPIConstructorArgsType = ClientOptions & {
 }
 
 type IntermediateChatMessageType = ChatCompletionMessageParam & {
-  stage: LinkQStageType,
+  stage: string,
 }
 
 /**
@@ -114,10 +113,9 @@ export class ChatAPI {
       chatId: this.chatId,
       content: openAiResponseMessage.content, //this makes typescript happy
       name: this.chatCompletionCreateOptions.model,
-      stage: mostRecentMessage?.stage || "Unknown", //TODO this isn't accurate
+      stage: "Unknown", //TODO this isn't accurate
     }
     this.messages.push(responseMessage)
-    this.addMessagesCallback?.([responseMessage])
 
     //return the LLM's message
     return responseMessage

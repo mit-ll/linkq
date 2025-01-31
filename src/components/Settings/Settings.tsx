@@ -9,7 +9,7 @@ import { ErrorMessage } from "components/ErrorMessage"
 
 import { useMainChatAPI } from "hooks/useMainChatAPI"
 
-import { setApiKey, setBaseURL, setModel } from "redux/settingsSlice"
+import { setApiKey, setBaseURL, setModel, toggleShowStateDiagramStatus } from "redux/settingsSlice"
 import { toggleShowFullChatHistory } from "redux/chatHistorySlice"
 import { useAppDispatch, useAppSelector } from "redux/store"
 
@@ -21,12 +21,13 @@ export function Settings() {
   const apiKey = useAppSelector(state => state.settings.apiKey)
   const baseURL = useAppSelector(state => state.settings.baseURL)
   const model = useAppSelector(state => state.settings.model)
+  const showStateDiagramStatus = useAppSelector(state => state.settings.showStateDiagramStatus)
   const showFullChatHistory = useAppSelector(state => state.chatHistory.showFullChatHistory)
 
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false)
   const closeSettingsModal = () => setShowSettingsModal(false)
   
-  const chatAPI = useMainChatAPI()
+  const { chatAPI } = useMainChatAPI()
 
   const {data, error, isLoading} = useQuery({
     queryKey: [baseURL],
@@ -51,6 +52,12 @@ export function Settings() {
           checked={showFullChatHistory}
           onChange={() => dispatch(toggleShowFullChatHistory())}
           label="Show full chat history"
+        />
+        <br/>
+        <Checkbox
+          checked={showStateDiagramStatus}
+          onChange={() => dispatch(toggleShowStateDiagramStatus())}
+          label="Show state diagram status"
         />
         <hr/>
         <TextInput

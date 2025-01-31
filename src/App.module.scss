@@ -1,24 +1,38 @@
 /* Copyright (c) 2024 Massachusetts Institute of Technology */
 /* SPDX-License-Identifier: MIT */
 #app {
-  display: flex;
   width: 100vw;
   height: 100vh;
-}
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
 
-#sidebar {
-  width:500px;
-  position: relative;
-}
-
-#content {
-  width: calc(100% - 500px);
-  height: 100vh;
-  overflow-y: auto;
-  background-color: #333;
-
-  #results-content {
-    color: white;
-    padding: 1em;
+  #state-diagram-container {
+    flex: 0; /* Allows the content to scale */
   }
+
+  #sidebar-content-container {
+    flex: 1; /* Fills the remaining space */
+    display: flex;
+    overflow: hidden;
+    
+    #sidebar {
+      width:500px;
+      position: relative;
+    }
+    
+    #content {
+      width: calc(100% - 500px);
+      overflow-y: auto;
+      background-color: #333;
+    
+      #results-content {
+        color: white;
+        padding: 1em;
+      }
+    }
+  }  
 }
+
+
