@@ -3,7 +3,7 @@
 import { fuzzySearchEntitiesResponse } from "./knowledgeBase/fuzzySearch"
 import { getPropertiesForEntityResponse } from "./knowledgeBase/getPropertiesForEntity"
 import { findTailEntitiesResponse } from "./knowledgeBase/findTailEntities"
-import { ChatAPI } from "./ChatAPI"
+import { ChatAPI, setStateAndAddMessage } from "./ChatAPI"
 import { 
   ENTITY_SEARCH_PREFIX, 
   INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE, 
@@ -25,18 +25,10 @@ export async function queryBuildingWorkflow(
     {
       content: INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE,
       role: "system",
-      stage: "Query Building",
+      stage: "KG Exploration",
     },
   ])
 
-  const setLLMResponseStage = (stage:string) => {
-    chatAPI.addMessagesCallback?.([
-      {
-        ...llmResponse,
-        stage,
-      }
-    ])
-  }
 
   /* Main Query Building Loop */
   //in this while loop, we let the LLM interface with the KG
@@ -47,13 +39,13 @@ export async function queryBuildingWorkflow(
     
     const responseText = llmResponse.content.trim() //trim the LLM response
     if(responseText.toUpperCase() === "STOP") { //if the LLM responded with stop
-      setLLMResponseStage("Query Building")
+      setStateAndAddMessage(chatAPI, llmResponse, "Query Building")
       break //break out of the while loop
     }
     //else if the LLM wants to fuzzy search for entities
     else if(responseText.includes(ENTITY_SEARCH_PREFIX)) {
       const fuzzySearchString = responseText.split(ENTITY_SEARCH_PREFIX)[1].trim()
-      setLLMResponseStage(`Entity Fuzzy Search: ${fuzzySearchString}`)
+      setStateAndAddMessage(chatAPI, llmResponse, `Entity Fuzzy Search: ${fuzzySearchString}`)
       llmResponse = await handleFuzzySearchForEntity( //run the entity search function
         chatAPI,
         fuzzySearchString,
@@ -62,7 +54,7 @@ export async function queryBuildingWorkflow(
     //else if the LLM wants to search for all the properties for an entity
     else if(responseText.includes(PROPERTIES_SEARCH_PREFIX)) {
       const entityId = responseText.split(PROPERTIES_SEARCH_PREFIX)[1].trim()
-      setLLMResponseStage(`Proeprty Searching: ${entityId}`)
+      setStateAndAddMessage(chatAPI, llmResponse, `Proeprty Searching: ${entityId}`)
       llmResponse = await handleGetPropertiesForEntity( //run the property search function
         chatAPI,
         entityId,
@@ -72,7 +64,7 @@ export async function queryBuildingWorkflow(
     //that are connected to this head entity via a relation
     else if(responseText.startsWith(TAIL_SEARCH_PREFIX)) {
       const pair = responseText.replace(TAIL_SEARCH_PREFIX,"").trim()
-      setLLMResponseStage(`Tail Searching: ${pair}`)
+      setStateAndAddMessage(chatAPI, llmResponse, `Tail Searching: ${pair}`)
       llmResponse = await handleFindTailEntities(
         chatAPI,
         pair,
@@ -80,12 +72,12 @@ export async function queryBuildingWorkflow(
     }
     //else the LLM didn't give us an expected response
     else {
-      setLLMResponseStage(`Admonishing LLM`)
+      setStateAndAddMessage(chatAPI, llmResponse, `Admonishing LLM`)
       llmResponse = await chatAPI.sendMessages([
         {
           content: `That was an invalid response. If you are done, just respond with STOP. Follow the specified format. ${INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE}`,
           role: "system",
-          stage: "Query Building",
+          stage: "KG Exploration",
         }
       ])
     }

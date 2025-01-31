@@ -1,10 +1,14 @@
 #state-diagram-container {
   background-color: #666;
   padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
 
   h4 {
     margin-bottom: 0.5rem;
     color: white;
+    margin-right: 2rem;
   }
 
   #state-diagram {
@@ -12,17 +16,30 @@
     justify-content: space-between;
     font-weight: bold;
     position: relative;
+
     
     #line {
       position: absolute;
       top: 50%;
-      left: 1em;
-      right: 1em;
-      border-bottom: 2px solid #aaa;
+      left: 2em;
+      right: 2em;
+      border-bottom: 2px solid #ccc;
+    }
+
+    :global(.mantine-Card-root) {
+      transition: 0.25s;
+      border: 1px solid white;
+      color: white;
+    }
+
+    :global(.mantine-Card-root):not(:last-child) {
+      margin-right: 3rem;
     }
 
     .inactive {
-      filter: brightness(0.7);
+      filter: brightness(0.8);
+      transform: scale(0.8);
+      border: none;
     }
   }
 }

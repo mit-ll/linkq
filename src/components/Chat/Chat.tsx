@@ -188,7 +188,7 @@ function RenderSparqlQuery({
 function LinkQDetailedBadgeStatus() {
   const fullChatHistory = useAppSelector(state => state.chatHistory.fullChatHistory)
   const { runQueryIsPending, summarizeResultsIsPending } = useRunQuery()
-
+  console.log("fullChatHistory",fullChatHistory)
   const {
     useMutationOutput: {
       isPending: chatIsPending,
@@ -208,10 +208,10 @@ function LinkQDetailedBadgeStatus() {
   }
   else if(summarizeResultsIsPending) {
     color = "yellow"
-    displayMessage = "Query Summarization"
+    displayMessage = "Summarizing Results"
   }
 
   return (
-    <p className={styles.loading}><Badge color={color}>{displayMessage}</Badge></p>
+    <div className={styles.loading}><Badge color={color}>{displayMessage}</Badge></div>
   )
 }

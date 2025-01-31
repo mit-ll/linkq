@@ -1,6 +1,6 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
-import { ChatAPI } from "./ChatAPI"
+import { ChatAPI, setStateAndAddMessage } from "./ChatAPI"
 import { queryBuildingWorkflow } from "./queryBuildingWorkflow"
 
 /**
@@ -19,9 +19,13 @@ export async function handleUserChat(userText: string, chatAPI: ChatAPI) {
   //determine what to do with the LLM's response
   if(llmResponse.content.includes("BUILD QUERY")) {
     //if we want to use the query building workflow
-    llmResponse = await queryBuildingWorkflow(chatAPI, userText) 
+    llmResponse = await queryBuildingWorkflow(chatAPI, userText)
+    setStateAndAddMessage(chatAPI, llmResponse, `Query Building`)
   }
   //else converse with the assistant like normal
+  else {
+    setStateAndAddMessage(chatAPI, llmResponse, `Question Refinement`)
+  }
 
   return llmResponse
 }

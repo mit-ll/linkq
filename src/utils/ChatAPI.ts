@@ -107,17 +107,34 @@ export class ChatAPI {
     }
 
     //add the LLM's response to the message history
-    const mostRecentMessage = this.messages.at(-1)
     const responseMessage:LinkQChatMessageType = {
       ...openAiResponseMessage,
       chatId: this.chatId,
       content: openAiResponseMessage.content, //this makes typescript happy
       name: this.chatCompletionCreateOptions.model,
-      stage: "Unknown", //TODO this isn't accurate
+      stage: "", //we don't need the stage for the API
     }
     this.messages.push(responseMessage)
 
     //return the LLM's message
     return responseMessage
   }
+}
+
+
+/**
+ * We can't properly set the stage of a message directly in the ChatAPI
+ * because we need to determine what the stage is first.
+ * This function lets you do that outside the ChatAPI and run the callback
+ * @param chatAPI 
+ * @param llmResponse 
+ * @param stage 
+ */
+export const setStateAndAddMessage = (chatAPI:ChatAPI, llmResponse: LinkQChatMessageType, stage:string) => {
+  chatAPI.addMessagesCallback?.([
+    {
+      ...llmResponse,
+      stage,
+    }
+  ])
 }

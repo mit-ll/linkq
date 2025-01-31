@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 import { SparqlResultsJsonType } from "types/sparql";
 
-import { ChatAPI } from "./ChatAPI";
+import { ChatAPI, setStateAndAddMessage } from "./ChatAPI";
 import { getEntityDataFromQuery } from "./knowledgeBase/getEntityData";
 
 export type SummarizeOutcomeType = {
@@ -24,7 +24,7 @@ export async function summarizeQueryResults(chatAPI: ChatAPI, query:string, outc
 
   //first ask the LLM to come up with a name for the query
   //this is useful for the query history feature
-  const {content:name} = await chatAPI.sendMessages([
+  let llmResponse = await chatAPI.sendMessages([
     {
       content: `Here is a KG query:
 ${query}
@@ -34,37 +34,41 @@ ${entityData?.map(({id,label,description}) => `ID ${id} | Label: ${label} | Desc
 
 Respond with a brief name for this query.`,
       role: "system",
-      stage: "Query Summarization",
+      stage: "Summarizing Results",
     }
   ])
+  setStateAndAddMessage(chatAPI, llmResponse, `Summarizing Results`)
+  const name = llmResponse.content
 
   //if there was data, then the query executed successfully
   if("data" in outcome) {
-    const {content:summary} = await chatAPI.sendMessages([
+    llmResponse = await chatAPI.sendMessages([
       {
         content: `These are the JSON results from the last query:
 ${JSON.stringify(outcome.data, undefined, 2)}
 
 Respond with a brief summary of the results.`,
         role: "system",
-        stage: "Query Summarization",
+        stage: "Summarizing Results",
       }
     ])
-    return {name, summary}
   }
   //else if there was an error
   else {
     //ask the LLM to summarize the results
-    const {content:summary} = await chatAPI.sendMessages([
+    llmResponse = await chatAPI.sendMessages([
       {
         content: `The query did not execute successfully and had this error:.
 ${outcome.error}
 
 Respond with a brief guess as to why the query failed.`,
         role: "system",
-        stage: "Query Summarization",
+        stage: "Summarizing Results",
       }
     ])
-    return {name, summary}
   }
+
+  setStateAndAddMessage(chatAPI, llmResponse, `Summarizing Results`)
+  const summary = llmResponse.content
+  return {name, summary}
 }
