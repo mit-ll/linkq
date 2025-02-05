@@ -1,6 +1,6 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
-import { Title } from "@mantine/core"
+import { ActionIcon, Title } from "@mantine/core"
 import { ErrorMessage } from "components/ErrorMessage"
 import { InfoModal } from "components/InfoModal"
 import { LLMWarning } from "components/LLMWarning"
@@ -10,10 +10,21 @@ import { useAppSelector } from "redux/store"
 
 import styles from "./Results.module.scss"
 import { ResultsGraph } from "components/ResultsGraph/ResultsGraph"
+import { useState } from "react"
+import { IconAffiliate, IconTable } from "@tabler/icons-react"
+
+const VIS_OPTIONS = [
+  {option:"graph",icon:<IconAffiliate/>},
+  {option:"table",icon:<IconTable/>}
+] as const
+
+type VisOptionType = typeof VIS_OPTIONS[number]["option"]
 
 export function Results() {
   const { runQueryIsPending } = useRunQuery()
   const results = useAppSelector(state => state.results.results)
+
+  const [tab, setTab] = useState<VisOptionType>("graph")
 
   const summaryContent = (() => {
     if(results) {
@@ -37,12 +48,10 @@ export function Results() {
 
   const resultsContent = (() => {
     if(results?.data) {
-      return (
-        <>
-          <ResultsTable data={results.data}/>
-          <ResultsGraph data={results.data}/>
-        </>
-      )
+      if(tab === "graph") {
+        return <ResultsGraph data={results.data}/>
+      }
+      return <ResultsTable data={results.data}/>
     }
     else if(results?.error) {
       return (
@@ -67,11 +76,24 @@ export function Results() {
         <hr/>
         
         <Title order={4}>
-          Results Table from KG
+          Results from KG
           <InfoModal title="Results Table from KG">
             <p>These are ground-truth results retrieved from the KG using the query you executed.</p>
             <p>Note that the absence of data does not necessairly mean that there is actually no data in the data source. It is possible that the query did not find what that you are looking for.</p>
           </InfoModal>
+
+
+          <span style={{float:"right"}}>
+            {VIS_OPTIONS.map(({option,icon},i) => (
+              <ActionIcon
+                key={i}
+                size="xs" variant="filled" aria-label="Table View"
+                color={tab===option?"blue":"gray"}
+                onClick={() => setTab(option)} style={{marginLeft: "0.5em"}}>
+                {icon}
+              </ActionIcon>
+            ))}
+          </span>
         </Title>
         {resultsContent}
       </>
