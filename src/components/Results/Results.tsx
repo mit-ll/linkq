@@ -9,6 +9,7 @@ import { useRunQuery } from "hooks/useRunQuery"
 import { useAppSelector } from "redux/store"
 
 import styles from "./Results.module.scss"
+import { ResultsGraph } from "components/ResultsGraph/ResultsGraph"
 
 export function Results() {
   const { runQueryIsPending } = useRunQuery()
@@ -36,7 +37,12 @@ export function Results() {
 
   const resultsContent = (() => {
     if(results?.data) {
-      return <ResultsTable data={results.data}/>
+      return (
+        <>
+          <ResultsTable data={results.data}/>
+          <ResultsGraph data={results.data}/>
+        </>
+      )
     }
     else if(results?.error) {
       return (

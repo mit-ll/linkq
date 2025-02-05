@@ -1,42 +1,23 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import {useMemo, useRef} from "react";
-
 import Graphin, {Components, LegendChildrenProps} from "@antv/graphin";
 import '@antv/graphin/dist/index.css';
 import { ActionIcon, Title } from '@mantine/core';
 
-import { useAppSelector } from "redux/store.ts";
-
-import { parseSparqlQuery } from "utils/parseSparqlQuery.ts";
-import { transformTripleQueryToGraphin } from "utils/transformTripleDataToGraphin.ts";
-import { useQueryGetIDTableEntitiesFromQuery } from "utils/knowledgeBase/getEntityData.ts";
 import { IconFocus } from "@tabler/icons-react";
+
+import { useGraphinRef } from "hooks/useGraphinRef";
+import { useParsedQueryData } from "hooks/useParsedQueryData";
 
 import styles from "./QueryGraph.module.scss"
 
 const { Legend } = Components;
 
 export const QueryGraph = () => {
-    const queryValue = useAppSelector(state => state.queryValue.queryValue)
+    const queryGraphData = useParsedQueryData()
 
-    const {data: idTableEntities} = useQueryGetIDTableEntitiesFromQuery(queryValue);
-
-    const queryGraphData = useMemo(() => {
-        const semanticTriples = parseSparqlQuery(queryValue);
-
-        return transformTripleQueryToGraphin(semanticTriples, idTableEntities||undefined);
-    }, [queryValue, idTableEntities]);
-
-    const graphRef = useRef<Graphin>(null)
-    const center = () => {
-        if(graphRef.current) {
-            const graph = graphRef.current.graph;
-            graph.fitView(); // Re-centers and fits graph to view
-        }
-    }
-
+    const { graphRef, recenter } = useGraphinRef()
 
     if(queryGraphData.nodes.length===0) return null
 
@@ -52,7 +33,7 @@ export const QueryGraph = () => {
                     </Legend>
                 </Graphin>
 
-                <ActionIcon className={styles["recenter-button"]} size="sm" variant="filled" aria-label="Center" onClick={() => center()}>
+                <ActionIcon className={styles["recenter-button"]} size="sm" variant="filled" aria-label="Re-Center" onClick={() => recenter()}>
                     <IconFocus/>
                 </ActionIcon>
             </div>
