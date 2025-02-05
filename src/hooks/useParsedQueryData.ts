@@ -1,12 +1,10 @@
 import { useMemo } from "react";
-import { useAppSelector } from "redux/store";
+
 import { useQueryGetIDTableEntitiesFromQuery } from "utils/knowledgeBase/getEntityData";
 import { parseSparqlQuery } from "utils/parseSparqlQuery";
 import { transformTripleQueryToGraphin } from "utils/transformTripleDataToGraphin";
 
-export function useParsedQueryData() {
-  const queryValue = useAppSelector(state => state.queryValue.queryValue)
-  
+export function useParsedQueryData(queryValue:string) {  
   const {data: idTableEntities} = useQueryGetIDTableEntitiesFromQuery(queryValue);
 
   return useMemo(() => {

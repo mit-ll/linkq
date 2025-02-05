@@ -76,14 +76,14 @@ export function RunQueryProvider({
       return await runQueryFunction(query) //run the query
     },
     onSuccess: async (data, query) => { //the query executed properly
-      dispatch(pushQueryHistory({data, query})) //update the query history
-      dispatch(setResults({data, error: null, summary: null})) //set the results
+      dispatch(pushQueryHistory({data, queryValue:query})) //update the query history
+      dispatch(setResults({data, error: null, summary: null, queryValue:query})) //set the results
       summarizeResults({query, outcome:{data}}) //try to summarize the results
     },
     onError: async (error, query) => { //there was an error executing the query
       console.error(error)
-      dispatch(pushQueryHistory({error: error.message, query})) //update the query history
-      dispatch(setResults({data: null, error: error.message, summary: null})) //show the error
+      dispatch(pushQueryHistory({error: error.message, queryValue:query})) //update the query history
+      dispatch(setResults({data: null, error: error.message, summary: null, queryValue:query})) //show the error
       summarizeResults({query, outcome:{error}}) //try to explain the error
     },
   })

@@ -18,7 +18,6 @@ ORDER BY ?awardDate`
 export const DEMO_QUERY_HISTORY = [
   {
     "name": "Academy Award for Best Picture winners (2022-2024) with directors and award dates",
-    "query": "SELECT ?movie ?movieLabel ?director ?directorLabel ?awardDate\nWHERE {\n  ?movie p:P166 ?statement. # P166 is the property for 'award received'\n  ?statement ps:P166 wd:Q102427; # Q102427 represents 'Academy Award for Best Picture'\n            pq:P585 ?awardDate. # P585 is the property for 'point in time'\n  ?movie wdt:P57 ?director. # P57 is the property for 'director'\n  \n  FILTER(YEAR(?awardDate) >= 2022 && YEAR(?awardDate) <= 2024)\n  \n  SERVICE wikibase:label { bd:serviceParam wikibase:language \"[AUTO_LANGUAGE],en\". }\n}\nORDER BY ?awardDate",
     "results": {
       "data": {
         "head": {
@@ -136,7 +135,8 @@ export const DEMO_QUERY_HISTORY = [
         }
       },
       "error": null,
-      "summary": "The Academy Award for Best Picture between 2022 and 2024 was won by:\n\n1. \"CODA\" directed by Siân Héder, which won the award on March 27, 2022.\n2. \"Everything Everywhere All at Once\" with directors Dan Kwan and Daniel Scheinert, both awarded on January 1, 2023. It's listed twice because there are two directors.\n3. \"Oppenheimer\" directed by Christopher Nolan, which won the award on March 10, 2024."
+      "summary": "The Academy Award for Best Picture between 2022 and 2024 was won by:\n\n1. \"CODA\" directed by Siân Héder, which won the award on March 27, 2022.\n2. \"Everything Everywhere All at Once\" with directors Dan Kwan and Daniel Scheinert, both awarded on January 1, 2023. It's listed twice because there are two directors.\n3. \"Oppenheimer\" directed by Christopher Nolan, which won the award on March 10, 2024.",
+      "queryValue": "SELECT ?movie ?movieLabel ?director ?directorLabel ?awardDate\nWHERE {\n  ?movie p:P166 ?statement. # P166 is the property for 'award received'\n  ?statement ps:P166 wd:Q102427; # Q102427 represents 'Academy Award for Best Picture'\n            pq:P585 ?awardDate. # P585 is the property for 'point in time'\n  ?movie wdt:P57 ?director. # P57 is the property for 'director'\n  \n  FILTER(YEAR(?awardDate) >= 2022 && YEAR(?awardDate) <= 2024)\n  \n  SERVICE wikibase:label { bd:serviceParam wikibase:language \"[AUTO_LANGUAGE],en\". }\n}\nORDER BY ?awardDate",
     }
   }
 ]
@@ -258,7 +258,8 @@ export const DEMO_RESULTS = {
     }
   },
   "error": null,
-  "summary": "The Academy Award for Best Picture between 2022 and 2024 was won by:\n\n1. \"CODA\" directed by Siân Héder, which won the award on March 27, 2022.\n2. \"Everything Everywhere All at Once\" with directors Dan Kwan and Daniel Scheinert, both awarded on January 1, 2023. It's listed twice because there are two directors.\n3. \"Oppenheimer\" directed by Christopher Nolan, which won the award on March 10, 2024."
+  "summary": "The Academy Award for Best Picture between 2022 and 2024 was won by:\n\n1. \"CODA\" directed by Siân Héder, which won the award on March 27, 2022.\n2. \"Everything Everywhere All at Once\" with directors Dan Kwan and Daniel Scheinert, both awarded on January 1, 2023. It's listed twice because there are two directors.\n3. \"Oppenheimer\" directed by Christopher Nolan, which won the award on March 10, 2024.",
+  "queryValue": DEMO_QUERY,
 }
 
 export const DEMO_SIMPLE_HISTORY:LinkQChatMessageType[] = [

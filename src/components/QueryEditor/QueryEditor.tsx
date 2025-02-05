@@ -60,7 +60,7 @@ export function QueryEditor() {
               {queryHistory.map((record,i) => {
                 return (
                   <Button key={i} className={styles["query-history-button"]} fullWidth variant='default' onClick={() => {
-                    dispatch(setQueryValue(record.query))
+                    dispatch(setQueryValue(record.results.queryValue))
                     dispatch(setResults(record.results))
                   }}>
                     {i+1}: {record.name || "There was an error generating a name for this query"}

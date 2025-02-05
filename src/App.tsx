@@ -5,6 +5,7 @@ import { ApiKeyWarning } from 'components/ApiKeyWarning';
 import { Chat } from 'components/Chat/Chat';
 import { DemoModeModal } from 'components/DemoModeModal';
 import { IDTableContainer } from 'components/IDTable/IDTable';
+import { LinkQStateDiagramStatus } from 'components/LinkQStateDiagramStatus/LinkQStateDiagramStatus';
 import { QueryEditor } from 'components/QueryEditor/QueryEditor'
 import { QueryVisualization } from "components/QueryVisualization/QueryVisualization";
 import { Results } from 'components/Results/Results';
@@ -13,7 +14,8 @@ import { MainChatAPIProvider } from 'hooks/useMainChatAPI';
 import { RunQueryProvider } from 'hooks/useRunQuery';
 
 import styles from 'App.module.scss'
-import { LinkQStateDiagramStatus } from 'components/LinkQStateDiagramStatus/LinkQStateDiagramStatus';
+
+import '@antv/graphin/dist/index.css';
 
 
 function App() {

@@ -24,7 +24,7 @@ export function Results() {
   const { runQueryIsPending } = useRunQuery()
   const results = useAppSelector(state => state.results.results)
 
-  const [tab, setTab] = useState<VisOptionType>("graph")
+  const [tab, setTab] = useState<VisOptionType>("table")
 
   const summaryContent = (() => {
     if(results) {
@@ -83,17 +83,19 @@ export function Results() {
           </InfoModal>
 
 
-          <span style={{float:"right"}}>
-            {VIS_OPTIONS.map(({option,icon},i) => (
-              <ActionIcon
-                key={i}
-                size="xs" variant="filled" aria-label="Table View"
-                color={tab===option?"blue":"gray"}
-                onClick={() => setTab(option)} style={{marginLeft: "0.5em"}}>
-                {icon}
-              </ActionIcon>
-            ))}
-          </span>
+          {results.data && (
+            <span style={{float:"right"}}>
+              {VIS_OPTIONS.map(({option,icon},i) => (
+                <ActionIcon
+                  key={i}
+                  size="xs" variant="filled" aria-label="Table View"
+                  color={tab===option?"blue":"gray"}
+                  onClick={() => setTab(option)} style={{marginLeft: "0.5em"}}>
+                  {icon}
+                </ActionIcon>
+              ))}
+            </span>
+          )}
         </Title>
         {resultsContent}
       </>

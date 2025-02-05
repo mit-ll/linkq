@@ -1,8 +1,11 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
+
+import { useAppSelector } from "redux/store";
+
 import Graphin, {Components, LegendChildrenProps} from "@antv/graphin";
-import '@antv/graphin/dist/index.css';
+
 import { ActionIcon, Title } from '@mantine/core';
 
 import { IconFocus } from "@tabler/icons-react";
@@ -15,7 +18,9 @@ import styles from "./QueryGraph.module.scss"
 const { Legend } = Components;
 
 export const QueryGraph = () => {
-    const queryGraphData = useParsedQueryData()
+    const queryValue = useAppSelector(state => state.queryValue.queryValue)
+    
+    const queryGraphData = useParsedQueryData(queryValue)
 
     const { graphRef, recenter } = useGraphinRef()
 

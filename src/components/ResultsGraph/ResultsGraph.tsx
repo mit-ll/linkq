@@ -11,15 +11,15 @@ import { IconFocus } from "@tabler/icons-react";
 import { useGraphinRef } from "hooks/useGraphinRef";
 import { useParsedQueryData } from "hooks/useParsedQueryData";
 
-import { SparqlBindingType, SparqlResultsJsonType, SparqlValueObjectType } from "types/sparql";
+import { SparqlResultsJsonType } from "types/sparql";
 
 import styles from "./ResultsGraph.module.scss"
 import { useAppSelector } from "redux/store";
 
 export function ResultsGraph({data}:{data: SparqlResultsJsonType}) {
-  const results = useAppSelector(state => state.results.results)
+  const queryValue = useAppSelector(state => state.results.results?.queryValue)
 
-  const queryGraphData = useParsedQueryData()
+  const queryGraphData = useParsedQueryData(queryValue || "")
 
   const graphData = useMemo(() => {
     //application/sparql+json format doesn't actually have the schema 
@@ -30,6 +30,7 @@ export function ResultsGraph({data}:{data: SparqlResultsJsonType}) {
     //will hold the results nodes and edges
     const nodes:IUserNode[] = []
     const edges:IUserEdge[] = []
+    if(queryGraphData.nodes.length === 0) return { nodes, edges }
 
     //tracks which node IDs we have already added, so we don't duplicate
     const addedNodeIDsSet = new Set<string>()
@@ -57,7 +58,7 @@ export function ResultsGraph({data}:{data: SparqlResultsJsonType}) {
         else if(node.data.type === "Variable") {
           nodeCopy.id = `${node.id} - ${rowIndex}` //we need to duplicate this variable node
           if(nodeCopy?.style?.label) { //set the node label
-            nodeCopy.style.label.value = `${node.id} - ${rowIndex}`
+            nodeCopy.style.label.value = node.id
           }
         }
         //else this is a Term variable from the query that does not need to be modified
@@ -97,10 +98,12 @@ export function ResultsGraph({data}:{data: SparqlResultsJsonType}) {
 
   const { graphRef, recenter } = useGraphinRef()
 
+  if(graphData.nodes.length===0) return null
+
 
   return (
     <div className={styles["graph-container"]}>
-      <Graphin data={graphData} ref={graphRef} layout={{type: 'force', strength: 1000, manyBody: 100}} style={{height:500}}>
+      <Graphin data={graphData} ref={graphRef} layout={{type: 'graphin-force'}} style={{height:700}}>
         <ActionIcon className={styles["recenter-button"]} size="sm" variant="filled" aria-label="Re-Center" onClick={() => recenter()}>
           <IconFocus/>
         </ActionIcon>
