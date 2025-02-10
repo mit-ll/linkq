@@ -15,6 +15,7 @@ import { SparqlResultsJsonType } from "types/sparql.ts";
 
 import { useGetNewChatId } from "./useGetNewChatId.ts";
 import { useChatAPIInstance } from "./useChatAPIInstance.ts";
+import { setStage } from "redux/stageSlice.ts";
 
 //this sets up a context so we can define one runQuery function for the whole app
 const RunQueryContext = createContext<{
@@ -73,6 +74,10 @@ export function RunQueryProvider({
     mutationKey: ['runQuery'],
     mutationFn: async (query: string) => {
       dispatch(setResults(null)) //clear the current results
+      dispatch(setStage({
+        mainStage: "Results Summarization",
+        subStage: "User executes query",
+      }))
       return await runQueryFunction(query) //run the query
     },
     onSuccess: async (data, query) => { //the query executed properly

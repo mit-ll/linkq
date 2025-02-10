@@ -199,7 +199,7 @@ function LinkQDetailedBadgeStatus() {
   const stage = fullChatHistory.at(-1)?.stage
   if(chatIsPending) {
     color = "yellow"
-    displayMessage = stage || ""
+    displayMessage = stage?.description || stage?.subStage || ""
   }
   else if(runQueryIsPending) {
     color = "yellow"

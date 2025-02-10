@@ -4,12 +4,13 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 
 import { DEMO_FULL_HISTORY, DEMO_SIMPLE_HISTORY, IS_DEMO_MODE } from 'utils/demoData'
+import { StageType } from './stageSlice'
 
 export type LinkQChatMessageType = ChatCompletionMessageParam & {
   content:string
   chatId: number
   name: string
-  stage: string,
+  stage?: StageType,
 }
 
 const initialState: {

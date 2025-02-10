@@ -5,7 +5,7 @@ import { ApiKeyWarning } from 'components/ApiKeyWarning';
 import { Chat } from 'components/Chat/Chat';
 import { DemoModeModal } from 'components/DemoModeModal';
 import { IDTableContainer } from 'components/IDTable/IDTable';
-import { LinkQStateDiagramStatus } from 'components/LinkQStateDiagramStatus/LinkQStateDiagramStatus';
+import { LinkQStages } from 'components/LinkQStages/LinkQStages';
 import { QueryEditor } from 'components/QueryEditor/QueryEditor'
 import { QueryVisualization } from "components/QueryVisualization/QueryVisualization";
 import { Results } from 'components/Results/Results';
@@ -24,7 +24,7 @@ function App() {
       <RunQueryProvider>
         <div id={styles["app"]}>
           <div id={styles["state-diagram-container"]}>
-            <LinkQStateDiagramStatus/>
+            <LinkQStages/>
           </div>
 
           <div id={styles["sidebar-content-container"]}>

@@ -45,7 +45,11 @@ export function MainChatAPIProvider({
         content: text, 
         name: "user",
         role: "user",
-        stage: "Question Refinement",
+        stage: {
+          mainStage: "Question Refinement",
+          subStage: "User asks question",
+          description: text,
+        },
       }))
 
       const llmResponse = await handleUserChat(text, chatAPI)

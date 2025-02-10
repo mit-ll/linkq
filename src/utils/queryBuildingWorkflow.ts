@@ -3,7 +3,7 @@
 import { fuzzySearchEntitiesResponse } from "./knowledgeBase/fuzzySearch"
 import { getPropertiesForEntityResponse } from "./knowledgeBase/getPropertiesForEntity"
 import { findTailEntitiesResponse } from "./knowledgeBase/findTailEntities"
-import { ChatAPI, setStateAndAddMessage } from "./ChatAPI"
+import { ChatAPI, setLLMResponseStage } from "./ChatAPI"
 import { 
   ENTITY_SEARCH_PREFIX, 
   INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE, 
@@ -12,6 +12,8 @@ import {
   QUERY_BUILDING_SYSTEM_MESSAGE,
   TAIL_SEARCH_PREFIX
 } from "./knowledgeBase/prompts"
+import { setStage, StageType } from "redux/stageSlice"
+import { store } from "redux/store"
 
 
 const QUERY_BUILDING_MAX_LOOPS = 20 //HARDCODED we don't want the LLM looping forever
@@ -21,11 +23,20 @@ export async function queryBuildingWorkflow(
   text: string,
 ) {
   //send the initial query building message to the LLM as the system role
+  setTimeout(() => {
+    store.dispatch(setStage({
+      mainStage: "KG Exploration",
+      subStage: "System enumerates KG APIs",
+    }))
+  })
   let llmResponse = await chatAPI.sendMessages([
     {
       content: INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE,
       role: "system",
-      stage: "KG Exploration",
+      stage: {
+        mainStage: "KG Exploration",
+        subStage: "System enumerates KG APIs",
+      },
     },
   ])
 
@@ -39,13 +50,20 @@ export async function queryBuildingWorkflow(
     
     const responseText = llmResponse.content.trim() //trim the LLM response
     if(responseText.toUpperCase() === "STOP") { //if the LLM responded with stop
-      setStateAndAddMessage(chatAPI, llmResponse, "Query Building")
+      setLLMResponseStage(chatAPI, llmResponse, {
+        mainStage: "KG Exploration",
+        subStage: "LLM is done exploring",
+      })
       break //break out of the while loop
     }
     //else if the LLM wants to fuzzy search for entities
     else if(responseText.includes(ENTITY_SEARCH_PREFIX)) {
       const fuzzySearchString = responseText.split(ENTITY_SEARCH_PREFIX)[1].trim()
-      setStateAndAddMessage(chatAPI, llmResponse, `Entity Fuzzy Search: ${fuzzySearchString}`)
+      setLLMResponseStage(chatAPI, llmResponse, {
+        mainStage: "KG Exploration",
+        subStage: "LLM fuzzy searches for entity",
+        description: `Entity Fuzzy Search: ${fuzzySearchString}`
+      })
       llmResponse = await handleFuzzySearchForEntity( //run the entity search function
         chatAPI,
         fuzzySearchString,
@@ -54,7 +72,11 @@ export async function queryBuildingWorkflow(
     //else if the LLM wants to search for all the properties for an entity
     else if(responseText.includes(PROPERTIES_SEARCH_PREFIX)) {
       const entityId = responseText.split(PROPERTIES_SEARCH_PREFIX)[1].trim()
-      setStateAndAddMessage(chatAPI, llmResponse, `Proeprty Searching: ${entityId}`)
+      setLLMResponseStage(chatAPI, llmResponse, {
+        mainStage: "KG Exploration",
+        subStage: "LLM searches for properties",
+        description: `Property Search: ${entityId}`,
+      })
       llmResponse = await handleGetPropertiesForEntity( //run the property search function
         chatAPI,
         entityId,
@@ -64,7 +86,11 @@ export async function queryBuildingWorkflow(
     //that are connected to this head entity via a relation
     else if(responseText.startsWith(TAIL_SEARCH_PREFIX)) {
       const pair = responseText.replace(TAIL_SEARCH_PREFIX,"").trim()
-      setStateAndAddMessage(chatAPI, llmResponse, `Tail Searching: ${pair}`)
+      setLLMResponseStage(chatAPI, llmResponse, {
+        mainStage: "KG Exploration",
+        subStage: "LLM searches for tail entities",
+        description: `Tail Searching: ${pair}`
+      })
       llmResponse = await handleFindTailEntities(
         chatAPI,
         pair,
@@ -72,12 +98,18 @@ export async function queryBuildingWorkflow(
     }
     //else the LLM didn't give us an expected response
     else {
-      setStateAndAddMessage(chatAPI, llmResponse, `Admonishing LLM`)
+      setLLMResponseStage(chatAPI, llmResponse, {
+        mainStage: "KG Exploration",
+        subStage: "LLM is misbehaving",
+      })
       llmResponse = await chatAPI.sendMessages([
         {
           content: `That was an invalid response. If you are done, just respond with STOP. Follow the specified format. ${INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE}`,
           role: "system",
-          stage: "KG Exploration",
+          stage: {
+            mainStage: "KG Exploration",
+            subStage: "LLM is misbehaving",
+          },
         }
       ])
     }
@@ -85,11 +117,18 @@ export async function queryBuildingWorkflow(
   //now the LLM should have found all the IDs it needs
   
   //ask the LLM to generate a query
+  store.dispatch(setStage({
+    mainStage: "Query Generation",
+    subStage: "System gives SPARQL few-shot training",
+  }))
   return await chatAPI.sendMessages([
     {
       content: QUERY_BUILDING_SYSTEM_MESSAGE + ` Now construct a query that answers the user's question: ${text}`,
       role: "system",
-      stage: "Query Building",
+      stage: {
+        mainStage: "Query Generation",
+        subStage: "System gives SPARQL few-shot training",
+      },
     }
   ])
 }
@@ -99,12 +138,17 @@ async function handleFuzzySearchForEntity(chatAPI:ChatAPI, text:string) {
   //try to resolve these entities by requesting data from the KG
   const responseText = await fuzzySearchEntitiesResponse(text)
 
+  const stage: StageType = {
+    mainStage: "KG Exploration",
+    subStage: "LLM fuzzy searches for entity",
+    description: `Entity Fuzzy Search: ${text}`,
+  }
   if(!responseText) {
     return await chatAPI.sendMessages([
       {
         content: `${KG_NAME} did not resolve any entities. You may need to rephrase or simplify your entity search`,
         role: "system",
-        stage: `Entity Fuzzy Search: ${text}`,
+        stage,
       }
     ])
   }
@@ -113,7 +157,7 @@ async function handleFuzzySearchForEntity(chatAPI:ChatAPI, text:string) {
     {
       content: responseText,
       role: "system",
-      stage: `Entity Fuzzy Search: ${text}`,
+      stage,
     }
   ])
 }
@@ -121,12 +165,17 @@ async function handleFuzzySearchForEntity(chatAPI:ChatAPI, text:string) {
 async function handleGetPropertiesForEntity(chatAPI:ChatAPI, entityId: string) {
   const responseText = await getPropertiesForEntityResponse(entityId)
 
+  const stage: StageType = {
+    mainStage: "KG Exploration",
+    subStage: "LLM searches for properties",
+    description: `Property Search: ${entityId}`,
+  }
   if(!responseText) {
     return await chatAPI.sendMessages([
       {
         content: `${KG_NAME} did not resolve any properties for that entity. Are you sure that entity exists?`,
         role: "system",
-        stage: `Property Search: ${entityId}`,
+        stage,
       }
     ])
   }
@@ -135,7 +184,7 @@ async function handleGetPropertiesForEntity(chatAPI:ChatAPI, entityId: string) {
     {
       content: responseText,
       role: "system",
-      stage: `Property Search: ${entityId}`,
+      stage,
     }
   ])
 }
@@ -145,12 +194,19 @@ async function handleFindTailEntities(chatAPI:ChatAPI, text: string) {
   if(split.length !== 2) {
     split = text.split(", ")
   }
+
+  const stage: StageType = {
+    mainStage: "KG Exploration",
+    subStage: "LLM searches for tail entities",
+    description: `Tail Search: ${text}`,
+  }
+
   if(split.length !== 2) {
     return await chatAPI.sendMessages([
       {
         content: "Your response did not follow the correct format. Please try again.",
         role: "system",
-        stage: `Tail Search: ${text}`,
+        stage,
       }
     ])
   }
@@ -163,7 +219,7 @@ async function handleFindTailEntities(chatAPI:ChatAPI, text: string) {
       {
         content: `${KG_NAME} did not resolve any entities for that entity and property. Are you sure that entity has that property?`,
         role: "system",
-        stage: `Tail Search: ${text}`,
+        stage,
       }
     ])
   }
@@ -172,7 +228,7 @@ async function handleFindTailEntities(chatAPI:ChatAPI, text: string) {
     {
       content: responseText,
       role: "system",
-      stage: `Tail Search: ${text}`,
+      stage,
     }
   ])
 }

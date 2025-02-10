@@ -17,12 +17,15 @@ export async function staticChat() {
     {
       role: "system",
       content: INITIAL_SYSTEM_MESSAGE,
-      stage: "Initial System Message",
     },
     {
       role: "user",
       content: "Can you tell me about interesting movies?",
-      stage: "Question Refinement",
+      stage: {
+        mainStage: "Question Refinement",
+        subStage: "User asks question",
+        description: "Can you tell me about interesting movies?",
+      },
     },
   ])
   

@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: MIT
 import { SparqlResultsJsonType } from "types/sparql";
 
-import { ChatAPI, setStateAndAddMessage } from "./ChatAPI";
+import { ChatAPI, setLLMResponseStage } from "./ChatAPI";
 import { getEntityDataFromQuery } from "./knowledgeBase/getEntityData";
+import { store } from "redux/store";
+import { setStage } from "redux/stageSlice";
 
 export type SummarizeOutcomeType = {
   data: SparqlResultsJsonType,
@@ -20,6 +22,13 @@ export type SummarizeOutcomeType = {
  * @returns        a Promise that returns the name and summary as a key-value object
  */
 export async function summarizeQueryResults(chatAPI: ChatAPI, query:string, outcome:SummarizeOutcomeType):Promise<{name:string,summary:string}> {
+  setTimeout(() => {
+    store.dispatch(setStage({
+      mainStage: "Results Summarization",
+      subStage: "LLM names query",
+    }))
+  }, 2000)
+
   const entityData = await getEntityDataFromQuery(query)
 
   //first ask the LLM to come up with a name for the query
@@ -34,11 +43,22 @@ ${entityData?.map(({id,label,description}) => `ID ${id} | Label: ${label} | Desc
 
 Respond with a brief name for this query.`,
       role: "system",
-      stage: "Summarizing Results",
+      stage: {
+        mainStage: "Results Summarization",
+        subStage: "LLM names query",
+      },
     }
   ])
-  setStateAndAddMessage(chatAPI, llmResponse, `Summarizing Results`)
+  setLLMResponseStage(chatAPI, llmResponse, {
+    mainStage: "Results Summarization",
+    subStage: "LLM names query",
+  })
   const name = llmResponse.content
+
+  store.dispatch(setStage({
+    mainStage: "Results Summarization",
+    subStage: "LLM summarizes results",
+  }))
 
   //if there was data, then the query executed successfully
   if("data" in outcome) {
@@ -49,7 +69,10 @@ ${JSON.stringify(outcome.data, undefined, 2)}
 
 Respond with a brief summary of the results.`,
         role: "system",
-        stage: "Summarizing Results",
+        stage: {
+          mainStage: "Results Summarization",
+          subStage: "LLM summarizes results",
+        },
       }
     ])
   }
@@ -63,12 +86,24 @@ ${outcome.error}
 
 Respond with a brief guess as to why the query failed.`,
         role: "system",
-        stage: "Summarizing Results",
+        stage: {
+          mainStage: "Results Summarization",
+          subStage: "LLM summarizes results",
+        },
       }
     ])
   }
 
-  setStateAndAddMessage(chatAPI, llmResponse, `Summarizing Results`)
+  setLLMResponseStage(chatAPI, llmResponse, {
+    mainStage: "Results Summarization",
+    subStage: "LLM summarizes results",
+  })
+  setTimeout(() => {
+    store.dispatch(setStage({
+      mainStage: "Question Refinement",
+      subStage: "User asks question",
+    }))
+  }, 2000)
   const summary = llmResponse.content
   return {name, summary}
 }
