@@ -1,6 +1,6 @@
 # LinkQ: An LLM-Assisted Visual Interface for Knowledge Graph Question-Answering
 
-Arxiv Paper: https://arxiv.org/abs/2406.06621
+IEEE VIS 2024 Paper: https://ieeexplore.ieee.org/document/10771088
 
 Demo Site: https://mit-ll.github.io/linkq
 
@@ -30,27 +30,20 @@ npm run dev
 ## Change KG Data Source
 `src/utils/knowledgeBase` contains most of the code that you would have to change to switch to a different KG data source. There are also some types in `src/types/idTable.ts` and `src/types/resultsTable.ts` that would need to be changed.
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
+## Citation
+```
+@INPROCEEDINGS{10771088,
+  author={Li, Harry and Appleby, Gabriel and Suh, Ashley},
+  booktitle={2024 IEEE Visualization and Visual Analytics (VIS)}, 
+  title={LinkQ: An LLM-Assisted Visual Interface for Knowledge Graph Question-Answering}, 
+  year={2024},
+  volume={},
+  number={},
+  pages={116-120},
+  keywords={Analytical models;Protocols;Limiting;Data analysis;Visual analytics;Large language models;Data visualization;Knowledge graphs;Writing;Data models;Knowledge graphs;large language models;query construction;question-answering;natural language interfaces},
+  doi={10.1109/VIS55277.2024.00031}
 }
 ```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
 
 
 ## Disclaimer
