@@ -1,6 +1,8 @@
 # LinkQ: An LLM-Assisted Visual Interface for Knowledge Graph Question-Answering
 
-Arxiv Paper: https://arxiv.org/abs/2406.06621
+This is a release version of LinkQ to record the version of LinkQ that we presented to IEEE VIS 2024.
+
+IEEE VIS 2024 Paper: https://ieeexplore.ieee.org/document/10771088
 
 Demo Site: https://mit-ll.github.io/linkq
 
@@ -51,6 +53,21 @@ export default {
 - Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
 - Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
 - Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+
+## Citation
+```
+@INPROCEEDINGS{10771088,
+  author={Li, Harry and Appleby, Gabriel and Suh, Ashley},
+  booktitle={2024 IEEE Visualization and Visual Analytics (VIS)}, 
+  title={LinkQ: An LLM-Assisted Visual Interface for Knowledge Graph Question-Answering}, 
+  year={2024},
+  volume={},
+  number={},
+  pages={116-120},
+  keywords={Analytical models;Protocols;Limiting;Data analysis;Visual analytics;Large language models;Data visualization;Knowledge graphs;Writing;Data models;Knowledge graphs;large language models;query construction;question-answering;natural language interfaces},
+  doi={10.1109/VIS55277.2024.00031}
+}
+```
 
 
 ## Disclaimer
