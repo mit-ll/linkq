@@ -210,7 +210,11 @@ function LinkQDetailedBadgeStatus() {
     displayMessage = "Summarizing Results"
   }
 
+  if(displayMessage.length > 60) {
+    displayMessage = displayMessage.slice(0,60) + "..."
+  }
+
   return (
-    <div className={styles.loading}><Badge color={color}>{displayMessage}</Badge></div>
+    <div className={styles["chat-status-badge"]}><Badge color={color}>{displayMessage}</Badge></div>
   )
 }
