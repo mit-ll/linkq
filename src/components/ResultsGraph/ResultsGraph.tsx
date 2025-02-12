@@ -1,113 +1,134 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import { useMemo } from "react";
+import {useMemo, useState} from "react";
 
-import Graphin, { IUserEdge, IUserNode } from "@antv/graphin";
+import {EdgeData, NodeData} from "@antv/g6";
 
-import { ActionIcon } from "@mantine/core";
-import { IconFocus } from "@tabler/icons-react";
+import {useParsedQueryData} from "hooks/useParsedQueryData";
 
-import { useGraphinRef } from "hooks/useGraphinRef";
-import { useParsedQueryData } from "hooks/useParsedQueryData";
-
-import { SparqlResultsJsonType } from "types/sparql";
+import {SparqlResultsJsonType} from "types/sparql";
 
 import styles from "./ResultsGraph.module.scss"
-import { useAppSelector } from "redux/store";
+import {useAppSelector} from "redux/store";
+import {Graphin} from "@antv/graphin";
 
-export function ResultsGraph({data}:{data: SparqlResultsJsonType}) {
-  const queryValue = useAppSelector(state => state.results.results?.queryValue)
+import {ExtensionCategory, register} from '@antv/g6';
+import {ReactNode} from '@antv/g6-extension-react';
+import {DataGrid, GridColDef, GridRowParams} from "@mui/x-data-grid";
 
-  const queryGraphData = useParsedQueryData(queryValue || "")
+interface NodeTableProps {
+    node: NodeData,
+    hoveredRow?: string | null,
+    handleOnRowEnter?: (params: GridRowParams) => void
+}
 
-  const graphData = useMemo(() => {
-    //application/sparql+json format doesn't actually have the schema 
-    //information we need to properly connect the nodes in the results.
-    //Instead, we apply the parsed query structure to each row that
-    //we get back in our results
+register(ExtensionCategory.NODE, 'react', ReactNode);
 
-    //will hold the results nodes and edges
-    const nodes:IUserNode[] = []
-    const edges:IUserEdge[] = []
-    if(queryGraphData.nodes.length === 0) return { nodes, edges }
 
-    //tracks which node IDs we have already added, so we don't duplicate
-    const addedNodeIDsSet = new Set<string>()
-
-    //loop through all the bindings, aka rows in our results
-    data.results.bindings.forEach((row, rowIndex) => {
-      //this tracks how we're mapping the node IDs parsed from the query,
-      //vs the node IDs we're copying and adding to the results graph
-      const queryToResultsNodeIDMap = new Map()
-
-      //loop through all the nodes in the query
-      queryGraphData.nodes.forEach((node) => {
-        //make a deep copy of the node from the query
-        const nodeCopy:IUserNode = JSON.parse(JSON.stringify(node))
-
-        //attempt to find the node as a cell from the results
-        const cell = row[node.id]
-        const cellLabel = row[node.id+"Label"] //HARDCODED specific to Wikidata
-        if(cell) { //if the cell is present in the results
-          nodeCopy.id = cell.value //set the ID to the entity URI
-          if(nodeCopy?.style?.label) { //set the entity label
-            nodeCopy.style.label.value = cellLabel?.value || cell.value
-          }
+const columns: GridColDef[] = [
+    {field: 'idLabel', headerName: 'ID', width: 150},
+    {field: 'uri', headerName: 'URI', width: 150},
+    {field: 'label', headerName: 'Label', width: 150}
+];
+const NodeTable = ({node, hoveredRow, handleOnRowEnter}: NodeTableProps) => {
+    // @ts-ignore
+    const rows = node.data.entries.map((element, i) => {
+            return {id: node.id + element.uri + i, idLabel: node.id, uri: element.uri, label: element.label, key: node.id + element.uri}
         }
-        else if(node.data.type === "Variable") {
-          nodeCopy.id = `${node.id} - ${rowIndex}` //we need to duplicate this variable node
-          if(nodeCopy?.style?.label) { //set the node label
-            nodeCopy.style.label.value = node.id
-          }
-        }
-        //else this is a Term variable from the query that does not need to be modified
+    );
+    return (
+        <DataGrid rows={rows} columns={columns} onRowClick={handleOnRowEnter} getRowClassName={(params) => params.id === hoveredRow ? 'highlight' : ''} sx={{'& .highlight': {backgroundColor: '#d3f9d8 !important'}}}/>
+    );
+}
 
-        //if we have not added this node yet
-        if(!addedNodeIDsSet.has(nodeCopy.id)) {
-          nodes.push(nodeCopy) //add the node to our results graph
-        }
-        addedNodeIDsSet.add(nodeCopy.id) //record that we added this node
-        queryToResultsNodeIDMap.set(node.id,nodeCopy.id) //record any changes we made to the copy
-      })
+const Node = () => {
 
-      //loop through the edges
-      queryGraphData.edges.forEach(edge => {
-        //find the original source and target node from the query
-        const sourceNode = queryGraphData.nodes.find(n => n.id === edge.source)
-        const targetNode = queryGraphData.nodes.find(n => n.id === edge.target)
+    return (
+        <div>
+            Test
+        </div>
+    );
+};
 
-        //if we found the original source and target node
-        if(sourceNode && targetNode) {
-          //make a deep copy of the edge from the query
-          const edgeCopy:IUserEdge = JSON.parse(JSON.stringify(edge))
+export function ResultsGraph({data}: { data: SparqlResultsJsonType }) {
+    const queryValue = useAppSelector(state => state.results.results?.queryValue)
 
-          //set this edge to connect the node copies we made earlier
-          edgeCopy.source = queryToResultsNodeIDMap.get(sourceNode.id)
-          edgeCopy.target = queryToResultsNodeIDMap.get(targetNode.id)
-          edgeCopy.id = `${edgeCopy.source}-${edgeCopy.target}`
+    const queryGraphData = useParsedQueryData(queryValue || "")
+    const [hoveredRow, setHoveredRow] = useState<string | null>(null);
 
-          //add the edge to our results graph
-          edges.push(edgeCopy)
-        }
-      })
-    })
+    const handleOnRowEnter = (params: GridRowParams) => {
+      console.log(params);
+      // setHoveredRow(params.id as string)
+    };
 
-    return { nodes, edges }
-  }, [data, queryGraphData])
+    const graphData = useMemo(() => {
+        //application/sparql+json format doesn't actually have the schema
+        //information we need to properly connect the nodes in the results.
+        //Instead, we apply the parsed query structure to each row that
+        //we get back in our results
 
-  const { graphRef, recenter } = useGraphinRef()
+        //will hold the results nodes and edges
+        let nodes: NodeData[] = []
+        let edges: EdgeData[] = []
+        if (queryGraphData?.nodes?.length === 0) return {nodes: nodes, edges: edges}
 
-  if(graphData.nodes.length===0) return null
+        // @ts-ignore
+        nodes = queryGraphData.nodes.map(n => {
+            const data = {...n.data, entries: []};
+
+            return {...n, data: data};
+        })
+        console.log(nodes);
+
+        edges = JSON.parse(JSON.stringify(queryGraphData.edges));
+
+        //loop through all the bindings, aka rows in our results
+        data.results.bindings.forEach((row) => {
+            //loop through all the nodes in the query
+            nodes.forEach((node) => {
+                //attempt to find the node as a cell from the results
+                const cell = row[node.id]
+                const cellLabel = row[node.id + "Label"] //HARDCODED specific to Wikidata
+                if (cell) { //if the cell is present in the results
+                    // @ts-ignore
+                    node.data.entries.push({uri: cell.value, label: cellLabel?.value || cell.value})
+                    node.type = 'react'
+                    node.style = {
+                        size: [500, 300],
+                        component: <NodeTable node={node} hoveredRow={hoveredRow} handleOnRowEnter={handleOnRowEnter}/>,
+                    }
+                }
+            })
+        })
+
+        return {nodes: nodes, edges: edges}
+    }, [data, queryGraphData])
+
+    // const { graphRef, recenter } = useGraphinRef()
+
+    if (graphData.nodes.length === 0) return null
+    console.log(graphData);
 
 
-  return (
-    <div className={styles["graph-container"]}>
-      <Graphin data={graphData} ref={graphRef} layout={{type: 'graphin-force'}} style={{height:700}}>
-        <ActionIcon className={styles["recenter-button"]} size="sm" variant="filled" aria-label="Re-Center" onClick={() => recenter()}>
-          <IconFocus/>
-        </ActionIcon>
-      </Graphin>
-    </div>
-  )
+    return (
+        <div className={styles["graph-container"]}>
+            <Graphin options={{
+                autoResize: true, data: graphData, layout: {type: 'force'},
+                behaviors: ['drag-element', 'drag-canvas', 'zoom-canvas'],
+                plugins: [{
+                    type: 'legend',
+                    key: 'legend',
+                    nodeField: 'type',
+                    edgeField: 'type',
+                    itemLabelFontSize: 12,
+                    position: 'right'
+                },]
+            }} style={{height: 700, background: "white"}}>
+            </Graphin>
+            {/*<ActionIcon className={styles["recenter-button"]} size="sm" variant="filled" aria-label="Re-Center" onClick={() => recenter()}>*/}
+            {/*  <IconFocus/>*/}
+            {/*</ActionIcon>*/}
+        </div>
+    )
 }
