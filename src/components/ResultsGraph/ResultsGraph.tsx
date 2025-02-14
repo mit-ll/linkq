@@ -3,7 +3,8 @@
 
 import { useMemo } from "react";
 
-import Graphin, { IUserEdge, IUserNode } from "@antv/graphin";
+import { Graphin } from "@antv/graphin";
+import {EdgeData, NodeData} from "@antv/g6";
 
 import { ActionIcon } from "@mantine/core";
 import { IconFocus } from "@tabler/icons-react";
@@ -28,9 +29,9 @@ export function ResultsGraph({data}:{data: SparqlResultsJsonType}) {
     //we get back in our results
 
     //will hold the results nodes and edges
-    const nodes:IUserNode[] = []
-    const edges:IUserEdge[] = []
-    if(queryGraphData.nodes.length === 0) return { nodes, edges }
+    const nodes:NodeData[] = []
+    const edges:EdgeData[] = []
+    if(queryGraphData?.nodes?.length === 0) return { nodes, edges }
 
     //tracks which node IDs we have already added, so we don't duplicate
     const addedNodeIDsSet = new Set<string>()
@@ -42,9 +43,9 @@ export function ResultsGraph({data}:{data: SparqlResultsJsonType}) {
       const queryToResultsNodeIDMap = new Map()
 
       //loop through all the nodes in the query
-      queryGraphData.nodes.forEach((node) => {
+      queryGraphData?.nodes?.forEach((node) => {
         //make a deep copy of the node from the query
-        const nodeCopy:IUserNode = JSON.parse(JSON.stringify(node))
+        const nodeCopy:NodeData = JSON.parse(JSON.stringify(node))
 
         //attempt to find the node as a cell from the results
         const cell = row[node.id]
@@ -52,13 +53,13 @@ export function ResultsGraph({data}:{data: SparqlResultsJsonType}) {
         if(cell) { //if the cell is present in the results
           nodeCopy.id = cell.value //set the ID to the entity URI
           if(nodeCopy?.style?.label) { //set the entity label
-            nodeCopy.style.label.value = cellLabel?.value || cell.value
+            nodeCopy.style.labelText = cellLabel?.value || cell.value
           }
         }
-        else if(node.data.type === "Variable") {
+        else if(node?.data?.type === "Variable") {
           nodeCopy.id = `${node.id} - ${rowIndex}` //we need to duplicate this variable node
           if(nodeCopy?.style?.label) { //set the node label
-            nodeCopy.style.label.value = node.id
+            nodeCopy.style.labelText = node.id
           }
         }
         //else this is a Term variable from the query that does not need to be modified
@@ -72,15 +73,15 @@ export function ResultsGraph({data}:{data: SparqlResultsJsonType}) {
       })
 
       //loop through the edges
-      queryGraphData.edges.forEach(edge => {
+      queryGraphData?.edges?.forEach(edge => {
         //find the original source and target node from the query
-        const sourceNode = queryGraphData.nodes.find(n => n.id === edge.source)
-        const targetNode = queryGraphData.nodes.find(n => n.id === edge.target)
+        const sourceNode = queryGraphData?.nodes?.find(n => n.id === edge.source)
+        const targetNode = queryGraphData?.nodes?.find(n => n.id === edge.target)
 
         //if we found the original source and target node
         if(sourceNode && targetNode) {
           //make a deep copy of the edge from the query
-          const edgeCopy:IUserEdge = JSON.parse(JSON.stringify(edge))
+          const edgeCopy:EdgeData = JSON.parse(JSON.stringify(edge))
 
           //set this edge to connect the node copies we made earlier
           edgeCopy.source = queryToResultsNodeIDMap.get(sourceNode.id)
@@ -93,7 +94,7 @@ export function ResultsGraph({data}:{data: SparqlResultsJsonType}) {
       })
     })
 
-    return { nodes, edges }
+    return { nodes: nodes, edges: edges }
   }, [data, queryGraphData])
 
   const { graphRef, recenter } = useGraphinRef()
@@ -103,11 +104,22 @@ export function ResultsGraph({data}:{data: SparqlResultsJsonType}) {
 
   return (
     <div className={styles["graph-container"]}>
-      <Graphin data={graphData} ref={graphRef} layout={{type: 'graphin-force'}} style={{height:700}}>
-        <ActionIcon className={styles["recenter-button"]} size="sm" variant="filled" aria-label="Re-Center" onClick={() => recenter()}>
-          <IconFocus/>
-        </ActionIcon>
+      <Graphin options={{
+        autoResize: true, data: graphData, layout: {type: 'force'},
+        behaviors: ['drag-element', 'drag-canvas', 'zoom-canvas'],
+        plugins: [{
+          type: 'legend',
+          key: 'legend',
+          nodeField: 'type',
+          edgeField: 'type',
+          itemLabelFontSize: 12,
+          position: 'right'
+        },]
+      }} ref={graphRef} style={{height: 700, background: "white"}}>
       </Graphin>
+      <ActionIcon className={styles["recenter-button"]} size="sm" variant="filled" aria-label="Re-Center" onClick={() => recenter()}>
+        <IconFocus/>
+      </ActionIcon>
     </div>
   )
 }
