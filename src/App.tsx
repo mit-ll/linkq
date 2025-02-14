@@ -15,8 +15,6 @@ import { RunQueryProvider } from 'hooks/useRunQuery';
 
 import styles from 'App.module.scss'
 
-import '@antv/graphin/dist/index.css';
-
 
 function App() {
   return (

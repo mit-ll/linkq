@@ -12,8 +12,7 @@
     "deploy": "gh-pages -d build"
   },
   "dependencies": {
-    "@antv/graphin": "^2.7.27",
-    "@antv/graphin-components": "^2.4.1",
+    "@antv/graphin": "^3.0.4",
     "@codemirror/language": "^6.10.1",
     "@codemirror/legacy-modes": "^6.3.3",
     "@mantine/core": "^7.5.3",
