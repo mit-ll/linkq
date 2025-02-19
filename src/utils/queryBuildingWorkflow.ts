@@ -51,8 +51,8 @@ export async function queryBuildingWorkflow(
     const responseText = llmResponse.content.trim() //trim the LLM response
     if(responseText.toUpperCase() === "STOP") { //if the LLM responded with stop
       setLLMResponseStage(chatAPI, llmResponse, {
-        mainStage: "KG Exploration",
-        subStage: "LLM is done exploring",
+        mainStage: "Query Generation",
+        subStage: "System gives SPARQL few-shot training", //this is slightly inaccurate, but how we've decided to display the stages
       })
       break //break out of the while loop
     }
@@ -100,7 +100,7 @@ export async function queryBuildingWorkflow(
     else {
       setLLMResponseStage(chatAPI, llmResponse, {
         mainStage: "KG Exploration",
-        subStage: "LLM is misbehaving",
+        subStage: "System enumerates KG APIs", //this is slightly inaccurate, but how we've decided to display the stages
       })
       llmResponse = await chatAPI.sendMessages([
         {
@@ -108,7 +108,7 @@ export async function queryBuildingWorkflow(
           role: "system",
           stage: {
             mainStage: "KG Exploration",
-            subStage: "LLM is misbehaving",
+            subStage: "System enumerates KG APIs",
           },
         }
       ])

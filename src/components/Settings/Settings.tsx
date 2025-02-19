@@ -57,7 +57,7 @@ export function Settings() {
         <Checkbox
           checked={showStateDiagramStatus}
           onChange={() => dispatch(toggleShowStateDiagramStatus())}
-          label="Show state diagram status"
+          label="Show LinkQ State Diagram"
         />
         <hr/>
         <TextInput

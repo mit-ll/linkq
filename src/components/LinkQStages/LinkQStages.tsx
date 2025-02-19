@@ -1,10 +1,11 @@
 import { useState } from "react"
 
-import { Card, Title } from "@mantine/core"
+import { ActionIcon, Card, Title } from "@mantine/core"
 
 import { useAppSelector } from "redux/store"
 
 import styles from "./LinkQStages.module.scss"
+import { IconCaretDown, IconCaretUp } from "@tabler/icons-react"
 
 const BLUE = "#1c7ed6"
 const PURPLE = "#862e9c"
@@ -27,10 +28,10 @@ const STEPS = [
         name: "LLM clarifies question",
         color: YELLOW,
       },
-      {
-        name: "LLM begins KG exploration",
-        color: YELLOW,
-      },
+      // {
+      //   name: "LLM begins KG exploration",
+      //   color: YELLOW,
+      // },
     ]
   },
   {
@@ -53,14 +54,14 @@ const STEPS = [
         name: "LLM searches for tail entities",
         color: YELLOW,
       },
-      {
-        name: "LLM is misbehaving",
-        color: YELLOW,
-      },
-      {
-        name: "LLM is done exploring",
-        color: YELLOW,
-      },
+      // {
+      //   name: "LLM is misbehaving",
+      //   color: YELLOW,
+      // },
+      // {
+      //   name: "LLM is done exploring",
+      //   color: YELLOW,
+      // },
     ]
   },
   {
@@ -109,7 +110,7 @@ export type SubStatusNameType = typeof STEPS[number]["children"][number]["name"]
 export function LinkQStages() {
   const stage = useAppSelector(state => state.stage)
   const showStateDiagramStatus = useAppSelector(state => state.settings.showStateDiagramStatus)
-  const [showDetails, _] = useState<boolean>(false)
+  const [showDetails, setShowDetails] = useState<boolean>(true)
 
 
   if(!showStateDiagramStatus) return null
@@ -117,7 +118,7 @@ export function LinkQStages() {
   return (
     <div>
       <div id={styles["state-diagram-container"]}>
-        <Title order={4}>LinkQ Stage</Title>
+        <Title order={4}>LinkQ State Diagram</Title>
         <div className={styles["state-diagram-grid"]}>
           {/* <div id={styles["line"]}/> */}
           {STEPS.map(({name,color},i) => {
@@ -129,29 +130,34 @@ export function LinkQStages() {
               </div>
             )
           })}
-        </div>
-        <div className={styles["state-diagram-grid"]}>
-          {STEPS.map((_,i) => <div key={i}><hr/></div>)}
-        </div>
-        <div className={styles["state-diagram-grid"]}>
-          {STEPS.map(({name:mainStatusName,children},i) => {
-            return (
-              <div key={i}>
-                {children?.map(({name, color},j) => {
-                  return (
-                    <Card key={j} className={`${(stage?.mainStage!==mainStatusName || stage?.subStage!==name) && styles["inactive"]}`} shadow="lg" padding="xs" radius="md" style={{backgroundColor: color}}>
-                      <span>{name}</span>
-                    </Card>
-                  )
-                })}
-              </div>
-            )
-          })}
-        </div>
-      </div>
 
-      <div id={styles["detailed-state-diagram-container"]}>
+          <ActionIcon id={styles["show-details-toggle"]} size="sm" color="gray" variant="filled" aria-label="Show Details" onClick={() => setShowDetails(!showDetails)}>
+            {showDetails ? <IconCaretDown/> : <IconCaretUp/>}
+          </ActionIcon>
+        </div>
         
+        {showDetails && (
+          <>
+            <div className={styles["state-diagram-grid"]}>
+              {STEPS.map((_,i) => <div key={i}><hr/></div>)}
+            </div>
+            <div className={styles["state-diagram-grid"]}>
+              {STEPS.map(({name:mainStatusName,children},i) => {
+                return (
+                  <div key={i}>
+                    {children?.map(({name, color},j) => {
+                      return (
+                        <Card key={j} className={`${(stage?.mainStage!==mainStatusName || stage?.subStage!==name) && styles["inactive"]}`} shadow="lg" padding="xs" radius="md" style={{backgroundColor: color}}>
+                          <span>{name}</span>
+                        </Card>
+                      )
+                    })}
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

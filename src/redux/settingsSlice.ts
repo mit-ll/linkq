@@ -11,7 +11,7 @@ const initialState: {
   apiKey: import.meta.env.VITE_OPENAI_API_KEY?.trim() || "",
   baseURL: import.meta.env.VITE_BASE_URL?.trim() || "https://api.openai.com/v1/",
   model: import.meta.env.VITE_MODEL?.trim() || "gpt-4-turbo-preview",
-  showStateDiagramStatus: true,
+  showStateDiagramStatus: false,
 }
 
 const settingsSlice = createSlice({

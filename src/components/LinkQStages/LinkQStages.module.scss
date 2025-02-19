@@ -38,9 +38,10 @@
       border: none;
     }
   }
-}
 
-
-#detailed-state-diagram-container {
-
+  #show-details-toggle {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
 }

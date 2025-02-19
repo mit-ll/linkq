@@ -352,8 +352,8 @@ export const DEMO_FULL_HISTORY:LinkQChatMessageType[] = [
     "role": "assistant",
     "content": "BUILD QUERY",
     "stage": {
-      mainStage: "Question Refinement",
-      subStage: "LLM begins KG exploration",
+      mainStage: "KG Exploration",
+      subStage: "System enumerates KG APIs",
     }
   },
   {
@@ -505,7 +505,7 @@ export const DEMO_FULL_HISTORY:LinkQChatMessageType[] = [
     "content": "STOP",
     "stage": {
       mainStage: "KG Exploration",
-      subStage: "LLM is done exploring"
+      subStage: "System gives SPARQL few-shot training"
     }
   },
   {
