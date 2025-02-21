@@ -29,7 +29,7 @@ function App() {
             <div id={styles["sidebar"]}>
               <Chat/>
             </div>
-            
+
             <div id={styles["content"]}>
               <QueryEditor/>
 
