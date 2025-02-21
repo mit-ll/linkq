@@ -29,7 +29,7 @@ export const QueryGraph = () => {
         <div>
             <Title style={{color:"white", marginLeft: 13, marginBottom: 7, marginTop: 7, padding: 1}} order={4}>Query Structure Graph</Title>
             <div id={styles["graph-container"]}>
-                <Graphin options={{autoResize: true, data: queryGraphData, layout: {type: 'dagre', rankdir: 'LR'},
+                <Graphin options={{autoResize: true, data: queryGraphData, layout: {type: 'dagre', rankdir: 'LR', nodesep: 150, ranksep: 150},
                     behaviors: ['drag-element', 'drag-canvas', 'zoom-canvas'],
                     plugins: [{
                         type: 'legend',
