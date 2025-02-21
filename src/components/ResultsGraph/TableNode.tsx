@@ -38,6 +38,6 @@ export const NodeTable = ({node, selectedRow, handleRowSelection}: NodeTableProp
                       toolbar: {
                           showQuickFilter: true,
                       },
-                  }}/>
+                  }} style={{background:"white"}}/>
     );
 }

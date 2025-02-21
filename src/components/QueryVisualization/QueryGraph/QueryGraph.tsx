@@ -14,6 +14,7 @@ import { useGraphinRef } from "hooks/useGraphinRef";
 import { useParsedQueryData } from "hooks/useParsedQueryData";
 
 import styles from "./QueryGraph.module.scss"
+import { useEffect } from "react";
 
 
 export const QueryGraph = () => {
@@ -22,6 +23,10 @@ export const QueryGraph = () => {
     const queryGraphData = useParsedQueryData(queryValue)
 
     const { graphRef, recenter } = useGraphinRef()
+
+    useEffect(() => {
+        recenter()
+    },[queryGraphData])
 
     if(queryGraphData?.nodes?.length===0) return null
 
