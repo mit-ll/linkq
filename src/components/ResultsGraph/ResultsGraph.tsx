@@ -60,6 +60,7 @@ const createData = ({queryGraphData, data, selectedRow, handleRowSelection}: Cre
 export const ResultsGraph = ({data}: { data: SparqlResultsJsonType }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const graphRef = useRef<G6Graph>();
+    const [isDragEnabled, setIsDragEnabled] = useState(true);
     const queryValue = useAppSelector(state => state.results.results?.queryValue)
 
     const queryGraphData = useParsedQueryData(queryValue || "");
@@ -83,7 +84,10 @@ export const ResultsGraph = ({data}: { data: SparqlResultsJsonType }) => {
             container: containerRef.current || undefined,
             data: graphData,
             layout: {type: 'dagre', rankdir: 'LR'},
-            behaviors: ['drag-element', 'zoom-canvas', 'drag-canvas'],
+            behaviors: [{
+                type: 'drag-element',
+                key: 'drag-element',
+            }, 'zoom-canvas', 'drag-canvas'],
             plugins: [{
                 type: 'legend',
                 key: 'legend',
@@ -143,6 +147,43 @@ export const ResultsGraph = ({data}: { data: SparqlResultsJsonType }) => {
         }
     }, [data, queryGraphData, selectedRow]);
 
+    useEffect(() => {
+        if (graphRef.current) {
+            const graph = graphRef.current;
+
+            const handleKeyDown = (e: KeyboardEvent) => {
+                console.log(e);
+                if (e.key === 'Shift' && isDragEnabled) {
+                    graph.updateBehavior({
+                        key: 'drag-element',
+                        enable: false,
+                    });
+                    setIsDragEnabled(false);
+                }
+                if (e.key === 'r') {
+                    graph.render();
+                }
+            };
+
+            const handleKeyUp = (e: KeyboardEvent) => {
+                if (e.key === 'Shift' && !isDragEnabled) {
+                    graph.updateBehavior({
+                        key: 'drag-element',
+                        enable: true,
+                    });
+                    setIsDragEnabled(true);
+                }
+            };
+
+            window.addEventListener('keydown', handleKeyDown);
+            window.addEventListener('keyup', handleKeyUp);
+
+            return () => {
+                window.removeEventListener('keydown', handleKeyDown);
+                window.removeEventListener('keyup', handleKeyUp);
+            };
+        }
+    }, [isDragEnabled]);
 
     return (<div style={{width: '100%', height: '100%', background: 'white'}} ref={containerRef}/>);
 };
