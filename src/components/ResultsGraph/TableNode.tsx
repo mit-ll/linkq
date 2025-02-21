@@ -14,6 +14,13 @@ const columns: GridColDef[] = [
     {field: 'label', headerName: 'Label', width: 150}
 ];
 
+const dataGridStyle = {
+    WebkitUserSelect: "none",
+    MozUserSelect: "none",
+    msUserSelect: "none",
+    userSelect: "none",
+    '& .highlight': {backgroundColor: '#edf4fc !important'}
+}
 
 export const NodeTable = ({node, selectedRow, handleRowSelection}: NodeTableProps) => {
     let rows = []
@@ -25,7 +32,7 @@ export const NodeTable = ({node, selectedRow, handleRowSelection}: NodeTableProp
     return (
         <DataGrid rows={rows} columns={columns} onRowClick={handleRowSelection} getRowClassName={(params) => {
             return params.row.index === selectedRow ? 'highlight' : ''
-        }} rowSelectionModel={[]} sx={{'& .highlight': {backgroundColor: '#d3f9d8 !important'}}}
+        }} rowSelectionModel={[]} sx={dataGridStyle}
                   slots={{toolbar: GridToolbar}}
                   slotProps={{
                       toolbar: {
