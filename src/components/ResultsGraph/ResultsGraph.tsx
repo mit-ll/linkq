@@ -58,7 +58,7 @@ const createData = ({queryGraphData, data, selectedRow, handleRowSelection}: Cre
 }
 
 export const ResultsGraph = ({data}: { data: SparqlResultsJsonType }) => {
-    const containerRef = useRef();
+    const containerRef = useRef<HTMLDivElement>(null);
     const graphRef = useRef<G6Graph>();
     const queryValue = useAppSelector(state => state.results.results?.queryValue)
 
@@ -80,7 +80,7 @@ export const ResultsGraph = ({data}: { data: SparqlResultsJsonType }) => {
         const graphData = createData({queryGraphData, data, selectedRow, handleRowSelection});
 
         const graph = new G6Graph({
-            container: containerRef.current,
+            container: containerRef.current || undefined,
             data: graphData,
             layout: {type: 'dagre', rankdir: 'LR'},
             behaviors: ['drag-element', 'zoom-canvas', 'drag-canvas'],
@@ -144,6 +144,5 @@ export const ResultsGraph = ({data}: { data: SparqlResultsJsonType }) => {
     }, [data, queryGraphData, selectedRow]);
 
 
-    // @ts-ignore
-    return (<div style={{width: '100%', height: '100%', background: 'white'}} ref={containerRef}></div>);
+    return (<div style={{width: '100%', height: '100%', background: 'white'}} ref={containerRef}/>);
 };
