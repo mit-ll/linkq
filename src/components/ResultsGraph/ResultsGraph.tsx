@@ -116,17 +116,21 @@ export const ResultsGraph = ({data}: { data: SparqlResultsJsonType }) => {
                     if (item === 'exit-fullscreen') {
                         fullscreenPlugin.exit();
                     }
+                    if (item === 'auto-fit') {
+                        graph.fitView();
+                    }
                 },
                 getItems: () => {
                     return [
                         {id: 'request-fullscreen', value: 'request-fullscreen'},
                         {id: 'exit-fullscreen', value: 'exit-fullscreen'},
+                        {id: 'auto-fit', value: 'auto-fit'},
                     ];
                 },
             },
         ]);
 
-        graph.render();
+        graph.render().then(() => graph.render());
 
         return () => {
             const graph = graphRef.current;
@@ -152,16 +156,12 @@ export const ResultsGraph = ({data}: { data: SparqlResultsJsonType }) => {
             const graph = graphRef.current;
 
             const handleKeyDown = (e: KeyboardEvent) => {
-                console.log(e);
                 if (e.key === 'Shift' && isDragEnabled) {
                     graph.updateBehavior({
                         key: 'drag-element',
                         enable: false,
                     });
                     setIsDragEnabled(false);
-                }
-                if (e.key === 'r') {
-                    graph.render();
                 }
             };
 

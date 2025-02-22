@@ -2,39 +2,42 @@
 // SPDX-License-Identifier: MIT
 
 
-import { useAppSelector } from "redux/store";
+import {useAppSelector} from "redux/store";
 
-import { Graphin } from "@antv/graphin";
+import {Graphin} from "@antv/graphin";
 
-import { ActionIcon, Title } from '@mantine/core';
+import {Title} from '@mantine/core';
 
-import { IconFocus } from "@tabler/icons-react";
-
-import { useGraphinRef } from "hooks/useGraphinRef";
-import { useParsedQueryData } from "hooks/useParsedQueryData";
+import {useGraphinRef} from "hooks/useGraphinRef";
+import {useParsedQueryData} from "hooks/useParsedQueryData";
 
 import styles from "./QueryGraph.module.scss"
-import { useEffect } from "react";
+import {useEffect} from "react";
+import {Fullscreen} from "@antv/g6";
 
 
 export const QueryGraph = () => {
     const queryValue = useAppSelector(state => state.queryValue.queryValue)
-    
+
     const queryGraphData = useParsedQueryData(queryValue)
 
-    const { graphRef, recenter } = useGraphinRef()
+    const {graphRef, recenter} = useGraphinRef()
 
     useEffect(() => {
         recenter()
-    },[queryGraphData])
+    }, [queryGraphData])
 
-    if(queryGraphData?.nodes?.length===0) return null
+    if (queryGraphData?.nodes?.length === 0) return null
 
     return (
         <div>
-            <Title style={{color:"white", marginLeft: 13, marginBottom: 7, marginTop: 7, padding: 1}} order={4}>Query Structure Graph</Title>
+            <Title style={{color: "white", marginLeft: 13, marginBottom: 7, marginTop: 7, padding: 1}} order={4}>Query
+                Structure Graph</Title>
             <div id={styles["graph-container"]}>
-                <Graphin options={{autoResize: true, data: queryGraphData, layout: {type: 'dagre', rankdir: 'LR', nodesep: 150, ranksep: 150},
+                <Graphin options={{
+                    autoResize: true,
+                    data: queryGraphData,
+                    layout: {type: 'dagre', rankdir: 'LR', nodesep: 150, ranksep: 150},
                     behaviors: ['drag-element', 'drag-canvas', 'zoom-canvas'],
                     plugins: [{
                         type: 'legend',
@@ -43,11 +46,37 @@ export const QueryGraph = () => {
                         edgeField: 'type',
                         itemLabelFontSize: 12,
                         position: 'right'
-                    },]}} ref={graphRef} style={{minHeight: "unset", background: "white"}}>
+                    }, {
+                        type: 'fullscreen',
+                        key: 'fullscreen',
+                    }, {
+                        type: 'toolbar',
+                        key: 'toolbar',
+                        position: 'top-left',
+                        onClick: (item: string) => {
+                            const fullscreenPlugin = graphRef?.current?.getPluginInstance<Fullscreen>('fullscreen');
+                            if (fullscreenPlugin) {
+                                if (item === 'request-fullscreen') {
+                                    fullscreenPlugin.request();
+                                }
+                                if (item === 'exit-fullscreen') {
+                                    fullscreenPlugin.exit();
+                                }
+                            }
+                            if (item === 'auto-fit') {
+                                recenter();
+                            }
+                        },
+                        getItems: () => {
+                            return [
+                                {id: 'request-fullscreen', value: 'request-fullscreen'},
+                                {id: 'exit-fullscreen', value: 'exit-fullscreen'},
+                                {id: 'auto-fit', value: 'auto-fit'},
+                            ];
+                        },
+                    }]
+                }} ref={graphRef} style={{minHeight: "unset", background: "white"}}>
                 </Graphin>
-                <ActionIcon className={styles["recenter-button"]} size="sm" variant="filled" aria-label="Re-Center" onClick={() => recenter()}>
-                    <IconFocus/>
-                </ActionIcon>
             </div>
         </div>
     )
