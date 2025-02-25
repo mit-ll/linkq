@@ -30,7 +30,7 @@ export async function handleUserChat(userText: string, chatAPI: ChatAPI) {
   })
   
   //determine what to do with the LLM's response
-  if(llmResponse.content.includes("BUILD QUERY")) {
+  if(llmResponse.content.includes("BUILD QUERY:")) {
     //if we want to use the query building workflow
 
     setLLMResponseStage(chatAPI, llmResponse, {
@@ -38,7 +38,8 @@ export async function handleUserChat(userText: string, chatAPI: ChatAPI) {
       subStage: "System enumerates KG APIs", //this is slightly inaccurate, but how we've decided to display the stages
     })
     
-    llmResponse = await queryBuildingWorkflow(chatAPI, userText)
+    const question = llmResponse.content.split("BUILD QUERY:").at(1)
+    llmResponse = await queryBuildingWorkflow(chatAPI, (question || userText).trim())
     setLLMResponseStage(chatAPI, llmResponse, {
       mainStage: "Query Generation",
       subStage: "LLM generates query",

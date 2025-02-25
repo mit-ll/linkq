@@ -20,7 +20,7 @@ const QUERY_BUILDING_MAX_LOOPS = 20 //HARDCODED we don't want the LLM looping fo
 
 export async function queryBuildingWorkflow(
   chatAPI:ChatAPI,
-  text: string,
+  question: string,
 ) {
   //send the initial query building message to the LLM as the system role
   setTimeout(() => {
@@ -64,10 +64,12 @@ export async function queryBuildingWorkflow(
         subStage: "LLM fuzzy searches for entity",
         description: `Entity Fuzzy Search: ${fuzzySearchString}`
       })
-      llmResponse = await handleFuzzySearchForEntity( //run the entity search function
+      //run the entity search function
+      llmResponse = await handleFuzzySearchForEntity({
         chatAPI,
         fuzzySearchString,
-      )
+        question,
+      })
     }
     //else if the LLM wants to search for all the properties for an entity
     else if(responseText.includes(PROPERTIES_SEARCH_PREFIX)) {
@@ -123,7 +125,7 @@ export async function queryBuildingWorkflow(
   }))
   return await chatAPI.sendMessages([
     {
-      content: QUERY_BUILDING_SYSTEM_MESSAGE + ` Now construct a query that answers the user's question: ${text}`,
+      content: QUERY_BUILDING_SYSTEM_MESSAGE + ` Now construct a query that answers the user's question: ${question}`,
       role: "system",
       stage: {
         mainStage: "Query Generation",
@@ -134,14 +136,18 @@ export async function queryBuildingWorkflow(
 }
 
 
-async function handleFuzzySearchForEntity(chatAPI:ChatAPI, text:string) {
+async function handleFuzzySearchForEntity({
+  chatAPI, fuzzySearchString, question,
+}:{
+  chatAPI:ChatAPI, fuzzySearchString:string, question:string,
+}) {
   //try to resolve these entities by requesting data from the KG
-  const responseText = await fuzzySearchEntitiesResponse(text)
+  const responseText = await fuzzySearchEntitiesResponse(fuzzySearchString)
 
   const stage: StageType = {
     mainStage: "KG Exploration",
     subStage: "LLM fuzzy searches for entity",
-    description: `Entity Fuzzy Search: ${text}`,
+    description: `Entity Fuzzy Search: ${fuzzySearchString}`,
   }
   if(!responseText) {
     return await chatAPI.sendMessages([
@@ -152,10 +158,24 @@ async function handleFuzzySearchForEntity(chatAPI:ChatAPI, text:string) {
       }
     ])
   }
+
+  const filteredResponse = await chatAPI.sendMessages([
+    {
+      content: responseText + `\n\nWhich entity (or entities) is most relevant to the question '${question}'?`,
+      role: "system",
+      stage,
+    }
+  ])
+  chatAPI.addMessagesCallback?.([
+    {
+      ...filteredResponse,
+      stage,
+    }
+  ])
  
   return await chatAPI.sendMessages([
     {
-      content: responseText,
+      content: INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE,
       role: "system",
       stage,
     }
