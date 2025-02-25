@@ -1,5 +1,14 @@
-import {DataGrid, GridColDef, GridRowParams, GridToolbar} from "@mui/x-data-grid";
+import {
+    DataGrid,
+    GridColDef,
+    GridRowParams,
+    GridToolbarColumnsButton,
+    GridToolbarContainer, GridToolbarDensitySelector, GridToolbarFilterButton, GridToolbarQuickFilter
+} from "@mui/x-data-grid";
 import {NodeData} from "@antv/g6";
+import {Box, Typography} from "@mui/material";
+import {SparqlValueObjectType} from "../../types/sparql.ts";
+import {formatURI, getHrefFromURI} from "../../utils/knowledgeBase/formatURI.ts";
 
 
 interface NodeTableProps {
@@ -9,9 +18,8 @@ interface NodeTableProps {
 }
 
 const columns: GridColDef[] = [
-    {field: 'idLabel', headerName: 'ID', width: 150},
-    {field: 'uri', headerName: 'URI', width: 150},
-    {field: 'label', headerName: 'Label', width: 150}
+    {field: 'uri', headerName: 'URI', width: 200, type: "string", valueFormatter: (item: string) => item},
+    {field: 'label', headerName: 'Label', width: 200, type: "string", valueFormatter: (item: string) => item},
 ];
 
 const dataGridStyle = {
@@ -22,6 +30,32 @@ const dataGridStyle = {
     '& .highlight': {backgroundColor: '#edf4fc !important'}
 }
 
+interface DGTitle
+{
+    title: string;
+}
+
+const DataGridTitle = ({title}: DGTitle) => {
+    return(
+        <Box style={{width: "100%", display: "flex", justifyContent: "center", alignItems: "center"}}>
+            <Typography variant="h5">{title}</Typography>
+        </Box>
+    )
+}
+
+const CustomToolbar = ({title}: DGTitle) => {
+    return (
+        <GridToolbarContainer>
+            <DataGridTitle title={title} />
+            <GridToolbarColumnsButton />
+            <GridToolbarFilterButton />
+            <GridToolbarDensitySelector/>
+            <GridToolbarQuickFilter />
+        </GridToolbarContainer>
+    );
+}
+
+
 export const NodeTable = ({node, selectedRow, handleRowSelection}: NodeTableProps) => {
     let rows = []
     if (node?.data?.entries && Array.isArray(node.data.entries)) {
@@ -29,11 +63,12 @@ export const NodeTable = ({node, selectedRow, handleRowSelection}: NodeTableProp
             return {...entry, id: `${entry.id}_${entry.value}_${i}`, key: `${node.id}_${entry.value}_${i}`, index: i}
         });
     }
+
     return (
         <DataGrid rows={rows} columns={columns} onRowClick={handleRowSelection} getRowClassName={(params) => {
             return params.row.index === selectedRow ? 'highlight' : ''
         }} rowSelectionModel={[]} sx={dataGridStyle}
-                  slots={{toolbar: GridToolbar}}
+                  slots={{toolbar: () => <CustomToolbar title={node.id}/>}}
                   slotProps={{
                       toolbar: {
                           showQuickFilter: true,
