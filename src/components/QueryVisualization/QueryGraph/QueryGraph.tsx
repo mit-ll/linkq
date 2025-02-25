@@ -45,7 +45,7 @@ export const QueryGraph = () => {
                         nodeField: 'type',
                         edgeField: 'type',
                         itemLabelFontSize: 12,
-                        position: 'right'
+                        position: 'top-right'
                     }, {
                         type: 'fullscreen',
                         key: 'fullscreen',

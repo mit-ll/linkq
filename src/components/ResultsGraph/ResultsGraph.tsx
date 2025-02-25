@@ -103,7 +103,7 @@ export const ResultsGraph = ({data}: { data: SparqlResultsJsonType }) => {
                 nodeField: 'type',
                 edgeField: 'type',
                 itemLabelFontSize: 12,
-                position: 'right'
+                position: 'top-right'
             }, {
                 type: 'fullscreen',
                 key: 'fullscreen',
@@ -139,7 +139,7 @@ export const ResultsGraph = ({data}: { data: SparqlResultsJsonType }) => {
             },
         ]);
 
-        graph.render().then(() => graph.render());
+        graph.render().then(() => graph.render()).then(() => graph.fitView());
 
         return () => {
             const graph = graphRef.current;

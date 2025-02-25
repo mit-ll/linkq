@@ -24,23 +24,6 @@ interface NodeTableProps {
     handleRowSelection?: (params: GridRowParams) => void
 }
 
-const columns: GridColDef[] = [
-    {
-        field: 'cell', headerName: 'Value', width: 200,
-        valueGetter: (cell: SparqlValueObjectType) => cell.value,
-        renderCell: (item: { row: CustomRowType }) => {
-            return <RenderSPARQLValue cell={item.row.cell}/>
-        },
-    },
-    {
-        field: 'cellLabel', headerName: 'Label', width: 300,
-        valueGetter: (cellLabel?:SparqlValueObjectType) => cellLabel?.value || "",
-        renderCell: (item: { row: CustomRowType }) => {
-            return <RenderSPARQLValue cell={item.row.cellLabel || item.row.cell}/>
-        },
-    },
-];
-
 const dataGridStyle = {
     WebkitUserSelect: "none",
     MozUserSelect: "none",
@@ -81,8 +64,12 @@ export const NodeTable = ({node, selectedRow, handleRowSelection}: NodeTableProp
             index: number,
         }
     )[] = []
+    let hasLabelColumn = false
     if (isTableNodeType(node)) {
         rows = node.data.rows.map((row, i) => {
+            if(row.cellLabel) {
+                hasLabelColumn = true
+            }
             return {
                 ...row,
                 id: `${node.id}_${row.cell.value}_${i}`,
@@ -90,6 +77,26 @@ export const NodeTable = ({node, selectedRow, handleRowSelection}: NodeTableProp
                 index: i,
             }
         });
+    }
+
+    const columns: GridColDef[] = [
+        {
+            field: 'cell', headerName: 'Value', width: 500,
+            valueGetter: (cell: SparqlValueObjectType) => cell.value,
+            renderCell: (item: { row: CustomRowType }) => {
+                return <RenderSPARQLValue cell={item.row.cell}/>
+            },
+        },
+    ];
+    if(hasLabelColumn) {
+        columns[0].width = 200
+        columns.push({
+            field: 'cellLabel', headerName: 'Label', width: 300,
+            valueGetter: (cellLabel?:SparqlValueObjectType) => cellLabel?.value || "",
+            renderCell: (item: { row: CustomRowType }) => {
+                return <RenderSPARQLValue cell={item.row.cellLabel || item.row.cell}/>
+            },
+        },)
     }
 
     return (
