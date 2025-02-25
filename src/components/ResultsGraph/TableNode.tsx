@@ -2,7 +2,6 @@ import {
     DataGrid,
     GridColDef,
     GridRowParams,
-    GridToolbarColumnsButton,
     GridToolbarContainer,
     GridToolbarDensitySelector,
     GridToolbarFilterButton,
@@ -10,7 +9,14 @@ import {
 } from "@mui/x-data-grid";
 import {NodeData} from "@antv/g6";
 import {Box, Typography} from "@mui/material";
+import { RenderSPARQLValue } from "components/ResultsTable/ResultsTable";
+import { SparqlValueObjectType } from "types/sparql";
 
+
+type CustomRowType = {
+    cell: SparqlValueObjectType,
+    cellLabel?: SparqlValueObjectType,
+}
 
 interface NodeTableProps {
     node: NodeData,
@@ -19,8 +25,20 @@ interface NodeTableProps {
 }
 
 const columns: GridColDef[] = [
-    {field: 'uri', headerName: 'URI', width: 200, type: "string", valueFormatter: (item: string) => item},
-    {field: 'label', headerName: 'Label', width: 200, type: "string", valueFormatter: (item: string) => item},
+    {
+        field: 'cell', headerName: 'Value', width: 200,
+        valueGetter: (cell: SparqlValueObjectType) => cell.value,
+        renderCell: (item: { row: CustomRowType }) => {
+            return <RenderSPARQLValue cell={item.row.cell}/>
+        },
+    },
+    {
+        field: 'cellLabel', headerName: 'Label', width: 300,
+        valueGetter: (cellLabel?:SparqlValueObjectType) => cellLabel?.value || "",
+        renderCell: (item: { row: CustomRowType }) => {
+            return <RenderSPARQLValue cell={item.row.cellLabel || item.row.cell}/>
+        },
+    },
 ];
 
 const dataGridStyle = {
@@ -47,7 +65,6 @@ const CustomToolbar = ({title}: DGTitle) => {
     return (
         <GridToolbarContainer>
             <DataGridTitle title={title}/>
-            <GridToolbarColumnsButton/>
             <GridToolbarFilterButton/>
             <GridToolbarDensitySelector/>
             <GridToolbarQuickFilter/>
@@ -57,22 +74,45 @@ const CustomToolbar = ({title}: DGTitle) => {
 
 
 export const NodeTable = ({node, selectedRow, handleRowSelection}: NodeTableProps) => {
-    let rows = []
-    if (node?.data?.entries && Array.isArray(node.data.entries)) {
-        rows = node.data.entries.map((entry, i) => {
-            return {...entry, id: `${entry.id}_${entry.value}_${i}`, key: `${node.id}_${entry.value}_${i}`, index: i}
+    let rows:(
+        CustomRowType & {
+            id: string,
+            key: string,
+            index: number,
+        }
+    )[] = []
+    if (isTableNodeType(node)) {
+        rows = node.data.rows.map((row, i) => {
+            return {
+                ...row,
+                id: `${node.id}_${row.cell.value}_${i}`,
+                key: `${node.id}_${row.cell.value}_${i}`,
+                index: i,
+            }
         });
     }
 
     return (
-        <DataGrid rows={rows} columns={columns} onRowClick={handleRowSelection} getRowClassName={(params) => {
-            return params.row.index === selectedRow ? 'highlight' : ''
-        }} rowSelectionModel={[]} sx={dataGridStyle}
-                  slots={{toolbar: () => <CustomToolbar title={node.id}/>}}
-                  slotProps={{
-                      toolbar: {
-                          showQuickFilter: true,
-                      },
-                  }} style={{background: "white"}}/>
+        <DataGrid
+            rows={rows}
+            columns={columns}
+            onRowClick={handleRowSelection}
+            getRowClassName={(params) => {
+                return params.row.index === selectedRow ? 'highlight' : ''
+            }}
+            rowSelectionModel={[]}
+            sx={dataGridStyle}
+            slots={{toolbar: () => <CustomToolbar title={node.id}/>}}
+            slotProps={{
+                toolbar: {
+                    showQuickFilter: true,
+                },
+            }}
+            style={{background: "white"}}
+        />
     );
+}
+
+export function isTableNodeType(node: NodeData):node is NodeData & { data: { rows: CustomRowType[] } } {
+    return Array.isArray(node?.data?.rows)
 }

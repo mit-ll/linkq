@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {EdgeData, ExtensionCategory, Fullscreen, Graph as G6Graph, GraphData, NodeData, register} from '@antv/g6';
-import {NodeTable} from "./TableNode.tsx";
+import {isTableNodeType, NodeTable} from "./TableNode.tsx";
 import {useAppSelector} from "../../redux/store.ts";
 import {useParsedQueryData} from "../../hooks/useParsedQueryData.ts";
 import {GridRowParams} from "@mui/x-data-grid";
@@ -22,7 +22,7 @@ const createData = ({queryGraphData, data, selectedRow, handleRowSelection}: Cre
     if (queryGraphData?.nodes && queryGraphData?.nodes?.length !== 0) {
 
         nodes = queryGraphData.nodes.map(n => {
-            const data = {...n.data, entries: []};
+            const data = {...n.data, rows: []};
 
             return {...n, data: data};
         })
@@ -37,21 +37,30 @@ const createData = ({queryGraphData, data, selectedRow, handleRowSelection}: Cre
                 const cell = row[node.id]
                 const cellLabel = row[node.id + "Label"] //HARDCODED specific to Wikidata
                 if (cell) { //if the cell is present in the results
-                    if (node?.data?.entries && Array.isArray(node?.data?.entries)) {
-                        node.data.entries.push({
-                            uri: cell.value,
-                            label: cellLabel?.value || cell.value,
-                            idLabel: node.id
+                    if (isTableNodeType(node)) {
+                        node.data.rows.push({
+                            cell,
+                            cellLabel,
                         })
-                    }
-                    node.type = 'react'
-                    node.style = {
-                        size: [500, 400],
-                        component: <NodeTable node={node} selectedRow={selectedRow}
-                                              handleRowSelection={handleRowSelection}/>,
                     }
                 }
             })
+        })
+
+        nodes.forEach((node) => {
+            if (isTableNodeType(node) && node.data.rows.length>0) {
+                node.type = 'react'
+                node.style = {
+                    size: [500, 400],
+                    component: (
+                        <NodeTable
+                            node={node}
+                            selectedRow={selectedRow}
+                            handleRowSelection={handleRowSelection}
+                        />
+                    ),
+                }
+            }
         })
     }
     return {nodes: nodes, edges: edges};

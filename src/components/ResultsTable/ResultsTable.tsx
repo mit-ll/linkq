@@ -18,7 +18,7 @@ export function ResultsTable({data}:{data: SparqlResultsJsonType}) {
     row => row[c],
     {
       id: c,
-      cell: info => <span>{renderCell(info.getValue())}</span>,
+      cell: info => <span><RenderSPARQLValue cell={info.getValue()}/></span>,
       header: () => <span>{c}</span>,
     }
   ))
@@ -71,7 +71,7 @@ export function ResultsTable({data}:{data: SparqlResultsJsonType}) {
   )
 }
 
-function renderCell(cell:SparqlValueObjectType):React.ReactNode {
+export function RenderSPARQLValue({cell}:{cell:SparqlValueObjectType}):React.ReactNode {
   if(!cell) {
     return <code>undefined</code>
   }
