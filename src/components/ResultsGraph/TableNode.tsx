@@ -3,12 +3,13 @@ import {
     GridColDef,
     GridRowParams,
     GridToolbarColumnsButton,
-    GridToolbarContainer, GridToolbarDensitySelector, GridToolbarFilterButton, GridToolbarQuickFilter
+    GridToolbarContainer,
+    GridToolbarDensitySelector,
+    GridToolbarFilterButton,
+    GridToolbarQuickFilter
 } from "@mui/x-data-grid";
 import {NodeData} from "@antv/g6";
 import {Box, Typography} from "@mui/material";
-import {SparqlValueObjectType} from "../../types/sparql.ts";
-import {formatURI, getHrefFromURI} from "../../utils/knowledgeBase/formatURI.ts";
 
 
 interface NodeTableProps {
@@ -30,13 +31,12 @@ const dataGridStyle = {
     '& .highlight': {backgroundColor: '#edf4fc !important'}
 }
 
-interface DGTitle
-{
+interface DGTitle {
     title: string;
 }
 
 const DataGridTitle = ({title}: DGTitle) => {
-    return(
+    return (
         <Box style={{width: "100%", display: "flex", justifyContent: "center", alignItems: "center"}}>
             <Typography variant="h5">{title}</Typography>
         </Box>
@@ -46,11 +46,11 @@ const DataGridTitle = ({title}: DGTitle) => {
 const CustomToolbar = ({title}: DGTitle) => {
     return (
         <GridToolbarContainer>
-            <DataGridTitle title={title} />
-            <GridToolbarColumnsButton />
-            <GridToolbarFilterButton />
+            <DataGridTitle title={title}/>
+            <GridToolbarColumnsButton/>
+            <GridToolbarFilterButton/>
             <GridToolbarDensitySelector/>
-            <GridToolbarQuickFilter />
+            <GridToolbarQuickFilter/>
         </GridToolbarContainer>
     );
 }
@@ -73,6 +73,6 @@ export const NodeTable = ({node, selectedRow, handleRowSelection}: NodeTableProp
                       toolbar: {
                           showQuickFilter: true,
                       },
-                  }} style={{background:"white"}}/>
+                  }} style={{background: "white"}}/>
     );
 }
