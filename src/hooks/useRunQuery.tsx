@@ -13,9 +13,10 @@ import { SummarizeOutcomeType, summarizeQueryResults } from 'utils/summarizeQuer
 
 import { SparqlResultsJsonType } from "types/sparql.ts";
 
-import { useGetNewChatId } from "./useGetNewChatId.ts";
-import { useChatAPIInstance } from "./useChatAPIInstance.ts";
+// import { useGetNewChatId } from "./useGetNewChatId.ts";
+// import { useChatAPIInstance } from "./useChatAPIInstance.ts";
 import { setStage } from "redux/stageSlice.ts";
+import { useMainChatAPI } from "./useMainChatAPI.tsx";
 
 //this sets up a context so we can define one runQuery function for the whole app
 const RunQueryContext = createContext<{
@@ -36,10 +37,11 @@ export function RunQueryProvider({
 }) {
   const dispatch = useAppDispatch()
 
-  const chatAPI = useChatAPIInstance({
-    chatId: 1,
-  })
-  const getNewChatId = useGetNewChatId()
+  const { chatAPI } = useMainChatAPI()
+  // const chatAPI = useChatAPIInstance({
+  //   chatId: 1,
+  // })
+  // const getNewChatId = useGetNewChatId()
   const handleSummaryResults = ({name,summary}:{name:string,summary:string}) => {
     dispatch(updateLastQueryHistory({name, summary}))
     dispatch(setResultsSummary(summary))
@@ -58,7 +60,7 @@ export function RunQueryProvider({
     mutationFn: async ({query,outcome}) => {
       //try to ask the LLM to give the query a name and summarize the results
       try {
-        chatAPI.reset(getNewChatId())
+        // chatAPI.reset(getNewChatId())
         handleSummaryResults(
           await summarizeQueryResults(chatAPI, query, outcome)
         )
