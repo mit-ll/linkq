@@ -10,7 +10,6 @@ export async function staticChat() {
     apiKey: import.meta.env.VITE_OPENAI_API_KEY?.trim(),
     chatId: 0,
     dangerouslyAllowBrowser: true, //this is necessary for using a browser
-    addMessagesCallback: () => {},
   })
   
   const response = await chatAPI.sendMessages([
@@ -21,11 +20,6 @@ export async function staticChat() {
     {
       role: "user",
       content: "Can you tell me about interesting movies?",
-      stage: {
-        mainStage: "Question Refinement",
-        subStage: "User asks question",
-        description: "Can you tell me about interesting movies?",
-      },
     },
   ])
   

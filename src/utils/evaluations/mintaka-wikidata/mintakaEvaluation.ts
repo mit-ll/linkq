@@ -129,19 +129,16 @@ export async function runLinkQMintakaEvaluation() {
       //force the LLM to start the query building workflow
       chatGPT.messages = [
         {
-          chatId: 0,
           content: INITIAL_SYSTEM_MESSAGE,
           name: "system",
           role: "system",
         },
         {
-          chatId: 0,
           content: question,
           name: "user",
           role: "user",
         },
         {
-          chatId: 0,
           content: "BUILD QUERY",
           name: "gpt-4-turbo-preview",
           role: "assistant",

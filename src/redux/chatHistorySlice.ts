@@ -7,7 +7,7 @@ import { DEMO_FULL_HISTORY, DEMO_SIMPLE_HISTORY, IS_DEMO_MODE } from 'utils/demo
 import { StageType } from './stageSlice'
 
 export type LinkQChatMessageType = ChatCompletionMessageParam & {
-  content:string
+  content: string
   chatId: number
   name: string
   stage?: StageType,

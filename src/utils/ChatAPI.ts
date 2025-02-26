@@ -4,21 +4,19 @@
 import OpenAI, { ClientOptions } from "openai"
 import { ChatCompletionAssistantMessageParam, ChatCompletionMessageParam } from "openai/resources/index.mjs"
 import { LinkQChatMessageType } from "redux/chatHistorySlice"
-import { setStage, StageType } from "redux/stageSlice"
-import { store } from "redux/store"
+import { StageType } from "redux/stageSlice"
 
 //this typing is used to omit the "messages" field from OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 type OpenAICreateOptionsType = Omit<OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming, 'messages'>
 
 export type ChatAPIConstructorArgsType = ClientOptions & {
-  addMessagesCallback?:(messages: LinkQChatMessageType[]) => any,
   chatCompletionCreateOptions?: OpenAICreateOptionsType,
   chatId: number,
   systemMessage?: string,
 }
 
-type IntermediateChatMessageType = ChatCompletionMessageParam & {
+export type IntermediateChatMessageType = ChatCompletionMessageParam & {
   stage?: StageType,
 }
 
@@ -31,14 +29,12 @@ type IntermediateChatMessageType = ChatCompletionMessageParam & {
  * but it doesn't let you send additional system messages, which is annoying
  */
 export class ChatAPI {
-  addMessagesCallback?: (messages: LinkQChatMessageType[]) => any //an optional callback function used to reactively update state
   chatCompletionCreateOptions: OpenAICreateOptionsType
   chatId: number
-  messages: LinkQChatMessageType[] = [] //message history
+  messages: ChatCompletionMessageParam[] = [] //message history
   openAI: OpenAI //the openai instance
 
   constructor({
-    addMessagesCallback,
     chatCompletionCreateOptions={ model: 'gpt-4-turbo-preview' }, 
     chatId,
     systemMessage,
@@ -48,14 +44,11 @@ export class ChatAPI {
     this.chatCompletionCreateOptions = chatCompletionCreateOptions
     this.chatId = chatId
     
-    this.addMessagesCallback = addMessagesCallback //save the callback function
-
     if(systemMessage) {
-      this.messages.push(this.transformMessage({ //add the system message to the message history
+      this.messages.push({ //add the system message to the message history
         content: systemMessage,
         role: "system",
-      }))
-      this.addMessagesCallback?.(this.messages)
+      })
     }
   }
 
@@ -64,7 +57,12 @@ export class ChatAPI {
     this.messages = []
   }
 
-  private transformMessage(message: IntermediateChatMessageType):LinkQChatMessageType {
+  /**
+   * This function is used to add LinkQ-related context to the message
+   * @param message 
+   * @returns       LinkQChatMessageType
+   */
+  public transformMessage(message: IntermediateChatMessageType):LinkQChatMessageType {
     return ({
       ...message,
       chatId: this.chatId,
@@ -78,13 +76,11 @@ export class ChatAPI {
    * @param messages  the array of messages to send to the LLM
    * @returns         the LLM's response content as a string
    */
-  public async sendMessages(addMessages: IntermediateChatMessageType[]):Promise<SendMessagesReturnType> {
+  public async sendMessages(messages: ChatCompletionMessageParam[]):Promise<SendMessagesReturnType> {
     //OpenAI's LLMs don't actually manage any state.
     //Instead, you need to send it the entire message history
     //if you want to maintain continuity in your conversation.
-    const messages = addMessages.map((m) => this.transformMessage(m))
     this.messages.push(...messages) //push the new messages
-    this.addMessagesCallback?.(messages)
 
     let chatCompletion: OpenAI.Chat.Completions.ChatCompletion
     try {
@@ -126,23 +122,4 @@ export type SendMessagesReturnType = ChatCompletionAssistantMessageParam & {
   chatId: number;
   name: string;
   stage?: StageType;
-}
-
-
-/**
- * We can't properly set the stage of an LLM response message directly in the ChatAPI
- * because we need to determine what the stage is first.
- * This function lets you do that outside the ChatAPI and run the callback
- * @param chatAPI 
- * @param llmResponse 
- * @param stage 
- */
-export const setLLMResponseStage = (chatAPI:ChatAPI, llmResponse: LinkQChatMessageType, stage:StageType) => {
-  chatAPI.addMessagesCallback?.([
-    {
-      ...llmResponse,
-      stage,
-    }
-  ])
-  store.dispatch(setStage(stage))
 }

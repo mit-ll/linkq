@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: MIT
 import { SparqlResultsJsonType } from "types/sparql";
 
-import { ChatAPI, setLLMResponseStage } from "./ChatAPI";
+import { ChatAPI } from "./ChatAPI";
 import { getEntityDataFromQuery } from "./knowledgeBase/getEntityData";
-import { store } from "redux/store";
-import { setStage } from "redux/stageSlice";
+import { reduxSendMessages, reduxHandleLLMResponse, reduxSetStage } from "redux/reduxUtils";
 
 export type SummarizeOutcomeType = {
   data: SparqlResultsJsonType,
@@ -23,17 +22,17 @@ export type SummarizeOutcomeType = {
  */
 export async function summarizeQueryResults(chatAPI: ChatAPI, query:string, outcome:SummarizeOutcomeType):Promise<{name:string,summary:string}> {
   setTimeout(() => {
-    store.dispatch(setStage({
+    reduxSetStage({
       mainStage: "Results Summarization",
       subStage: "LLM names query",
-    }))
+    })
   }, 2000)
 
   const entityData = await getEntityDataFromQuery(query)
 
   //first ask the LLM to come up with a name for the query
   //this is useful for the query history feature
-  let llmResponse = await chatAPI.sendMessages([
+  let llmResponse = await reduxSendMessages(chatAPI,[
     {
       content: `Here is a KG query:
 ${query}
@@ -49,20 +48,20 @@ Respond with a brief name for this query.`,
       },
     }
   ])
-  setLLMResponseStage(chatAPI, llmResponse, {
+  reduxHandleLLMResponse(llmResponse, {
     mainStage: "Results Summarization",
     subStage: "LLM names query",
   })
   const name = llmResponse.content
 
-  store.dispatch(setStage({
+  reduxSetStage({
     mainStage: "Results Summarization",
     subStage: "LLM summarizes results",
-  }))
+  })
 
   //if there was data, then the query executed successfully
   if("data" in outcome) {
-    llmResponse = await chatAPI.sendMessages([
+    llmResponse = await reduxSendMessages(chatAPI,[
       {
         content: `These are the JSON results from the last query:
 ${JSON.stringify(outcome.data, undefined, 2)}
@@ -79,7 +78,7 @@ Respond with a brief summary of the results.`,
   //else if there was an error
   else {
     //ask the LLM to summarize the results
-    llmResponse = await chatAPI.sendMessages([
+    llmResponse = await reduxSendMessages(chatAPI,[
       {
         content: `The query did not execute successfully and had this error:.
 ${outcome.error}
@@ -94,15 +93,15 @@ Respond with a brief guess as to why the query failed.`,
     ])
   }
 
-  setLLMResponseStage(chatAPI, llmResponse, {
+  reduxHandleLLMResponse(llmResponse, {
     mainStage: "Results Summarization",
     subStage: "LLM summarizes results",
   })
   setTimeout(() => {
-    store.dispatch(setStage({
+    reduxSetStage({
       mainStage: "Question Refinement",
       subStage: "User asks question",
-    }))
+    })
   }, 2000)
   const summary = llmResponse.content
   return {name, summary}
