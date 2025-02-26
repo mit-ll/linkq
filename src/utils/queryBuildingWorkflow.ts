@@ -79,10 +79,12 @@ export async function queryBuildingWorkflow(
         subStage: "LLM searches for properties",
         description: `Property Search: ${entityId}`,
       })
-      llmResponse = await handleGetPropertiesForEntity( //run the property search function
+      //run the property search function
+      llmResponse = await handleGetPropertiesForEntity({
         chatAPI,
         entityId,
-      )
+        question,
+      })
     }
     //else if the LLM wants to traverse the graph to find all tail entities
     //that are connected to this head entity via a relation
@@ -93,10 +95,11 @@ export async function queryBuildingWorkflow(
         subStage: "LLM searches for tail entities",
         description: `Tail Searching: ${pair}`
       })
-      llmResponse = await handleFindTailEntities(
+      llmResponse = await handleFindTailEntities({
         chatAPI,
         pair,
-      )
+        question,
+      })
     }
     //else the LLM didn't give us an expected response
     else {
@@ -159,6 +162,8 @@ async function handleFuzzySearchForEntity({
     ])
   }
 
+  //TODO this could be farmed out to a separate LLM
+  //TODO only do this if there are multiple entities
   const filteredResponse = await chatAPI.sendMessages([
     {
       content: responseText + `\n\nWhich entity (or entities) is most relevant to the question '${question}'?`,
@@ -166,12 +171,7 @@ async function handleFuzzySearchForEntity({
       stage,
     }
   ])
-  chatAPI.addMessagesCallback?.([
-    {
-      ...filteredResponse,
-      stage,
-    }
-  ])
+  setLLMResponseStage(chatAPI, filteredResponse, stage)
  
   return await chatAPI.sendMessages([
     {
@@ -182,7 +182,11 @@ async function handleFuzzySearchForEntity({
   ])
 }
 
-async function handleGetPropertiesForEntity(chatAPI:ChatAPI, entityId: string) {
+async function handleGetPropertiesForEntity({
+  chatAPI, entityId, question,
+}:{
+  chatAPI:ChatAPI, entityId: string, question: string,
+}) {
   const responseText = await getPropertiesForEntityResponse(entityId)
 
   const stage: StageType = {
@@ -200,25 +204,40 @@ async function handleGetPropertiesForEntity(chatAPI:ChatAPI, entityId: string) {
     ])
   }
 
+  //TODO this could be farmed out to a separate LLM
+  //TODO only do this if there are multiple properties
+  const filteredResponse = await chatAPI.sendMessages([
+    {
+      content: responseText + `\n\nWhich property (or properties) is most relevant to the question '${question}'?`,
+      role: "system",
+      stage,
+    }
+  ])
+  setLLMResponseStage(chatAPI, filteredResponse, stage)
+
   return await chatAPI.sendMessages([
     {
-      content: responseText,
+      content: INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE,
       role: "system",
       stage,
     }
   ])
 }
 
-async function handleFindTailEntities(chatAPI:ChatAPI, text: string) {
-  let split = text.split(" ")
+async function handleFindTailEntities({
+  chatAPI, pair, question,
+}:{
+  chatAPI:ChatAPI, pair: string, question: string,
+}) {
+  let split = pair.split(" ")
   if(split.length !== 2) {
-    split = text.split(", ")
+    split = pair.split(", ")
   }
 
   const stage: StageType = {
     mainStage: "KG Exploration",
     subStage: "LLM searches for tail entities",
-    description: `Tail Search: ${text}`,
+    description: `Tail Search: ${pair}`,
   }
 
   if(split.length !== 2) {
@@ -244,9 +263,21 @@ async function handleFindTailEntities(chatAPI:ChatAPI, text: string) {
     ])
   }
 
+  //TODO this could be farmed out to a separate LLM
+  //TODO only do this if there are multiple tail entities
+  const filteredResponse = await chatAPI.sendMessages([
+    {
+      content: responseText + `\n\nWhich property (or properties) is most relevant to the question '${question}'?`,
+      role: "system",
+      stage,
+    }
+  ])
+  setLLMResponseStage(chatAPI, filteredResponse, stage)
+
+
   return await chatAPI.sendMessages([
     {
-      content: responseText,
+      content: INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE,
       role: "system",
       stage,
     }
