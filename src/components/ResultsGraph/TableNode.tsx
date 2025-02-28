@@ -1,3 +1,4 @@
+import {useEffect} from "react";
 import {
     DataGrid,
     GridColDef,
@@ -5,7 +6,8 @@ import {
     GridToolbarContainer,
     GridToolbarDensitySelector,
     GridToolbarFilterButton,
-    GridToolbarQuickFilter
+    GridToolbarQuickFilter,
+    useGridApiRef
 } from "@mui/x-data-grid";
 import {NodeData} from "@antv/g6";
 import {Box, Typography} from "@mui/material";
@@ -57,6 +59,9 @@ const CustomToolbar = ({title}: DGTitle) => {
 
 
 export const NodeTable = ({node, selectedRow, handleRowSelection}: NodeTableProps) => {
+    const apiRef = useGridApiRef();
+
+
     let rows:(
         CustomRowType & {
             id: string,
@@ -99,8 +104,16 @@ export const NodeTable = ({node, selectedRow, handleRowSelection}: NodeTableProp
         },)
     }
 
+    useEffect(() => {
+        if (selectedRow !== undefined && selectedRow !== null) {
+            apiRef.current.scrollToIndexes({rowIndex: selectedRow, colIndex: 0});
+        }
+    }, [apiRef, selectedRow]);
+
+
     return (
         <DataGrid
+            apiRef={apiRef}
             rows={rows}
             columns={columns}
             onRowClick={handleRowSelection}
@@ -110,11 +123,6 @@ export const NodeTable = ({node, selectedRow, handleRowSelection}: NodeTableProp
             rowSelectionModel={[]}
             sx={dataGridStyle}
             slots={{toolbar: () => <CustomToolbar title={node.id}/>}}
-            slotProps={{
-                toolbar: {
-                    showQuickFilter: true,
-                },
-            }}
             style={{background: "white"}}
         />
     );

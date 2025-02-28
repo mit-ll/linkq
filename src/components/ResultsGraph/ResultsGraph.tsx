@@ -69,7 +69,7 @@ const createData = ({queryGraphData, data, selectedRow, handleRowSelection}: Cre
 export const ResultsGraph = ({data}: { data: SparqlResultsJsonType }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const graphRef = useRef<G6Graph>();
-    const [isDragEnabled, setIsDragEnabled] = useState(true);
+
     const queryValue = useAppSelector(state => state.results.results?.queryValue)
 
     const queryGraphData = useParsedQueryData(queryValue || "");
@@ -82,7 +82,8 @@ export const ResultsGraph = ({data}: { data: SparqlResultsJsonType }) => {
     });
 
     const handleRowSelection = useCallback((params: GridRowParams) => {
-        setSelectedRow(params.row.index as number)
+        const rowIdx = params.row.index as number;
+        setSelectedRow(rowIdx)
     }, []);
 
 
@@ -96,7 +97,14 @@ export const ResultsGraph = ({data}: { data: SparqlResultsJsonType }) => {
             behaviors: [{
                 type: 'drag-element',
                 key: 'drag-element',
-            }, 'zoom-canvas', 'drag-canvas'],
+            }, {
+                type: 'zoom-canvas',
+                key: 'zoom-canvas',
+                preventDefault: true,
+            }, {
+                type: 'drag-canvas',
+                key: 'drag-canvas',
+            }],
             plugins: [{
                 type: 'legend',
                 key: 'legend',
@@ -151,36 +159,24 @@ export const ResultsGraph = ({data}: { data: SparqlResultsJsonType }) => {
     }, []);
 
     useEffect(() => {
-        const graphData = createData({queryGraphData, data, selectedRow, handleRowSelection});
-
-        if (graphRef.current) {
-            const graph = graphRef.current;
-            graph.updateData(graphData);
-            graph.draw();
-        }
-    }, [data, queryGraphData, selectedRow]);
-
-    useEffect(() => {
         if (graphRef.current) {
             const graph = graphRef.current;
 
             const handleKeyDown = (e: KeyboardEvent) => {
-                if (e.key === 'Shift' && isDragEnabled) {
+                if (e.key === 'Shift') {
                     graph.updateBehavior({
                         key: 'drag-element',
                         enable: false,
                     });
-                    setIsDragEnabled(false);
                 }
             };
 
             const handleKeyUp = (e: KeyboardEvent) => {
-                if (e.key === 'Shift' && !isDragEnabled) {
+                if (e.key === 'Shift') {
                     graph.updateBehavior({
                         key: 'drag-element',
                         enable: true,
                     });
-                    setIsDragEnabled(true);
                 }
             };
 
@@ -192,7 +188,17 @@ export const ResultsGraph = ({data}: { data: SparqlResultsJsonType }) => {
                 window.removeEventListener('keyup', handleKeyUp);
             };
         }
-    }, [isDragEnabled]);
+    }, []);
+
+    useEffect(() => {
+        const graphData = createData({queryGraphData, data, selectedRow, handleRowSelection});
+
+        if (graphRef.current) {
+            const graph = graphRef.current;
+            graph.updateData(graphData);
+            graph.draw();
+        }
+    }, [data, queryGraphData, selectedRow]);
 
     return (<div style={{width: '100%', height: '100%', background: 'white'}} ref={containerRef}/>);
 };
