@@ -145,6 +145,10 @@ export async function queryBuildingWorkflow(
 }
 
 
+
+const HAVE_LLM_FILTER_API_RESPONSES:boolean = false
+
+
 async function handleFuzzySearchForEntity({
   chatAPI, fuzzySearchString, question,
 }:{
@@ -168,20 +172,29 @@ async function handleFuzzySearchForEntity({
     ])
   }
 
-  //TODO this could be farmed out to a separate LLM
-  //TODO only do this if there are multiple entities
-  const filteredResponse = await reduxSendMessages(chatAPI,[
-    {
-      content: responseText + `\n\nWhich entity (or entities) is most relevant to the question '${question}'?`,
-      role: "system",
-      stage,
-    }
-  ])
-  reduxHandleLLMResponse(filteredResponse, stage)
+  if(HAVE_LLM_FILTER_API_RESPONSES) {
+    //TODO this could be farmed out to a separate LLM
+    //TODO only do this if there are multiple entities
+    const filteredResponse = await reduxSendMessages(chatAPI,[
+      {
+        content: responseText + `\n\nWhich entity (or entities) is most relevant to the question '${question}'?`,
+        role: "system",
+        stage,
+      }
+    ])
+    reduxHandleLLMResponse(filteredResponse, stage)
+    return await reduxSendMessages(chatAPI,[
+      {
+        content: INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE,
+        role: "system",
+        stage,
+      }
+    ])
+  }
  
   return await reduxSendMessages(chatAPI,[
     {
-      content: INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE,
+      content: responseText,
       role: "system",
       stage,
     }
@@ -210,20 +223,29 @@ async function handleGetPropertiesForEntity({
     ])
   }
 
-  //TODO this could be farmed out to a separate LLM
-  //TODO only do this if there are multiple properties
-  const filteredResponse = await reduxSendMessages(chatAPI,[
-    {
-      content: responseText + `\n\nWhich property (or properties) is most relevant to the question '${question}'?`,
-      role: "system",
-      stage,
-    }
-  ])
-  reduxHandleLLMResponse(filteredResponse, stage)
+  if(HAVE_LLM_FILTER_API_RESPONSES) {
+    //TODO this could be farmed out to a separate LLM
+    //TODO only do this if there are multiple properties
+    const filteredResponse = await reduxSendMessages(chatAPI,[
+      {
+        content: responseText + `\n\nWhich property (or properties) is most relevant to the question '${question}'?`,
+        role: "system",
+        stage,
+      }
+    ])
+    reduxHandleLLMResponse(filteredResponse, stage)
+    return await reduxSendMessages(chatAPI,[
+      {
+        content: INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE,
+        role: "system",
+        stage,
+      }
+    ])
+  }
 
   return await reduxSendMessages(chatAPI,[
     {
-      content: INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE,
+      content: responseText,
       role: "system",
       stage,
     }
@@ -269,21 +291,30 @@ async function handleFindTailEntities({
     ])
   }
 
-  //TODO this could be farmed out to a separate LLM
-  //TODO only do this if there are multiple tail entities
-  const filteredResponse = await reduxSendMessages(chatAPI,[
-    {
-      content: responseText + `\n\nWhich property (or properties) is most relevant to the question '${question}'?`,
-      role: "system",
-      stage,
-    }
-  ])
-  reduxHandleLLMResponse(filteredResponse, stage)
+  if(HAVE_LLM_FILTER_API_RESPONSES) {
+    //TODO this could be farmed out to a separate LLM
+    //TODO only do this if there are multiple tail entities
+    const filteredResponse = await reduxSendMessages(chatAPI,[
+      {
+        content: responseText + `\n\nWhich property (or properties) is most relevant to the question '${question}'?`,
+        role: "system",
+        stage,
+      }
+    ])
+    reduxHandleLLMResponse(filteredResponse, stage)
+    return await reduxSendMessages(chatAPI,[
+      {
+        content: INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE,
+        role: "system",
+        stage,
+      }
+    ])
+  }
 
 
   return await reduxSendMessages(chatAPI,[
     {
-      content: INITIAL_QUERY_BUILDING_SYSTEM_MESSAGE,
+      content: responseText,
       role: "system",
       stage,
     }
