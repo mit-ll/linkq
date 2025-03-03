@@ -126,6 +126,12 @@ export async function queryBuildingWorkflow(
     mainStage: "Query Generation",
     subStage: "System gives SPARQL few-shot training",
   })
+  setTimeout(() => {
+    reduxSetStage({
+      mainStage: "Query Generation",
+      subStage: "LLM generates query",
+    })
+  }, 2000)
   return await reduxSendMessages(chatAPI,[
     {
       content: QUERY_BUILDING_SYSTEM_MESSAGE + ` Now construct a query that answers the user's question: ${question}`,

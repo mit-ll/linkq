@@ -50,16 +50,31 @@ export async function handleUserChat(userText: string, chatAPI: ChatAPI) {
   }
   //else converse with the assistant like normal
   else {
-    reduxHandleLLMResponse(llmResponse, {
-      mainStage: "Question Refinement",
-      subStage: "LLM clarifies question",
-    })
-    setTimeout(() => {
-      reduxSetStage({
-        mainStage: "Question Refinement",
-        subStage: "User asks question",
+    //if the LLM generated a query
+    if(llmResponse.content.includes("```sparql")) {
+      reduxHandleLLMResponse(llmResponse, {
+        mainStage: "Query Generation",
+        subStage: "LLM generates query",
       })
-    }, 2000)
+      setTimeout(() => {
+        reduxSetStage({
+          mainStage: "Query Generation",
+          subStage: "User decides whether to execute or modify",
+        })
+      }, 2000)
+    }
+    else { //else ASSUME the LLM clarified the question
+      reduxHandleLLMResponse(llmResponse, {
+        mainStage: "Question Refinement",
+        subStage: "LLM clarifies question",
+      })
+      setTimeout(() => {
+        reduxSetStage({
+          mainStage: "Question Refinement",
+          subStage: "User asks question",
+        })
+      }, 2000)
+    }
   }
 
   return llmResponse
