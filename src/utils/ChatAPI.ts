@@ -108,7 +108,7 @@ export class ChatAPI {
       ...openAiResponseMessage,
       chatId: this.chatId,
       content: openAiResponseMessage.content, //this makes typescript happy
-      name: this.chatCompletionCreateOptions.model,
+      name: this.chatCompletionCreateOptions.model.replace(".",""), //OpenAI doesn't like periods in their names
     }
     this.messages.push(responseMessage)
 
