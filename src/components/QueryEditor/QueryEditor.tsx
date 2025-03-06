@@ -17,6 +17,8 @@ import { useRunQuery } from 'hooks/useRunQuery';
 import styles from "./QueryEditor.module.scss"
 import { LLMWarning } from 'components/LLMWarning';
 
+export const QUERY_EDITOR_DOM_ID = "query-editor-container"
+
 export function QueryEditor() {
   const dispatch = useAppDispatch()
   const queryHistory = useAppSelector(state => state.queryHistory.queryHistory)
@@ -27,7 +29,7 @@ export function QueryEditor() {
   const [historyOpened, { open:openHistory, close:closeHistory }] = useDisclosure(false);
 
   return (
-    <div>
+    <div id={QUERY_EDITOR_DOM_ID}>
       {/* probably want to style this appropriately later */}
       <Title style={{color:"white", marginLeft: 13, marginBottom: 3, marginTop: 2, padding: 1}} order={4}>Query Editor</Title> 
       <div id={styles["query-editor-container"]}>

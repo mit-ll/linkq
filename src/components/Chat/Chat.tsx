@@ -10,6 +10,7 @@ import { IconCaretRight, IconZoomCode } from '@tabler/icons-react';
 
 import { ErrorMessage } from 'components/ErrorMessage';
 import { LLMWarning } from 'components/LLMWarning';
+import { QUERY_EDITOR_DOM_ID } from 'components/QueryEditor/QueryEditor';
 import { Settings } from 'components/Settings/Settings';
 
 import { useMainChatAPI } from 'hooks/useMainChatAPI';
@@ -164,10 +165,14 @@ function RenderSparqlQuery({
       />
       <div className={styles["copy-query-buttons"]}>
         <div>
-          <Button onClick={() => dispatch(setQueryValue(query))} variant="outline" color="white">Copy query over to examine <IconZoomCode/></Button>
+          <Button onClick={() => {
+            dispatch(setQueryValue(query))
+            document.getElementById(QUERY_EDITOR_DOM_ID)?.scrollIntoView({ behavior: 'smooth' })
+          }} variant="outline" color="white">Copy query over to examine <IconZoomCode/></Button>
           <br/>
           <Button onClick={() => {
             dispatch(setQueryValue(query))
+            document.getElementById(QUERY_EDITOR_DOM_ID)?.scrollIntoView({ behavior: 'smooth' })
             runQuery(query)
           }}>Copy query over and run <IconCaretRight/></Button>
         </div>

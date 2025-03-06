@@ -24,7 +24,9 @@ export const QueryGraph = () => {
     const {graphRef, recenter} = useGraphinRef()
 
     useEffect(() => {
-        recenter()
+        setTimeout(() => {
+            recenter()
+        },1000)
     }, [queryGraphData])
 
     if (queryGraphData?.nodes?.length === 0) return null
