@@ -155,7 +155,10 @@ async function handleFuzzySearchForEntity({
   chatAPI:ChatAPI, fuzzySearchString:string, question:string,
 }) {
   //try to resolve these entities by requesting data from the KG
-  const responseText = await fuzzySearchEntitiesResponse(fuzzySearchString)
+  const responseText = await fuzzySearchEntitiesResponse(fuzzySearchString).catch(err => {
+    console.error(`There was an error running the request ${err}`)
+    return `There was an error running the request ${err}`
+  })
 
   const stage: StageType = {
     mainStage: "KG Exploration",
@@ -206,7 +209,10 @@ async function handleGetPropertiesForEntity({
 }:{
   chatAPI:ChatAPI, entityId: string, question: string,
 }) {
-  const responseText = await getPropertiesForEntityResponse(entityId)
+  const responseText = await getPropertiesForEntityResponse(entityId).catch(err => {
+    console.error(`There was an error running the request ${err}`)
+    return `There was an error running the request ${err}`
+  })
 
   const stage: StageType = {
     mainStage: "KG Exploration",
@@ -279,7 +285,10 @@ async function handleFindTailEntities({
   }
 
   const [entityId, propertyId] = split
-  const responseText = await findTailEntitiesResponse(entityId, propertyId)
+  const responseText = await findTailEntitiesResponse(entityId, propertyId).catch(err => {
+    console.error(`There was an error running the request ${err}`)
+    return `There was an error running the request ${err}`
+  })
 
   if(!responseText) {
     return await reduxSendMessages(chatAPI,[
