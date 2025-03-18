@@ -7,96 +7,95 @@ import { useAppSelector } from "redux/store"
 import styles from "./LinkQStages.module.scss"
 import { IconCaretDown, IconCaretUp } from "@tabler/icons-react"
 
-const BLUE = "#1c7ed6"
-const PURPLE = "#862e9c"
-const YELLOW = "#f59f00"
+const DARK_BLUE = "#2171b5"
+const LIGHT_BLUE = "#6baed6"
 
 const STEPS = [
   {
     name: "Question Refinement",
-    color: PURPLE,
+    color: LIGHT_BLUE,
     children: [
       {
         name: "User asks question",
-        color: PURPLE,
+        color: DARK_BLUE,
       },
       {
         name: "LLM decides whether to clarify question",
-        color: YELLOW,
+        color: DARK_BLUE,
       },
       {
         name: "LLM clarifies question",
-        color: YELLOW,
+        color: DARK_BLUE,
       },
       // {
       //   name: "LLM begins KG exploration",
-      //   color: YELLOW,
+      //   color: DARK_BLUE,
       // },
     ]
   },
   {
     name: "KG Exploration",
-    color: YELLOW,
+    color: LIGHT_BLUE,
     children: [
       {
-        name: "System enumerates KG APIs",
-        color: BLUE,
+        name: "System enumerates KG APIs to LLM",
+        color: DARK_BLUE,
       },
       {
         name: "LLM fuzzy searches for entity",
-        color: YELLOW,
+        color: DARK_BLUE,
       },
       {
         name: "LLM searches for properties",
-        color: YELLOW,
+        color: DARK_BLUE,
       },
       {
         name: "LLM searches for tail entities",
-        color: YELLOW,
+        color: DARK_BLUE,
       },
       // {
       //   name: "LLM is misbehaving",
-      //   color: YELLOW,
+      //   color: DARK_BLUE,
       // },
       // {
       //   name: "LLM is done exploring",
-      //   color: YELLOW,
+      //   color: DARK_BLUE,
       // },
     ]
   },
   {
     name: "Query Generation",
-    color: YELLOW,
+    color: LIGHT_BLUE,
     children: [
       {
-        name: "System gives SPARQL few-shot training",
-        color: BLUE,
+        name: "System gives SPARQL few-shot training to LLM",
+        color: DARK_BLUE,
       },
       {
         name: "LLM generates query",
-        color: YELLOW,
+        color: DARK_BLUE,
       },
       {
         name: "User decides whether to execute or modify",
-        color: PURPLE,
+        color: DARK_BLUE,
       },
     ]
   },
   {
     name: "Results Summarization",
-    color: YELLOW,
+    color: LIGHT_BLUE,
     children: [
       {
         name: "User executes query",
-        color: PURPLE,
+        color: DARK_BLUE,
       },
       {
         name: "LLM names query",
-        color: YELLOW,
+        color: DARK_BLUE,
       },
       {
         name: "LLM summarizes results",
-        color: YELLOW,
+        color: DARK_BLUE,
       },
     ]
   },
@@ -118,46 +117,35 @@ export function LinkQStages() {
   return (
     <div>
       <div id={styles["state-diagram-container"]}>
+        <ActionIcon id={styles["show-details-toggle"]} size="sm" color="gray" variant="filled" aria-label="Show Details" onClick={() => setShowDetails(!showDetails)}>
+          {showDetails ? <IconCaretDown/> : <IconCaretUp/>}
+        </ActionIcon>
         <Title order={4}>LinkQ State Diagram</Title>
         <div className={styles["state-diagram-grid"]}>
-          {/* <div id={styles["line"]}/> */}
-          {STEPS.map(({name,color},i) => {
+          {STEPS.map(({name:mainStageName,color,children},i) => {
+            const mainStageIsActive = stage?.mainStage===mainStageName
+
             return (
               <div key={i}>
-                <Card className={`${stage?.mainStage!==name && styles["inactive"]}`} shadow="lg" padding="xs" radius="md" style={{backgroundColor: color}}>
-                  <span>{name}</span>
+                <Card className={`${!mainStageIsActive && styles["inactive"]}`} shadow="lg" padding="xs" radius="md" style={{backgroundColor: color}}>
+                  <span className={styles["main-stage"]}>{mainStageName}</span>
+
+                  {showDetails && (
+                    <div key={i}>
+                      {children?.map(({name:subStageName, color},j) => {
+                        return (
+                          <Card key={j} className={`${(!mainStageIsActive || stage?.subStage!==subStageName) && styles["inactive"]}`} shadow="lg" padding="xs" radius="md" style={{backgroundColor: color}}>
+                            <span>{subStageName}</span>
+                          </Card>
+                        )
+                      })}
+                    </div>
+                  )}
                 </Card>
               </div>
             )
           })}
-
-          <ActionIcon id={styles["show-details-toggle"]} size="sm" color="gray" variant="filled" aria-label="Show Details" onClick={() => setShowDetails(!showDetails)}>
-            {showDetails ? <IconCaretDown/> : <IconCaretUp/>}
-          </ActionIcon>
         </div>
-        
-        {showDetails && (
-          <>
-            <div className={styles["state-diagram-grid"]}>
-              {STEPS.map((_,i) => <div key={i}><hr/></div>)}
-            </div>
-            <div className={styles["state-diagram-grid"]}>
-              {STEPS.map(({name:mainStatusName,children},i) => {
-                return (
-                  <div key={i}>
-                    {children?.map(({name, color},j) => {
-                      return (
-                        <Card key={j} className={`${(stage?.mainStage!==mainStatusName || stage?.subStage!==name) && styles["inactive"]}`} shadow="lg" padding="xs" radius="md" style={{backgroundColor: color}}>
-                          <span>{name}</span>
-                        </Card>
-                      )
-                    })}
-                  </div>
-                )
-              })}
-            </div>
-          </>
-        )}
       </div>
     </div>
   )

@@ -11,6 +11,12 @@ export function tryParsingOutQuery(text: string) {
     const [query, post] = split[1].split("```")
     return {pre: split[0], query, post}
   }
+
+  split = text.split("```\nsparql")
+  if(split.length === 2) {
+    const [queryWithoutSelect, post] = split[1].split("```")
+    return {pre: split[0], query: "SELECT" + queryWithoutSelect, post}
+  }
   
   split = text.split("```\nSELECT")
   if(split.length === 2) {

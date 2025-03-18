@@ -9,19 +9,15 @@
   }
 
   .state-diagram-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(100px, 1fr)); /* Adjust min size */
-    gap: 10px;
     font-weight: bold;
     position: relative;
 
-    
-    #line {
-      position: absolute;
-      top: 50%;
-      left: 2em;
-      right: 2em;
-      border-bottom: 2px solid #ccc;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    > div {
+      width: 25%;
     }
 
     :global(.mantine-Card-root) {
@@ -37,11 +33,16 @@
       transform: scale(0.8,0.8);
       border: none;
     }
+
+    .main-stage {
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
   }
 
   #show-details-toggle {
     position: absolute;
-    right: 0;
-    bottom: 0;
+    right: 0.5rem;
+    top: 0.5rem;
   }
 }
