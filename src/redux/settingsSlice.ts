@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-const initialState: {
+export const REDUX_SETTINGS_INITIAL_STATE: {
   apiKey: string,
   baseURL: string,
   model: string,
@@ -16,7 +16,7 @@ const initialState: {
 
 const settingsSlice = createSlice({
   name: 'settingsSlice',
-  initialState,
+  initialState: REDUX_SETTINGS_INITIAL_STATE,
   reducers: {
     setApiKey: (state, action: PayloadAction<string>) => {
       state.apiKey = action.payload

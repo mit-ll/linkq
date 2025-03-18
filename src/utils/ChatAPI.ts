@@ -4,6 +4,7 @@
 import OpenAI, { ClientOptions } from "openai"
 import { ChatCompletionAssistantMessageParam, ChatCompletionMessageParam } from "openai/resources/index.mjs"
 import { LinkQChatMessageType } from "redux/chatHistorySlice"
+import { REDUX_SETTINGS_INITIAL_STATE } from "redux/settingsSlice"
 import { StageType } from "redux/stageSlice"
 
 //this typing is used to omit the "messages" field from OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming
@@ -35,7 +36,7 @@ export class ChatAPI {
   openAI: OpenAI //the openai instance
 
   constructor({
-    chatCompletionCreateOptions={ model: 'gpt-4-turbo-preview' }, 
+    chatCompletionCreateOptions={ model: REDUX_SETTINGS_INITIAL_STATE.model }, 
     chatId,
     systemMessage,
     ...options //the rest of ClientOptions

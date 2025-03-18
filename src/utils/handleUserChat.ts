@@ -32,7 +32,7 @@ export async function handleUserChat(userText: string, chatAPI: ChatAPI) {
 
     reduxHandleLLMResponse(llmResponse, {
       mainStage: "KG Exploration",
-      subStage: "System enumerates KG APIs", //this is slightly inaccurate, but how we've decided to display the stages
+      subStage: "System enumerates KG APIs to LLM", //this is slightly inaccurate, but how we've decided to display the stages
     })
     
     const question = llmResponse.content.split("BUILD QUERY:").at(1)

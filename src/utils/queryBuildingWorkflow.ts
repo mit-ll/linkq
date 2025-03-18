@@ -26,7 +26,7 @@ export async function queryBuildingWorkflow(
   setTimeout(() => {
     reduxSetStage({
       mainStage: "KG Exploration",
-      subStage: "System enumerates KG APIs",
+      subStage: "System enumerates KG APIs to LLM",
     })
   })
   let llmResponse = await reduxSendMessages(chatAPI,[
@@ -35,7 +35,7 @@ export async function queryBuildingWorkflow(
       role: "system",
       stage: {
         mainStage: "KG Exploration",
-        subStage: "System enumerates KG APIs",
+        subStage: "System enumerates KG APIs to LLM",
       },
     },
   ])
@@ -52,7 +52,7 @@ export async function queryBuildingWorkflow(
     if(responseText.toUpperCase() === "STOP") { //if the LLM responded with stop
       reduxHandleLLMResponse(llmResponse, {
         mainStage: "Query Generation",
-        subStage: "System gives SPARQL few-shot training", //this is slightly inaccurate, but how we've decided to display the stages
+        subStage: "System gives SPARQL few-shot training to LLM", //this is slightly inaccurate, but how we've decided to display the stages
       })
       break //break out of the while loop
     }
@@ -105,7 +105,7 @@ export async function queryBuildingWorkflow(
     else {
       reduxHandleLLMResponse(llmResponse, {
         mainStage: "KG Exploration",
-        subStage: "System enumerates KG APIs", //this is slightly inaccurate, but how we've decided to display the stages
+        subStage: "System enumerates KG APIs to LLM", //this is slightly inaccurate, but how we've decided to display the stages
       })
       llmResponse = await reduxSendMessages(chatAPI,[
         {
@@ -113,7 +113,7 @@ export async function queryBuildingWorkflow(
           role: "system",
           stage: {
             mainStage: "KG Exploration",
-            subStage: "System enumerates KG APIs",
+            subStage: "System enumerates KG APIs to LLM",
           },
         }
       ])
@@ -124,7 +124,7 @@ export async function queryBuildingWorkflow(
   //ask the LLM to generate a query
   reduxSetStage({
     mainStage: "Query Generation",
-    subStage: "System gives SPARQL few-shot training",
+    subStage: "System gives SPARQL few-shot training to LLM",
   })
   setTimeout(() => {
     reduxSetStage({
@@ -138,7 +138,7 @@ export async function queryBuildingWorkflow(
       role: "system",
       stage: {
         mainStage: "Query Generation",
-        subStage: "System gives SPARQL few-shot training",
+        subStage: "System gives SPARQL few-shot training to LLM",
       },
     }
   ])

@@ -302,7 +302,7 @@ export const DEMO_SIMPLE_HISTORY:LinkQChatMessageType[] = [
     "role": "assistant",
     "stage": {
       mainStage: "KG Exploration",
-      subStage: "System enumerates KG APIs"
+      subStage: "System enumerates KG APIs to LLM"
     }
   }
 ]
@@ -353,7 +353,7 @@ export const DEMO_FULL_HISTORY:LinkQChatMessageType[] = [
     "content": "BUILD QUERY",
     "stage": {
       mainStage: "KG Exploration",
-      subStage: "System enumerates KG APIs",
+      subStage: "System enumerates KG APIs to LLM",
     }
   },
   {
@@ -363,7 +363,7 @@ export const DEMO_FULL_HISTORY:LinkQChatMessageType[] = [
     "role": "system",
     "stage": {
       mainStage: "KG Exploration",
-      subStage: "System enumerates KG APIs"
+      subStage: "System enumerates KG APIs to LLM"
     }
   },
   {
@@ -505,7 +505,7 @@ export const DEMO_FULL_HISTORY:LinkQChatMessageType[] = [
     "content": "STOP",
     "stage": {
       mainStage: "KG Exploration",
-      subStage: "System gives SPARQL few-shot training"
+      subStage: "System gives SPARQL few-shot training to LLM"
     }
   },
   {
@@ -515,7 +515,7 @@ export const DEMO_FULL_HISTORY:LinkQChatMessageType[] = [
     "role": "system",
     "stage": {
       mainStage: "Query Generation",
-      subStage: "System gives SPARQL few-shot training"
+      subStage: "System gives SPARQL few-shot training to LLM"
     }
   },
   {
