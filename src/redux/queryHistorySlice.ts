@@ -9,11 +9,11 @@ import { SparqlResultsJsonType } from 'types/sparql'
 
 type QueryRecordType = {
   name: string | null,
-  query: string,
   results: {
     data: SparqlResultsJsonType | null,
     error: string | null,
     summary: string | null,
+    queryValue: string,
   },
 }
 
@@ -25,9 +25,9 @@ const initialState: {
 }
 
 type PushQueryHistoryPayloadType = {
-  data:SparqlResultsJsonType, query: string //the query executed with data
+  data:SparqlResultsJsonType, queryValue: string //the query executed with data
 } | {
-  error: string, query: string //there was an error executing the query
+  error: string, queryValue: string //there was an error executing the query
 }
 
 type UpdateLastQueryHistoryPayloadType = {
@@ -43,22 +43,22 @@ const queryHistorySlice = createSlice({
       if("data" in action.payload) { //if there is data
         state.queryHistory.push({
           name: null,
-          query: action.payload.query,
           results: {
             data: action.payload?.data || null,
             error: null,
             summary: null,
+            queryValue: action.payload.queryValue,
           },
         })
       }
       else if("error" in action.payload) { //else if there is an error running the query
         state.queryHistory.push({
           name: null,
-          query: action.payload.query,
           results: {
             data: null,
             error: action.payload.error,
             summary: null,
+            queryValue: action.payload.queryValue,
           },
         })
       }

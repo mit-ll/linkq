@@ -1,60 +1,84 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import {useMemo, useRef} from "react";
 
-import Graphin, {Components, LegendChildrenProps} from "@antv/graphin";
-import '@antv/graphin/dist/index.css';
-import { ActionIcon, Title } from '@mantine/core';
+import {useAppSelector} from "redux/store";
 
-import { useAppSelector } from "redux/store.ts";
+import {Graphin} from "@antv/graphin";
 
-import { parseSparqlQuery } from "utils/parseSparqlQuery.ts";
-import { transformTripleQueryToGraphin } from "utils/transformTripleDataToGraphin.ts";
-import { useQueryGetIDTableEntitiesFromQuery } from "utils/knowledgeBase/getEntityData.ts";
-import { IconFocus } from "@tabler/icons-react";
+import {Title} from '@mantine/core';
+
+import {useGraphinRef} from "hooks/useGraphinRef";
+import {useParsedQueryData} from "hooks/useParsedQueryData";
 
 import styles from "./QueryGraph.module.scss"
+import {useEffect} from "react";
+import {Fullscreen} from "@antv/g6";
 
-const { Legend } = Components;
 
 export const QueryGraph = () => {
     const queryValue = useAppSelector(state => state.queryValue.queryValue)
 
-    const {data: idTableEntities} = useQueryGetIDTableEntitiesFromQuery(queryValue);
+    const queryGraphData = useParsedQueryData(queryValue)
 
-    const queryGraphData = useMemo(() => {
-        const semanticTriples = parseSparqlQuery(queryValue);
+    const {graphRef, recenter} = useGraphinRef()
 
-        return transformTripleQueryToGraphin(semanticTriples, idTableEntities||undefined);
-    }, [queryValue, idTableEntities]);
+    useEffect(() => {
+        setTimeout(() => {
+            recenter()
+        },1000)
+    }, [queryGraphData])
 
-    const graphRef = useRef<Graphin>(null)
-    const center = () => {
-        if(graphRef.current) {
-            const graph = graphRef.current.graph;
-            graph.fitView(); // Re-centers and fits graph to view
-        }
-    }
-
-
-    if(queryGraphData.nodes.length===0) return null
+    if (queryGraphData?.nodes?.length === 0) return null
 
     return (
         <div>
-            <Title style={{color:"white", marginLeft: 13, marginBottom: 7, marginTop: 7, padding: 1}} order={4}>Query Structure Graph</Title>
+            <Title style={{color: "white", marginLeft: 13, marginBottom: 7, marginTop: 7, padding: 1}} order={4}>Query
+                Structure Graph</Title>
             <div id={styles["graph-container"]}>
-                <Graphin data={queryGraphData} ref={graphRef} layout={{type: 'dagre', rankdir: 'LR'}} style={{minHeight: "unset"}}>
-                    <Legend bindType="node" sortKey="data.type">
-                        {(renderProps: LegendChildrenProps) => {
-                            return <Legend.Node {...renderProps} />;
-                        }}
-                    </Legend>
+                <Graphin options={{
+                    autoResize: true,
+                    data: queryGraphData,
+                    layout: {type: 'dagre', rankdir: 'LR', nodesep: 150, ranksep: 150},
+                    behaviors: ['drag-element', 'drag-canvas', 'zoom-canvas'],
+                    plugins: [{
+                        type: 'legend',
+                        key: 'legend',
+                        nodeField: 'type',
+                        edgeField: 'type',
+                        itemLabelFontSize: 12,
+                        position: 'top-right,'
+                    }, {
+                        type: 'fullscreen',
+                        key: 'fullscreen',
+                    }, {
+                        type: 'toolbar',
+                        key: 'toolbar',
+                        position: 'top-left',
+                        onClick: (item: string) => {
+                            const fullscreenPlugin = graphRef?.current?.getPluginInstance<Fullscreen>('fullscreen');
+                            if (fullscreenPlugin) {
+                                if (item === 'request-fullscreen') {
+                                    fullscreenPlugin.request();
+                                }
+                                if (item === 'exit-fullscreen') {
+                                    fullscreenPlugin.exit();
+                                }
+                            }
+                            if (item === 'auto-fit') {
+                                recenter();
+                            }
+                        },
+                        getItems: () => {
+                            return [
+                                {id: 'request-fullscreen', value: 'request-fullscreen'},
+                                {id: 'exit-fullscreen', value: 'exit-fullscreen'},
+                                {id: 'auto-fit', value: 'auto-fit'},
+                            ];
+                        },
+                    }]
+                }} ref={graphRef} style={{minHeight: "unset", background: "white"}}>
                 </Graphin>
-
-                <ActionIcon className={styles["recenter-button"]} size="sm" variant="filled" aria-label="Center" onClick={() => center()}>
-                    <IconFocus/>
-                </ActionIcon>
             </div>
         </div>
     )

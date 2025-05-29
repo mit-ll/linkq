@@ -4,18 +4,20 @@ import { useDispatch, useSelector } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 
 import { chatHistorySliceReducer } from './chatHistorySlice'
+import { queryHistoryReducer } from './queryHistorySlice'
 import { queryValueReducer } from './queryValueSlice'
 import { resultsReducer } from './resultsSlice'
-import { queryHistoryReducer } from './queryHistorySlice'
 import { settingsReducer } from './settingsSlice'
+import { stageSliceReducer } from './stageSlice'
 
 export const store = configureStore({
   reducer: {
     chatHistory: chatHistorySliceReducer,
     queryHistory: queryHistoryReducer,
     queryValue: queryValueReducer,
-    settings: settingsReducer,
     results: resultsReducer,
+    settings: settingsReducer,
+    stage: stageSliceReducer,
   }
 })
 

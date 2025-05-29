@@ -1,6 +1,6 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
-import {IUserEdge, IUserNode} from "@antv/graphin";
+import {EdgeData, NodeData} from "@antv/g6";
 
 import {SemanticTriple} from "types/semanticTypes.ts";
 
@@ -21,31 +21,29 @@ const createGraphinLabel = (id: string, termLabel?: string): string => {
     return termLabel ? `${id}\n${termLabel}` : id.split("/").at(-1)||"";
 }
 
-export const createNode = (id: string, itemType: SPARQLItemType, termLabel?: string): IUserNode => {
+export const createNode = (id: string, itemType: SPARQLItemType, termLabel?: string): NodeData => {
     const color = getColor(itemType);
 
     return (
         {
             id: id,
-            type: "graphin-circle",
+            type: "circle",
             data: {
                 type: itemType,
             },
             style: {
-                label: {value: createGraphinLabel(parseNameFromWikidataUrl(id), termLabel)},
-                keyshape: {
-                    fill: color,
-                    stroke: color,
-                    fillOpacity: 0.1,
-                    size: 30,
-                    lineWidth: 1
-                }
+                labelText: createGraphinLabel(parseNameFromWikidataUrl(id), termLabel),
+                fill: color,
+                stroke: color,
+                fillOpacity: 0.1,
+                size: 30,
+                lineWidth: 1
             }
         }
     )
 }
 
-export const createEdge = (triple: SemanticTriple, itemType: SPARQLItemType, termLabel?: string): IUserEdge => {
+export const createEdge = (triple: SemanticTriple, itemType: SPARQLItemType, termLabel?: string): EdgeData => {
     return (
         {
             // If you add an ID the graph will automatically filter out duplicates.
@@ -54,7 +52,7 @@ export const createEdge = (triple: SemanticTriple, itemType: SPARQLItemType, ter
             source: triple.subject.value,
             target: triple.object.value,
             style: {
-                label: {value: createGraphinLabel(parseNameFromWikidataUrl(triple.predicate.value), termLabel), fill: 'black'},
+                labelText: createGraphinLabel(parseNameFromWikidataUrl(triple.predicate.value), termLabel),
                 keyshape: {
                     stroke: getColor(itemType),
                     lineWidth: 2

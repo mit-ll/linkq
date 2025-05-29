@@ -67,7 +67,7 @@ export const useQueryGetIDTableEntitiesFromQuery = (query: string):UseQueryResul
   //this magical regex parses the entity and property IDs from the query
   const parsedIds = parseIdsFromQuery(query)
   return useQuery({
-    queryKey: [`entity-ids-${parsedIds?.join(", ")}`],
+    queryKey: [`entity-ids`,parsedIds], //queryKey can be an array of serializable variables
     queryFn: () => getEntityDataFromQuery(query)
   });
 }

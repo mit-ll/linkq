@@ -1,7 +1,7 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import {GraphinData, Utils} from "@antv/graphin";
+import {GraphData} from "@antv/g6";
 import {createEdge, createNode, parseNameFromWikidataUrl} from "./graphin.ts";
 
 import { IDTableEntitiesType } from "types/idTable.ts";
@@ -45,7 +45,7 @@ const extractUniqueEntitiesFromTriples = (triples: SemanticTriple[]): (SemanticT
  */
 const getTermLabel = (id: string, idTableEntities?: IDTableEntitiesType[]) => idTableEntities?.find(e => e.id===id)?.label
 
-export const transformTripleQueryToGraphin = (triples: SemanticTriple[], idTableEntities?: IDTableEntitiesType[]): GraphinData => {
+export const transformTripleQueryToGraphin = (triples: SemanticTriple[], idTableEntities?: IDTableEntitiesType[]): GraphData => {
     //create the nodes for the graph
     const uniqueEntities = extractUniqueEntitiesFromTriples(triples);
     const nodes = uniqueEntities.map(entity => (
@@ -57,13 +57,13 @@ export const transformTripleQueryToGraphin = (triples: SemanticTriple[], idTable
     ));
 
     //create the edges for the graph
-    const edges = Utils.processEdges(triples.map(triple => (
+    const edges = triples.map(triple => (
         createEdge(
             triple, 
             getSPARQLItemType(triple.predicate.termType), 
             getTermLabel(parseNameFromWikidataUrl(triple.predicate.value), idTableEntities)
         )
-    )), { poly: 50 });
+    ));
 
-    return {nodes, edges}
+    return {nodes: nodes, edges: edges}
 }

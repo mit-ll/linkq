@@ -13,8 +13,10 @@ import { SummarizeOutcomeType, summarizeQueryResults } from 'utils/summarizeQuer
 
 import { SparqlResultsJsonType } from "types/sparql.ts";
 
-import { useGetNewChatId } from "./useGetNewChatId.ts";
-import { useChatAPIInstance } from "./useChatAPIInstance.ts";
+// import { useGetNewChatId } from "./useGetNewChatId.ts";
+// import { useChatAPIInstance } from "./useChatAPIInstance.ts";
+import { setStage } from "redux/stageSlice.ts";
+import { useMainChatAPI } from "./useMainChatAPI.tsx";
 
 //this sets up a context so we can define one runQuery function for the whole app
 const RunQueryContext = createContext<{
@@ -35,10 +37,11 @@ export function RunQueryProvider({
 }) {
   const dispatch = useAppDispatch()
 
-  const chatAPI = useChatAPIInstance({
-    chatId: 1,
-  })
-  const getNewChatId = useGetNewChatId()
+  const { chatAPI } = useMainChatAPI()
+  // const chatAPI = useChatAPIInstance({
+  //   chatId: 1,
+  // })
+  // const getNewChatId = useGetNewChatId()
   const handleSummaryResults = ({name,summary}:{name:string,summary:string}) => {
     dispatch(updateLastQueryHistory({name, summary}))
     dispatch(setResultsSummary(summary))
@@ -57,7 +60,7 @@ export function RunQueryProvider({
     mutationFn: async ({query,outcome}) => {
       //try to ask the LLM to give the query a name and summarize the results
       try {
-        chatAPI.reset(getNewChatId())
+        // chatAPI.reset(getNewChatId())
         handleSummaryResults(
           await summarizeQueryResults(chatAPI, query, outcome)
         )
@@ -73,17 +76,21 @@ export function RunQueryProvider({
     mutationKey: ['runQuery'],
     mutationFn: async (query: string) => {
       dispatch(setResults(null)) //clear the current results
+      dispatch(setStage({
+        mainStage: "Results Summarization",
+        subStage: "User executes query",
+      }))
       return await runQueryFunction(query) //run the query
     },
     onSuccess: async (data, query) => { //the query executed properly
-      dispatch(pushQueryHistory({data, query})) //update the query history
-      dispatch(setResults({data, error: null, summary: null})) //set the results
+      dispatch(pushQueryHistory({data, queryValue:query})) //update the query history
+      dispatch(setResults({data, error: null, summary: null, queryValue:query})) //set the results
       summarizeResults({query, outcome:{data}}) //try to summarize the results
     },
     onError: async (error, query) => { //there was an error executing the query
       console.error(error)
-      dispatch(pushQueryHistory({error: error.message, query})) //update the query history
-      dispatch(setResults({data: null, error: error.message, summary: null})) //show the error
+      dispatch(pushQueryHistory({error: error.message, queryValue:query})) //update the query history
+      dispatch(setResults({data: null, error: error.message, summary: null, queryValue:query})) //show the error
       summarizeResults({query, outcome:{error}}) //try to explain the error
     },
   })

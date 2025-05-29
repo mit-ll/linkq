@@ -1,0 +1,48 @@
+#state-diagram-container {
+  background-color: #666;
+  padding: 0.5rem;
+
+  h4 {
+    margin-bottom: 0.5rem;
+    color: white;
+    margin-right: 2rem;
+  }
+
+  .state-diagram-grid {
+    font-weight: bold;
+    position: relative;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    > div {
+      width: 25%;
+    }
+
+    :global(.mantine-Card-root) {
+      transition: 0.25s;
+      border: 1px solid white;
+      color: white;
+      text-align: center;
+      width: 100%;
+    }
+
+    .inactive {
+      filter: brightness(0.8);
+      transform: scale(0.8,0.8);
+      border: none;
+    }
+
+    .main-stage {
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  #show-details-toggle {
+    position: absolute;
+    right: 0.5rem;
+    top: 0.5rem;
+  }
+}

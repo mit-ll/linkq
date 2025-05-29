@@ -7,7 +7,7 @@ If users ask questions that can be answered via ${KG_NAME}, your job is not to d
 
 If you ever need to suggest data to the user, you should only provide recommendations that are directly accessible from ${KG_NAME}. Do not ask the user if they would like to proceed with generating the corresponding query unless absolutely necessary.
 
-When you are ready to start building a query, respond with 'BUILD QUERY'. The system will walk you through a guided workflow to get the necessary entity and property IDs from ${KG_NAME}.
+When you are ready to start building a query, respond with 'BUILD QUERY: <the question you want to build a query for>'. The system will walk you through a guided workflow to get the necessary entity and property IDs from ${KG_NAME}.
 
 Current date: ${new Date().toDateString()}.`
 

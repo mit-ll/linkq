@@ -2,23 +2,23 @@
 // SPDX-License-Identifier: MIT
 
 import OpenAI, { ClientOptions } from "openai"
-import { ChatCompletionMessageParam } from "openai/resources/index.mjs"
+import { ChatCompletionAssistantMessageParam, ChatCompletionMessageParam } from "openai/resources/index.mjs"
 import { LinkQChatMessageType } from "redux/chatHistorySlice"
-import { LinkQStageType } from "types/linkQ"
+import { REDUX_SETTINGS_INITIAL_STATE } from "redux/settingsSlice"
+import { StageType } from "redux/stageSlice"
 
 //this typing is used to omit the "messages" field from OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 type OpenAICreateOptionsType = Omit<OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming, 'messages'>
 
 export type ChatAPIConstructorArgsType = ClientOptions & {
-  addMessagesCallback?:(messages: LinkQChatMessageType[]) => any,
   chatCompletionCreateOptions?: OpenAICreateOptionsType,
   chatId: number,
   systemMessage?: string,
 }
 
-type IntermediateChatMessageType = ChatCompletionMessageParam & {
-  stage: LinkQStageType,
+export type IntermediateChatMessageType = ChatCompletionMessageParam & {
+  stage?: StageType,
 }
 
 /**
@@ -30,15 +30,13 @@ type IntermediateChatMessageType = ChatCompletionMessageParam & {
  * but it doesn't let you send additional system messages, which is annoying
  */
 export class ChatAPI {
-  addMessagesCallback?: (messages: LinkQChatMessageType[]) => any //an optional callback function used to reactively update state
   chatCompletionCreateOptions: OpenAICreateOptionsType
   chatId: number
-  messages: LinkQChatMessageType[] = [] //message history
+  messages: ChatCompletionMessageParam[] = [] //message history
   openAI: OpenAI //the openai instance
 
   constructor({
-    addMessagesCallback,
-    chatCompletionCreateOptions={ model: 'gpt-4-turbo-preview' }, 
+    chatCompletionCreateOptions={ model: REDUX_SETTINGS_INITIAL_STATE.model }, 
     chatId,
     systemMessage,
     ...options //the rest of ClientOptions
@@ -47,15 +45,11 @@ export class ChatAPI {
     this.chatCompletionCreateOptions = chatCompletionCreateOptions
     this.chatId = chatId
     
-    this.addMessagesCallback = addMessagesCallback //save the callback function
-
     if(systemMessage) {
-      this.messages.push(this.transformMessage({ //add the system message to the message history
+      this.messages.push({ //add the system message to the message history
         content: systemMessage,
         role: "system",
-        stage: "Initial System Message",
-      }))
-      this.addMessagesCallback?.(this.messages)
+      })
     }
   }
 
@@ -64,7 +58,12 @@ export class ChatAPI {
     this.messages = []
   }
 
-  private transformMessage(message: IntermediateChatMessageType):LinkQChatMessageType {
+  /**
+   * This function is used to add LinkQ-related context to the message
+   * @param message 
+   * @returns       LinkQChatMessageType
+   */
+  public transformMessage(message: IntermediateChatMessageType):LinkQChatMessageType {
     return ({
       ...message,
       chatId: this.chatId,
@@ -78,13 +77,11 @@ export class ChatAPI {
    * @param messages  the array of messages to send to the LLM
    * @returns         the LLM's response content as a string
    */
-  public async sendMessages(addMessages: IntermediateChatMessageType[]) {
+  public async sendMessages(messages: ChatCompletionMessageParam[]):Promise<SendMessagesReturnType> {
     //OpenAI's LLMs don't actually manage any state.
     //Instead, you need to send it the entire message history
     //if you want to maintain continuity in your conversation.
-    const messages = addMessages.map((m) => this.transformMessage(m))
     this.messages.push(...messages) //push the new messages
-    this.addMessagesCallback?.(messages)
 
     let chatCompletion: OpenAI.Chat.Completions.ChatCompletion
     try {
@@ -108,18 +105,22 @@ export class ChatAPI {
     }
 
     //add the LLM's response to the message history
-    const mostRecentMessage = this.messages.at(-1)
     const responseMessage:LinkQChatMessageType = {
       ...openAiResponseMessage,
       chatId: this.chatId,
       content: openAiResponseMessage.content, //this makes typescript happy
-      name: this.chatCompletionCreateOptions.model,
-      stage: mostRecentMessage?.stage || "Unknown", //TODO this isn't accurate
+      name: this.chatCompletionCreateOptions.model.replace(".",""), //OpenAI doesn't like periods in their names
     }
     this.messages.push(responseMessage)
-    this.addMessagesCallback?.([responseMessage])
 
     //return the LLM's message
     return responseMessage
   }
+}
+
+export type SendMessagesReturnType = ChatCompletionAssistantMessageParam & {
+  content: string;
+  chatId: number;
+  name: string;
+  stage?: StageType;
 }

@@ -5,6 +5,7 @@ import { ApiKeyWarning } from 'components/ApiKeyWarning';
 import { Chat } from 'components/Chat/Chat';
 import { DemoModeModal } from 'components/DemoModeModal';
 import { IDTableContainer } from 'components/IDTable/IDTable';
+import { LinkQStages } from 'components/LinkQStages/LinkQStages';
 import { QueryEditor } from 'components/QueryEditor/QueryEditor'
 import { QueryVisualization } from "components/QueryVisualization/QueryVisualization";
 import { Results } from 'components/Results/Results';
@@ -20,19 +21,25 @@ function App() {
     <MainChatAPIProvider>
       <RunQueryProvider>
         <div id={styles["app"]}>
-          <div id={styles["sidebar"]}>
-            <Chat/>
+          <div id={styles["state-diagram-container"]}>
+            <LinkQStages/>
           </div>
-          
-          <div id={styles["content"]}>
-            <QueryEditor/>
 
-            <IDTableContainer/>
+          <div id={styles["sidebar-content-container"]}>
+            <div id={styles["sidebar"]}>
+              <Chat/>
+            </div>
 
-            <QueryVisualization/>
+            <div id={styles["content"]}>
+              <QueryEditor/>
 
-            <div id={styles["results-content"]}>
-              <Results/>
+              <IDTableContainer/>
+
+              <QueryVisualization/>
+
+              <div id={styles["results-content"]}>
+                <Results/>
+              </div>
             </div>
           </div>
         </div>

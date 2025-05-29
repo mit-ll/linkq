@@ -10,6 +10,7 @@ import { ActionIcon, Table } from '@mantine/core';
 import { IconDownload } from '@tabler/icons-react';
 
 import styles from "./ResultsTable.module.scss"
+import { useEffect } from "react";
 
 export function ResultsTable({data}:{data: SparqlResultsJsonType}) {
   const columnHelper = createColumnHelper<SparqlBindingType>()
@@ -18,7 +19,7 @@ export function ResultsTable({data}:{data: SparqlResultsJsonType}) {
     row => row[c],
     {
       id: c,
-      cell: info => <span>{renderCell(info.getValue())}</span>,
+      cell: info => <span><RenderSPARQLValue cell={info.getValue()}/></span>,
       header: () => <span>{c}</span>,
     }
   ))
@@ -28,6 +29,10 @@ export function ResultsTable({data}:{data: SparqlResultsJsonType}) {
     data: data.results.bindings,
     getCoreRowModel: getCoreRowModel(),
   })
+
+  useEffect(() => {
+    document.getElementById(styles["results-table-container"])?.scrollIntoView({ behavior: 'smooth' })
+  },[data])
 
   return (
     <div id={styles["results-table-container"]}>
@@ -71,7 +76,7 @@ export function ResultsTable({data}:{data: SparqlResultsJsonType}) {
   )
 }
 
-function renderCell(cell:SparqlValueObjectType):React.ReactNode {
+export function RenderSPARQLValue({cell}:{cell:SparqlValueObjectType}):React.ReactNode {
   if(!cell) {
     return <code>undefined</code>
   }

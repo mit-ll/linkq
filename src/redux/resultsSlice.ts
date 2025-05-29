@@ -10,6 +10,7 @@ type ResultsType = {
   error: string | null, 
   data: SparqlResultsJsonType | null, 
   summary: string | null, //null means that the LLM summarization is still loading
+  queryValue: string,
 } | null
 
 const initialState: {

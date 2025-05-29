@@ -6,29 +6,25 @@ import { StreamLanguage } from '@codemirror/language';
 import { sparql } from '@codemirror/legacy-modes/mode/sparql';
 import { Badge, Button, Modal, TextInput } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 import { IconCaretRight, IconZoomCode } from '@tabler/icons-react';
 
 import { ErrorMessage } from 'components/ErrorMessage';
 import { LLMWarning } from 'components/LLMWarning';
+import { QUERY_EDITOR_DOM_ID } from 'components/QueryEditor/QueryEditor';
 import { Settings } from 'components/Settings/Settings';
 
 import { useMainChatAPI } from 'hooks/useMainChatAPI';
 import { useRunQuery } from 'hooks/useRunQuery';
 
-import { addMessageToSimpleChatHistory } from 'redux/chatHistorySlice';
 import { setQueryValue } from 'redux/queryValueSlice';
 import { useAppDispatch, useAppSelector } from 'redux/store';
 
-import { handleUserChat } from 'utils/handleUserChat';
 import { tryParsingOutQuery } from 'utils/tryParsingOutQuery';
 
 import styles from "./Chat.module.scss"
 
 
 export function Chat() {
-  const dispatch = useAppDispatch()
-
   const fullChatHistory = useAppSelector(state => state.chatHistory.fullChatHistory)
   const simpleChatHistory = useAppSelector(state => state.chatHistory.simpleChatHistory)
 
@@ -48,34 +44,11 @@ export function Chat() {
   // const [inputText, setInputText] = useState<string>("Who won the 2023 Formula One Championship?"); // prefill the chat
   const [inputText, setInputText] = useState<string>("");
 
-  const chatAPI = useMainChatAPI()
-
-  const {error, isPending, mutate:submitChat, reset} = useMutation({
-    mutationKey: ['submit-chat'],
-    /**
-     * This function handles what happens when the user submits a chat message
-     * It sends the message to the LLM and determines whether to go down the query-building workflow
-     * @param text  the user's message
-     */
-    mutationFn: async (text:string) => {
-      //add the user's message to the simple chat history
-      dispatch(addMessageToSimpleChatHistory({
-        chatId: chatAPI.chatId,
-        content: text, 
-        name: "user",
-        role: "user",
-        stage: "Question Refinement",
-      }))
-
-      const llmResponse = await handleUserChat(text, chatAPI)
-
-      //add the LLM's final response to the simple chat
-      dispatch(addMessageToSimpleChatHistory(llmResponse))
-    },
-    onError(err) {
-      console.error(err)
+  const {
+    useMutationOutput: {
+      error, mutate:submitChat, reset
     }
-  })
+  } = useMainChatAPI()
 
   return (
     <div id={styles["chat-container"]}>
@@ -105,7 +78,7 @@ export function Chat() {
         </Modal>
       )}
       {/* {isPending && <p className={styles.loading}>Loading...</p>} */}
-      <LinkQStatus chatIsPending={isPending}/>
+      <LinkQDetailedBadgeStatus/>
 
       <form
         onSubmit={e => {
@@ -192,10 +165,14 @@ function RenderSparqlQuery({
       />
       <div className={styles["copy-query-buttons"]}>
         <div>
-          <Button onClick={() => dispatch(setQueryValue(query))} variant="outline" color="white">Copy query over to examine <IconZoomCode/></Button>
+          <Button onClick={() => {
+            dispatch(setQueryValue(query))
+            document.getElementById(QUERY_EDITOR_DOM_ID)?.scrollIntoView({ behavior: 'smooth' })
+          }} variant="outline" color="white">Copy query over to examine <IconZoomCode/></Button>
           <br/>
           <Button onClick={() => {
             dispatch(setQueryValue(query))
+            document.getElementById(QUERY_EDITOR_DOM_ID)?.scrollIntoView({ behavior: 'smooth' })
             runQuery(query)
           }}>Copy query over and run <IconCaretRight/></Button>
         </div>
@@ -213,20 +190,21 @@ function RenderSparqlQuery({
 
 
 
-function LinkQStatus({
-  chatIsPending,
-}:{
-  chatIsPending: boolean,
-}) {
+function LinkQDetailedBadgeStatus() {
   const fullChatHistory = useAppSelector(state => state.chatHistory.fullChatHistory)
   const { runQueryIsPending, summarizeResultsIsPending } = useRunQuery()
+  const {
+    useMutationOutput: {
+      isPending: chatIsPending,
+    }
+  } = useMainChatAPI()
 
   let color = "blue"
   let displayMessage = "Waiting for User Input"
   const stage = fullChatHistory.at(-1)?.stage
   if(chatIsPending) {
     color = "yellow"
-    displayMessage = stage || ""
+    displayMessage = stage?.description || stage?.subStage || ""
   }
   else if(runQueryIsPending) {
     color = "yellow"
@@ -234,10 +212,14 @@ function LinkQStatus({
   }
   else if(summarizeResultsIsPending) {
     color = "yellow"
-    displayMessage = "Query Summarization"
+    displayMessage = "Summarizing Results"
+  }
+
+  if(displayMessage.length > 60) {
+    displayMessage = displayMessage.slice(0,60) + "..."
   }
 
   return (
-    <p className={styles.loading}><Badge color={color}>{displayMessage}</Badge></p>
+    <div className={styles["chat-status-badge"]}><Badge color={color}>{displayMessage}</Badge></div>
   )
 }

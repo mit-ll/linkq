@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: MIT
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
-import { LinkQStageType } from 'types/linkQ'
 
 import { DEMO_FULL_HISTORY, DEMO_SIMPLE_HISTORY, IS_DEMO_MODE } from 'utils/demoData'
+import { StageType } from './stageSlice'
 
 export type LinkQChatMessageType = ChatCompletionMessageParam & {
-  content:string
+  content: string
   chatId: number
   name: string
-  stage: LinkQStageType,
+  stage?: StageType,
 }
 
 const initialState: {
