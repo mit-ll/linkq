@@ -10,6 +10,8 @@ Demo Site: https://mit-ll.github.io/linkq
 
 Created with React + TypeScript + Vite
 
+This implementation is set up out of the box to query Wikidata with SPARQL. You can use an OpenAI LLM, or any LLM hosted using an OpenAI-compatible API server (for example Llama3 hosted by [vLLM](https://github.com/vllm-project/vllm))
+
 ## Setup
 
 1. Clone this repo
@@ -28,7 +30,7 @@ npm run dev
 
 
 ## Change KG Data Source
-`src/utils/knowledgeBase` contains most of the code that you would have to change to switch to a different KG data source. There are also some types in `src/types/idTable.ts` and `src/types/resultsTable.ts` that would need to be changed.
+`src/utils/knowledgeBase` contains most of the code that you would have to change to switch to a different KG data source. There are also some types in `src/types/idTable.ts` and `src/types/sparql.ts` that would need to be changed if you want to use a different datasource or query language.
 
 ## Citation
 ```

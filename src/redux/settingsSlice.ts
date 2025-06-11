@@ -9,8 +9,8 @@ export const REDUX_SETTINGS_INITIAL_STATE: {
   showStateDiagramStatus: boolean,
 } = {
   apiKey: import.meta.env.VITE_OPENAI_API_KEY?.trim() || "",
-  baseURL: import.meta.env.VITE_BASE_URL?.trim() || "https://api.openai.com/v1/",
-  model: import.meta.env.VITE_MODEL?.trim() || "gpt-4-turbo-preview",
+  baseURL: import.meta.env.VITE_BASE_URL?.trim() || localStorage.getItem("baseURL") || "https://api.openai.com/v1/",
+  model: import.meta.env.VITE_MODEL?.trim() || localStorage.getItem("model") || "gpt-4o",
   showStateDiagramStatus: false,
 }
 
@@ -23,9 +23,11 @@ const settingsSlice = createSlice({
     },
     setBaseURL: (state, action: PayloadAction<string>) => {
       state.baseURL = action.payload
+      localStorage.setItem("baseURL",action.payload)
     },
     setModel: (state, action: PayloadAction<string>) => {
       state.model = action.payload
+      localStorage.setItem("model",action.payload)
     },
     toggleShowStateDiagramStatus: (state) => {
       state.showStateDiagramStatus = !state.showStateDiagramStatus
