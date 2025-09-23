@@ -51,9 +51,13 @@ export function Settings() {
         <Select
           label="Chat History View"
           placeholder="Set chat history complexity"
-          data={CHAT_HISTORY_DISPLAY_OPTIONS}
+          data={Object.entries(CHAT_HISTORY_DISPLAY_OPTIONS).map(([value,label]) => ({
+            value,label
+          }))}
           value={chatHistoryDisplay}
-          onChange={(value) => value && dispatch(setChatHistoryDisplay(value as ChatHistoryDisplayType))}
+          onChange={(value) => value && dispatch(setChatHistoryDisplay(
+            value as ChatHistoryDisplayType
+          ))}
         />
         <br/>
         <Checkbox

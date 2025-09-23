@@ -16,8 +16,12 @@ export type LinkQChatMessageType = ChatCompletionMessageParam & {
 //"simple" is a bare-bones for novice users
 //"condensed" shows more info for intermediate users 
 //"full" shows all the messages for expert users
-export const CHAT_HISTORY_DISPLAY_OPTIONS = ["simple","condensed","full"] as const
-export type ChatHistoryDisplayType = typeof CHAT_HISTORY_DISPLAY_OPTIONS[number]
+export const CHAT_HISTORY_DISPLAY_OPTIONS = {
+  "simple": "Simple View",
+  "condensed": "Condensed View",
+  "full": "Full Chat History",
+} as const
+export type ChatHistoryDisplayType = keyof typeof CHAT_HISTORY_DISPLAY_OPTIONS
 
 const initialState: {
   chatIdCounter: number,
