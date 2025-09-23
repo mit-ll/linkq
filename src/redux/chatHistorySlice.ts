@@ -13,20 +13,24 @@ export type LinkQChatMessageType = ChatCompletionMessageParam & {
   stage?: StageType,
 }
 
+//"simple" is a bare-bones for novice users
+//"condensed" shows more info for intermediate users 
+//"full" shows all the messages for expert users
+export const CHAT_HISTORY_DISPLAY_OPTIONS = ["simple","condensed","full"] as const
+export type ChatHistoryDisplayType = typeof CHAT_HISTORY_DISPLAY_OPTIONS[number]
+
 const initialState: {
   chatIdCounter: number,
   fullChatHistory: LinkQChatMessageType[],
   simpleChatHistory: LinkQChatMessageType[],
-  showFullChatHistory: boolean,
+  chatHistoryDisplay: ChatHistoryDisplayType,
 } = {
   chatIdCounter: 1,
 
   //state for the full chat history, including system messages and the LLM interfacing with the KG API
   fullChatHistory: IS_DEMO_MODE ? DEMO_FULL_HISTORY : [],
 
-  //this option toggles showing the full chat history for an ML expert user
-  //vs hiding the system messages for a non-expert user
-  showFullChatHistory: true,
+  chatHistoryDisplay: "condensed",
 
   //state for the filtered chat history (ie no behind-the-scenes system messages)
   simpleChatHistory: IS_DEMO_MODE ? DEMO_SIMPLE_HISTORY : [],
@@ -45,8 +49,8 @@ const chatHistorySlice = createSlice({
     incrementChatIdCounter: (state) => {
       state.chatIdCounter++
     },
-    toggleShowFullChatHistory: state => {
-      state.showFullChatHistory = !state.showFullChatHistory
+    setChatHistoryDisplay: (state, action: PayloadAction<ChatHistoryDisplayType>) => {
+      state.chatHistoryDisplay = action.payload
     }
   }
 })
@@ -57,6 +61,6 @@ export const {
     addMessagesToFullChatHistory,
     addMessageToSimpleChatHistory,
     incrementChatIdCounter,
-    toggleShowFullChatHistory,
+    setChatHistoryDisplay,
   }
 } = chatHistorySlice

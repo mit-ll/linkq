@@ -6,7 +6,7 @@ import { StreamLanguage } from '@codemirror/language';
 import { sparql } from '@codemirror/legacy-modes/mode/sparql';
 import { Badge, Button, Modal, TextInput } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
-import { IconCaretRight, IconZoomCode } from '@tabler/icons-react';
+import { IconCaretDown, IconCaretRight, IconCaretUp, IconZoomCode } from '@tabler/icons-react';
 
 import { ErrorMessage } from 'components/ErrorMessage';
 import { LLMWarning } from 'components/LLMWarning';
@@ -22,16 +22,17 @@ import { useAppDispatch, useAppSelector } from 'redux/store';
 import { tryParsingOutQuery } from 'utils/tryParsingOutQuery';
 
 import styles from "./Chat.module.scss"
+import { LinkQChatMessageType } from 'redux/chatHistorySlice';
 
 
 export function Chat() {
   const fullChatHistory = useAppSelector(state => state.chatHistory.fullChatHistory)
   const simpleChatHistory = useAppSelector(state => state.chatHistory.simpleChatHistory)
 
-  const showFullChatHistory = useAppSelector(state => state.chatHistory.showFullChatHistory)
+  const chatHistoryDisplay = useAppSelector(state => state.chatHistory.chatHistoryDisplay)
 
-  //based on showFullChatHistory, decide which chat history to display to the user
-  const chatHistory = showFullChatHistory ? fullChatHistory : simpleChatHistory
+  //based on chatHistoryDisplay, decide which chat history to display to the user
+  const chatHistory = chatHistoryDisplay==="full" ? fullChatHistory : simpleChatHistory
 
   const chatScrollBottomRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -55,20 +56,16 @@ export function Chat() {
       <Settings/>
 
       <div id={styles["chat-scroll-container"]}>
-        {chatHistory.map((c, i) => {
-          return (
-            <div key={i} className={`${styles["chat-row"]} ${styles[c.role]}`}>
-              <div className={styles["chat-justify"]}>
-                {showFullChatHistory && <p>{c.name}, chat #{c.chatId}</p>}
-                {
-                  c.role === "assistant" 
-                  ? <RenderLLMResponse text={c.content} setInputText={setInputText}/>
-                  : <pre className={styles.chat}>{c.content}</pre> 
-                }
-              </div>
-            </div>
-          )
-        })}
+        <br/>
+        {chatHistoryDisplay==="condensed" ? (
+          condenseChat(fullChatHistory).map((c,i) => (
+            <RenderCondensedMessage key={i} condensedChat={c} setInputText={setInputText}/>
+          ))
+        ) : (
+          chatHistory.map((c, i) => (
+            <RenderChatMessage key={i} chat={c} setInputText={setInputText}/>
+          ))
+        )}
         <div ref={chatScrollBottomRef}/>
       </div>
 
@@ -95,6 +92,68 @@ export function Chat() {
           value={inputText}
         />
       </form>
+    </div>
+  )
+}
+
+function RenderCondensedMessage({
+  condensedChat,
+  setInputText,
+}:{
+  condensedChat:CondensedChatType,
+  setInputText: React.Dispatch<React.SetStateAction<string>>,
+}) {
+  const [showDetails, setShowDetails] = useState<boolean>(false)
+
+  const firstChatMessage = condensedChat[0]
+  return (
+    <div className={styles["condensed-chat"]}>
+      {firstChatMessage.stage && (
+        <>
+          <p><b>{firstChatMessage.stage.mainStage}</b></p>
+          <p>{firstChatMessage.stage.subStage}</p>
+          {firstChatMessage.stage.description && <p>{firstChatMessage.stage.description}</p>}
+        </>
+      )}
+      <div>
+        <a aria-label="Show Details" onClick={() => setShowDetails(!showDetails)}>
+        {showDetails ? "Hide Details" : "Show Full Details"}
+      </a>
+      </div>
+      
+      {showDetails && (
+        <div>
+          <br/>
+          <div className={styles["show-all-content-container"]}>
+            {condensedChat.map((c, i) => (
+              <RenderChatMessage key={i} chat={c} setInputText={setInputText}/>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function RenderChatMessage({
+  chat,
+  setInputText,
+}:{
+  chat:LinkQChatMessageType,
+  setInputText: React.Dispatch<React.SetStateAction<string>>,
+}) {
+  const chatHistoryDisplay = useAppSelector(state => state.chatHistory.chatHistoryDisplay)
+
+  return (
+    <div className={`${styles["chat-row"]} ${styles[chat.role]}`}>
+      <div className={styles["chat-justify"]}>
+        {chatHistoryDisplay==="full"||chatHistoryDisplay==="condensed" && <p>{chat.name}, chat #{chat.chatId}</p>}
+        {
+          chat.role === "assistant" 
+          ? <RenderLLMResponse text={chat.content} setInputText={setInputText}/>
+          : <pre className={styles.chat}>{chat.content}</pre> 
+        }
+      </div>
     </div>
   )
 }
@@ -220,6 +279,42 @@ function LinkQDetailedBadgeStatus() {
   }
 
   return (
-    <div className={styles["chat-status-badge"]}><Badge color={color}>{displayMessage}</Badge></div>
+    <div className={styles["chat-status-badge"]}>
+      <Badge color={color}>{displayMessage}</Badge>
+    </div>
   )
+}
+
+type CondensedChatType = LinkQChatMessageType[]
+
+function condenseChat(fullChatHistory: LinkQChatMessageType[]):CondensedChatType[] {
+  const condensedChat:CondensedChatType[] = [];
+
+  for(let i=0; i<fullChatHistory.length; ++i) {
+    const currentChatMessage = fullChatHistory[i]
+    const nextChatMessage = fullChatHistory.at(i + 1)
+    if(i === 0) {
+      continue;
+    }
+    else if(nextChatMessage && messagesHaveMatchingStages(currentChatMessage,nextChatMessage)) {
+      condensedChat.push([
+        currentChatMessage,
+        nextChatMessage
+      ]);
+      ++i;
+    }
+    else if(currentChatMessage.stage) {
+      condensedChat.push([ currentChatMessage ])
+    }
+  }
+
+  return condensedChat
+}
+
+function messagesHaveMatchingStages(
+  chatMessage1: LinkQChatMessageType,
+  chatMessage2: LinkQChatMessageType,
+) {
+  return chatMessage1.stage?.mainStage===chatMessage2.stage?.mainStage
+  || chatMessage1.stage?.subStage===chatMessage2.stage?.subStage
 }

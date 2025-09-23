@@ -10,7 +10,7 @@ import { ErrorMessage } from "components/ErrorMessage"
 import { useMainChatAPI } from "hooks/useMainChatAPI"
 
 import { setApiKey, setBaseURL, setModel, toggleShowStateDiagramStatus } from "redux/settingsSlice"
-import { toggleShowFullChatHistory } from "redux/chatHistorySlice"
+import { CHAT_HISTORY_DISPLAY_OPTIONS, ChatHistoryDisplayType, setChatHistoryDisplay } from "redux/chatHistorySlice"
 import { useAppDispatch, useAppSelector } from "redux/store"
 
 import styles from "./Settings.module.scss"
@@ -22,7 +22,7 @@ export function Settings() {
   const baseURL = useAppSelector(state => state.settings.baseURL)
   const model = useAppSelector(state => state.settings.model)
   const showStateDiagramStatus = useAppSelector(state => state.settings.showStateDiagramStatus)
-  const showFullChatHistory = useAppSelector(state => state.chatHistory.showFullChatHistory)
+  const chatHistoryDisplay = useAppSelector(state => state.chatHistory.chatHistoryDisplay)
 
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false)
   const closeSettingsModal = () => setShowSettingsModal(false)
@@ -48,10 +48,12 @@ export function Settings() {
   return (
     <>
       <Modal opened={showSettingsModal} onClose={closeSettingsModal} title="Settings">
-        <Checkbox
-          checked={showFullChatHistory}
-          onChange={() => dispatch(toggleShowFullChatHistory())}
-          label="Show full chat history"
+        <Select
+          label="Chat History View"
+          placeholder="Set chat history complexity"
+          data={CHAT_HISTORY_DISPLAY_OPTIONS}
+          value={chatHistoryDisplay}
+          onChange={(value) => value && dispatch(setChatHistoryDisplay(value as ChatHistoryDisplayType))}
         />
         <br/>
         <Checkbox

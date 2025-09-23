@@ -7,10 +7,12 @@
   height: calc(100%);
 
   #chat-scroll-container { 
-    height: calc(100% - 35px - 2.5rem);
+    height: calc(100% - 35px);
     overflow-y: auto;
     margin-bottom: 3px;
     padding: 0.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1.5rem;
     
     pre {
       white-space: pre-wrap;
@@ -59,6 +61,35 @@
         text-align: right;
       }
     }
+
+    .condensed-chat {
+      background-color: #333;
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: 1px solid #555;
+
+      margin-bottom: 1.5rem;
+
+      color: white;
+      position: relative;
+
+      > p:first-child {
+        margin-top: 0;
+      }
+
+      a {
+        font-size: 0.8rem;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+
+      .show-all-content-container {
+        padding: 0.5rem;
+        padding-bottom: 0;
+        border-radius: 5px;
+        background-color: #222;
+      }
+    }
   }
     
   .chat-status-badge {
@@ -69,8 +100,10 @@
     left: 0;
     right: 0;
     padding: 0.5rem;
-    background: #22222280;
-    background: linear-gradient(0deg, rgba(34,34,34,0.75) 0%, rgba(34,34,34,0) 100%);
+
+    :global(.mantine-Badge-root) {
+      box-shadow: 0 0 3px 3px rgba(0,0,0,0.3);
+    }
   }
 
   
