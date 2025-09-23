@@ -285,32 +285,50 @@ function LinkQDetailedBadgeStatus() {
   )
 }
 
+//the condensed chat type is just one or two grouped chat messages
 type CondensedChatType = LinkQChatMessageType[]
 
+/**
+ * Converts the full chat history into the condensed/grouped view for better traceability.
+ * If two neighboring chat messages have the same stage details, they are condensed/grouped together
+ * @param fullChatHistory 
+ * @returns               array of condensed chat types
+ */
 function condenseChat(fullChatHistory: LinkQChatMessageType[]):CondensedChatType[] {
   const condensedChat:CondensedChatType[] = [];
 
+  //loop through the full chat history
   for(let i=0; i<fullChatHistory.length; ++i) {
     const currentChatMessage = fullChatHistory[i]
     const nextChatMessage = fullChatHistory.at(i + 1)
-    if(i === 0) {
+    if(i === 0) { //HARDCODED ignore the initial system prompt
       continue;
     }
+    //else if the current and next chat message have the same stage details
     else if(nextChatMessage && messagesHaveMatchingStages(currentChatMessage,nextChatMessage)) {
+      //condense these two messages together
       condensedChat.push([
         currentChatMessage,
         nextChatMessage
       ]);
-      ++i;
+      ++i; //skip over this next message in the subsequent iteration
     }
+    //else this chat message can stand alone by itself
     else if(currentChatMessage.stage) {
       condensedChat.push([ currentChatMessage ])
     }
+    //else the chat message doesn't have stage info
   }
 
   return condensedChat
 }
 
+/**
+ * Checks whether two messages have the same main and sub stage
+ * @param chatMessage1 
+ * @param chatMessage2 
+ * @returns             true if the main and sub stages match (including in the stage is undefined), else false
+ */
 function messagesHaveMatchingStages(
   chatMessage1: LinkQChatMessageType,
   chatMessage2: LinkQChatMessageType,
