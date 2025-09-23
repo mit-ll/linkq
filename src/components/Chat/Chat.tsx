@@ -6,7 +6,7 @@ import { StreamLanguage } from '@codemirror/language';
 import { sparql } from '@codemirror/legacy-modes/mode/sparql';
 import { Badge, Button, Modal, TextInput } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
-import { IconCaretDown, IconCaretRight, IconCaretUp, IconZoomCode } from '@tabler/icons-react';
+import { IconCaretRight, IconZoomCode } from '@tabler/icons-react';
 
 import { ErrorMessage } from 'components/ErrorMessage';
 import { LLMWarning } from 'components/LLMWarning';
