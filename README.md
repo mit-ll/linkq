@@ -1,58 +1,14 @@
 # LinkQ: An LLM-Assisted Visual Interface for Knowledge Graph Question-Answering
 
-IEEE VIS 2024 Paper: https://ieeexplore.ieee.org/document/10771088
+Our Mintaka evaluation results of LinkQ with GPT-4 and Llama3 are in [`src/utils/evaluations/mintaka-wikidata/data`](src/utils/evaluations/mintaka-wikidata/data/)
 
-Demo Site: https://mit-ll.github.io/linkq
-
-[![Screenshot](/public/screenshot.png)](https://mit-ll.github.io/linkq)
-
-
-
-Created with React + TypeScript + Vite
-
-This implementation is set up out of the box to query Wikidata with SPARQL. You can use an OpenAI LLM, or any LLM hosted using an OpenAI-compatible API server (for example Llama3 hosted by [vLLM](https://github.com/vllm-project/vllm))
-
-## Setup
-
-1. Clone this repo
-2. Install the necessary node packages
-```
-npm i
-```
-3. Get an API key from OpenAI https://openai.com/blog/openai-api
-4. Duplicate `.env` and rename the new file to `.env.local`
-5. Paste your API key into `.env.local`. DO NOT paste your API key into `.env`. It will be committed to the repo. `.env.local` will NOT be committed. You can read more about environment variables here https://vitejs.dev/guide/env-and-mode
-6. Run the development server
-```
-npm run dev
-```
-7. Open the webapp in your browser at http://localhost:5173/
-
-
-## Change KG Data Source
-`src/utils/knowledgeBase` contains most of the code that you would have to change to switch to a different KG data source. There are also some types in `src/types/idTable.ts` and `src/types/sparql.ts` that would need to be changed if you want to use a different datasource or query language.
-
-## Citation
-```
-@INPROCEEDINGS{10771088,
-  author={Li, Harry and Appleby, Gabriel and Suh, Ashley},
-  booktitle={2024 IEEE Visualization and Visual Analytics (VIS)}, 
-  title={LinkQ: An LLM-Assisted Visual Interface for Knowledge Graph Question-Answering}, 
-  year={2024},
-  volume={},
-  number={},
-  pages={116-120},
-  keywords={Analytical models;Protocols;Limiting;Data analysis;Visual analytics;Large language models;Data visualization;Knowledge graphs;Writing;Data models;Knowledge graphs;large language models;query construction;question-answering;natural language interfaces},
-  doi={10.1109/VIS55277.2024.00031}
-}
-```
-
+Our plotting script and results are in [`src/utils/evaluations/mintaka-wikidata/plot`](src/utils/evaluations/mintaka-wikidata/plot/)
 
 ## Disclaimer
 
 DISTRIBUTION STATEMENT A. Approved for public release. Distribution is unlimited.
 
-© 2024 MASSACHUSETTS INSTITUTE OF TECHNOLOGY
+© 2026 MASSACHUSETTS INSTITUTE OF TECHNOLOGY
 
 - Subject to FAR 52.227-11 – Patent Rights – Ownership by the Contractor (May 2014)
 - SPDX-License-Identifier: MIT
