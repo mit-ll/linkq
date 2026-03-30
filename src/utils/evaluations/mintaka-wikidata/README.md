@@ -12,3 +12,9 @@ headers: {
 ```
 3. Run `./mintakaEvaluation.ts`, which runs the evaluation of LinkQ and the plain LLM on the same question bank.
 4. Run `./calculateMintakaEvaluationMetrics.ts` to calculate the metrics.
+
+## Data
+Our analyzed data sits in [`data/`](data/)
+
+## Plots
+Our code to generate plots sits in [`plot/`](data/)

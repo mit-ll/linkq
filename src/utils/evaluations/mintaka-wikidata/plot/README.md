@@ -1,3 +1,18 @@
+# Plots
+
+1. Create a new conda environment, adivate it, and download the requirements
+```
+conda create --name linkq python=3.12
+conda activate linkq
+pip install -r requirements.txt
+```
+2. Run the script to generate the plots
+```
+python plots.py
+```
+
+## Old plotting script
+
 1. Download the evaluation results from TODO
 2. Place the CSVs from the `../data` folder
 3. Rename the CSVs, if applicable:
