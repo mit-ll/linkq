@@ -17,13 +17,34 @@
     display: flex;
     overflow: hidden;
     
-    #sidebar {
-      width:500px;
-      position: relative;
+    #sidebar-resizer {
+      position: absolute;
+      right: -4px;
+      top: 0;
+      width: 8px;
+      height: 100%;
+      cursor: ew-resize;
+      background: transparent;
+      transition: 0.1s;
+
+      &:hover {
+        background: var(--mantine-primary-color-filled);
+      }
+
+      #sidebar-icon {
+        position: absolute;
+        top: 50%;
+        transform: translate(-80%,-50%);
+        right: 0px;
+        width: 3px;
+        height: 30px;
+        border-radius: 2px;
+        background: gray;
+      }
     }
     
     #content {
-      width: calc(100% - 500px);
+      flex: 1;
       overflow-y: auto;
       background-color: #333;
     
@@ -34,5 +55,3 @@
     }
   }  
 }
-
-

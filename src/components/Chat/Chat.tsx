@@ -4,7 +4,7 @@
 import CodeMirror from '@uiw/react-codemirror';
 import { StreamLanguage } from '@codemirror/language';
 import { sparql } from '@codemirror/legacy-modes/mode/sparql';
-import { Badge, Button, Modal, TextInput } from "@mantine/core";
+import { Badge, Button, Modal, Textarea } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 import { IconCaretRight, IconZoomCode } from '@tabler/icons-react';
 
@@ -69,14 +69,6 @@ export function Chat() {
         <div ref={chatScrollBottomRef}/>
       </div>
 
-      {error && (
-        <Modal opened={true} onClose={reset} title="LLM Error">
-          <ErrorMessage>{error.message}</ErrorMessage>
-        </Modal>
-      )}
-      {/* {isPending && <p className={styles.loading}>Loading...</p>} */}
-      <LinkQDetailedBadgeStatus/>
-
       <form
         onSubmit={e => {
           e.preventDefault()
@@ -84,14 +76,22 @@ export function Chat() {
           setInputText("")
         }}
       >
-        <TextInput
+        <LinkQDetailedBadgeStatus/>
+        <Textarea
           id={styles.input}
           onChange={(event) => setInputText(event.currentTarget.value)}
           placeholder="Chat..."
+          resize="vertical"
           size={"md"}
           value={inputText}
         />
       </form>
+
+      {error && (
+        <Modal opened={true} onClose={reset} title="LLM Error">
+          <ErrorMessage>{error.message}</ErrorMessage>
+        </Modal>
+      )}
     </div>
   )
 }

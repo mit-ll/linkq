@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 
 import { useQuery } from "@tanstack/react-query"
 
@@ -9,7 +9,7 @@ import { ErrorMessage } from "components/ErrorMessage"
 
 import { useMainChatAPI } from "hooks/useMainChatAPI"
 
-import { setApiKey, setBaseURL, setModel, toggleShowStateDiagramStatus } from "redux/settingsSlice"
+import { setApiKey, setBaseURL, setModel, togglePersistAPIKey, toggleShowSettings, toggleShowStateDiagramStatus } from "redux/settingsSlice"
 import { CHAT_HISTORY_DISPLAY_OPTIONS, ChatHistoryDisplayType, setChatHistoryDisplay } from "redux/chatHistorySlice"
 import { useAppDispatch, useAppSelector } from "redux/store"
 
@@ -18,15 +18,13 @@ import styles from "./Settings.module.scss"
 export function Settings() {
   const dispatch = useAppDispatch()
 
-  const apiKey = useAppSelector(state => state.settings.apiKey)
-  const baseURL = useAppSelector(state => state.settings.baseURL)
-  const model = useAppSelector(state => state.settings.model)
-  const showStateDiagramStatus = useAppSelector(state => state.settings.showStateDiagramStatus)
+  const {
+    apiKey, baseURL, model,
+    persistAPIKey,
+    showSettings, showStateDiagramStatus
+  } = useAppSelector(state => state.settings)
   const chatHistoryDisplay = useAppSelector(state => state.chatHistory.chatHistoryDisplay)
 
-  const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false)
-  const closeSettingsModal = () => setShowSettingsModal(false)
-  
   const { chatAPI } = useMainChatAPI()
 
   const {data, error, isLoading} = useQuery({
@@ -45,9 +43,16 @@ export function Settings() {
     }
   }, [data])
 
+  //if the user loads LinkQ pointing to OpenAI but without an API key configured, immediately show the settings
+  useEffect(() => {
+    if(showSettings===false && apiKey==="" && baseURL==="https://api.openai.com/v1/") {
+      dispatch(toggleShowSettings())
+    }
+  }, [])
+
   return (
     <>
-      <Modal opened={showSettingsModal} onClose={closeSettingsModal} title="Settings">
+      <Modal opened={showSettings} onClose={() => dispatch(toggleShowSettings())} title="Settings">
         <Select
           label="Chat History View"
           placeholder="Set chat history complexity"
@@ -84,6 +89,12 @@ export function Settings() {
           value={apiKey}
           onChange={(event) => dispatch(setApiKey(event.currentTarget.value))}
         />
+        <Checkbox
+          checked={persistAPIKey}
+          onChange={() => dispatch(togglePersistAPIKey())}
+          label="Persist API Key in browser local storage"
+          style={{marginTop:"0.3rem"}}
+        />
         <br/>
         {isLoading ? <p>Loading models...</p> : (
           <>
@@ -100,7 +111,7 @@ export function Settings() {
         
       </Modal>
 
-      <ActionIcon className={styles["settings-button"]} size="sm" variant="filled" aria-label="Show Settings" onClick={() => setShowSettingsModal(true)} style={{position: "absolute"}}>
+      <ActionIcon className={styles["settings-button"]} size="sm" variant="filled" aria-label="Show Settings" onClick={() => dispatch(toggleShowSettings())} style={{position: "absolute"}}>
         <IconSettings/>
       </ActionIcon>
     </>

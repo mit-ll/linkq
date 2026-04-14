@@ -3,6 +3,7 @@
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import '@mantine/core/styles.css';
+import 'react-resizable/css/styles.css';
 import './index.css'
 
 import { QueryClient, QueryClientProvider, } from '@tanstack/react-query'

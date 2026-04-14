@@ -1,7 +1,6 @@
 // Copyright (c) 2024 Massachusetts Institute of Technology
 // SPDX-License-Identifier: MIT
 
-import { ApiKeyWarning } from 'components/ApiKeyWarning';
 import { Chat } from 'components/Chat/Chat';
 import { DemoModeModal } from 'components/DemoModeModal';
 import { IDTableContainer } from 'components/IDTable/IDTable';
@@ -12,11 +11,15 @@ import { Results } from 'components/Results/Results';
 
 import { MainChatAPIProvider } from 'hooks/useMainChatAPI';
 import { RunQueryProvider } from 'hooks/useRunQuery';
+import { useState } from 'react';
+import { ResizableBox } from "react-resizable";
 
 import styles from 'App.module.scss'
 
 
 function App() {
+  const [width, setWidth] = useState(500);
+
   return (
     <MainChatAPIProvider>
       <RunQueryProvider>
@@ -26,9 +29,24 @@ function App() {
           </div>
 
           <div id={styles["sidebar-content-container"]}>
-            <div id={styles["sidebar"]}>
+            <ResizableBox
+              width={width}
+              height={Infinity}
+              axis="x"
+              minConstraints={[200, Infinity]}
+              maxConstraints={[1000, Infinity]}
+              resizeHandles={["e"]}
+              onResizeStop={(_, data) => {
+                setWidth(data.size.width);
+              }}
+              handle={
+                <span id={styles["sidebar-resizer"]}>
+                  <span id={styles["sidebar-icon"]}/>
+                </span>
+              }
+            >
               <Chat/>
-            </div>
+            </ResizableBox>
 
             <div id={styles["content"]}>
               <QueryEditor/>
@@ -45,7 +63,6 @@ function App() {
         </div>
 
         <DemoModeModal/>
-        <ApiKeyWarning/>
       </RunQueryProvider>
     </MainChatAPIProvider>
   )

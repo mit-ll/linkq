@@ -5,14 +5,16 @@
   background-color: #222;
   position: relative;
   height: calc(100%);
+  display: flex;
+  flex-direction: column;
 
   #chat-scroll-container { 
-    height: calc(100% - 35px);
     overflow-y: auto;
     margin-bottom: 3px;
     padding: 0.5rem;
     padding-top: 1rem;
     padding-bottom: 1.5rem;
+    flex: 1;
     
     pre {
       white-space: pre-wrap;
@@ -91,26 +93,23 @@
       }
     }
   }
-    
-  .chat-status-badge {
-    margin: 0;
-    color: #fff;
-    position: absolute;
-    bottom: 2.5rem;
-    left: 0;
-    right: 0;
-    padding: 0.5rem;
-
-    :global(.mantine-Badge-root) {
-      box-shadow: 0 0 3px 3px rgba(0,0,0,0.3);
-    }
-  }
-
   
   form {
     width: 100%;
-    position: absolute;
-    bottom: 0;
-    left: 0;
+    position: relative;
+
+    .chat-status-badge {
+      margin: 0;
+      color: #fff;
+      position: absolute;
+      bottom: calc(100% - 0.3rem);
+      left: 0;
+      right: 0;
+      padding: 0.5rem;
+
+      :global(.mantine-Badge-root) {
+        box-shadow: 0 0 3px 3px rgba(0,0,0,0.3);
+      }
+    }
   }
 }
