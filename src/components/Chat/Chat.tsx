@@ -147,7 +147,7 @@ function RenderChatMessage({
   return (
     <div className={`${styles["chat-row"]} ${styles[chat.role]}`}>
       <div className={styles["chat-justify"]}>
-        {chatHistoryDisplay==="full"||chatHistoryDisplay==="condensed" && <p>{chat.name}, chat #{chat.chatId}</p>}
+        {(chatHistoryDisplay==="full"||chatHistoryDisplay==="condensed") && <p>{chat.name}, chat #{chat.chatId}</p>}
         {
           chat.role === "assistant" 
           ? <RenderLLMResponse text={chat.content} setInputText={setInputText}/>
