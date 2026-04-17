@@ -80,6 +80,14 @@ export function Chat() {
         <Textarea
           id={styles.input}
           onChange={(event) => setInputText(event.currentTarget.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+              event.preventDefault(); // Prevents default new line behavior
+              submitChat(inputText)
+              setInputText("")
+            }
+            // Shift+Enter will naturally add a new line (default behavior)
+          }}
           placeholder="Chat..."
           resize="vertical"
           size={"md"}
